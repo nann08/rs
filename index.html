@@ -84,6 +84,10 @@
             --console-main: #E83942;
             --console-dark: #b91c1c;
             --bg-color: #7f1d1d;
+
+            /* Dynamic Button Colors */
+            --btn-color: #1c1c1c;
+            --dpad-color: #1c1c1c;
         }
         
         @keyframes led-glow {
@@ -379,7 +383,7 @@
         .dpad-cross { width: 100%; height: 100%; position: relative; }
         
         .dpad-arm {
-            background-color: #1c1c1c; 
+            background-color: var(--dpad-color); 
             position: absolute; border-radius: 6px;
             box-shadow: 2px 4px 6px rgba(0,0,0,0.4); 
             transition: transform 0.05s; 
@@ -409,12 +413,12 @@
             position: absolute; 
             width: 40px; 
             height: 40px; 
-            background-color: #1c1c1c; 
+            background-color: var(--dpad-color); 
             top: 45px; 
             left: 45px; 
             z-index: 15;
             border-radius: 4px; 
-            background: radial-gradient(circle at center, #1c1c1c 60%, #1c1c1c 100%);
+            background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%);
         }
         
         .dpad-center::after {
@@ -423,7 +427,7 @@
             top: 6px; left: 6px; 
             width: 28px; height: 28px; 
             border-radius: 50%; 
-            background: radial-gradient(circle, #151515 0%, #1c1c1c 70%);
+            background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%);
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1);
         }
         
@@ -440,7 +444,7 @@
         }
         .btn-round {
             width: 60px; height: 60px; 
-            background-color: #1c1c1c; 
+            background-color: var(--btn-color); 
             border-radius: 50%; 
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; position: absolute; 
@@ -562,6 +566,14 @@
                     <div id="styles-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2>
                         <div class="w-full max-h-64 overflow-y-auto px-4">
+                            <!-- Nann Boy Option -->
+                            <div class="theme-option" data-theme="nannboy">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;">
+                                    <div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div>
+                                </div>
+                                <span class="font-bold text-gray-700">Nann Boy</span>
+                            </div>
+
                             <div class="theme-option" data-theme="red">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div>
                                 <span class="font-bold text-gray-700">Original Red</span>
@@ -751,6 +763,8 @@
             let mainColor = '#E83942';
             let darkColor = '#b91c1c';
             let bgColor = '#7f1d1d';
+            let btnColor = '#1c1c1c'; // Default Button Color
+            let dpadColor = '#1c1c1c'; // Default Dpad Color
 
             if (themeName === 'purple') {
                 // Atomic Purple
@@ -787,11 +801,20 @@
                 mainColor = '#27272a'; // zinc-800
                 darkColor = '#18181b'; // zinc-900 (was #000000)
                 bgColor = '#09090b';   // zinc-950 (was #000000)
+            } else if (themeName === 'nannboy') {
+                // Nann Boy (White Body, Maroon Red Buttons)
+                mainColor = '#f3f4f6';
+                darkColor = '#9ca3af'; 
+                bgColor = '#374151'; 
+                btnColor = '#800000'; // Maroon Red
+                dpadColor = '#800000'; // Maroon Red
             }
 
             root.style.setProperty('--console-main', mainColor);
             root.style.setProperty('--console-dark', darkColor);
             root.style.setProperty('--bg-color', bgColor);
+            root.style.setProperty('--btn-color', btnColor);
+            root.style.setProperty('--dpad-color', dpadColor);
             
             localStorage.setItem(themeStorageKey, themeName);
         }
