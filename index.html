@@ -735,7 +735,8 @@
             reader.readAsText(file);
         }
 
-        // --- HYBRID LOADER (Detects if binjgb.js is Factory or Global) ---
+        // --- NEW: BINJGB CORE INTEGRATION ---
+        
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -754,34 +755,65 @@
             if(loadingText) loadingText.innerText = "Booting...";
             debugLog("Starting Init...");
 
-            // 1. Setup Global Module Config (for "Global" variant)
-            window.Module = {
+            // 1. Manually fetch and verify WASM first
+            let wasmBinary;
+            try {
+                const response = await fetch('binjgb.wasm');
+                if (!response.ok) throw new Error(`WASM file not found (404). Ensure binjgb.wasm is in root.`);
+                const buffer = await response.arrayBuffer();
+                
+                // Verify Magic Bytes
+                const header = new Uint8Array(buffer, 0, 4);
+                if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
+                    throw new Error(`CRITICAL: binjgb.wasm is corrupt.`);
+                }
+                
+                // CRITICAL FIX: Convert to Uint8Array for Emscripten
+                wasmBinary = new Uint8Array(buffer);
+                debugLog(`WASM Validated (${buffer.byteLength} bytes).`);
+            } catch (e) {
+                if(loadingText) loadingText.innerHTML = `<span style="color:#ff5555">${e.message}</span>`;
+                debugLog(e.message, 'error');
+                throw e;
+            }
+
+            // 2. Load JS
+            try {
+                await loadScript('binjgb.js');
+                debugLog("binjgb.js loaded.");
+            } catch(e) {
+                if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
+                throw e;
+            }
+
+            // 3. Initialize Factory using DIRECT INJECTION
+            if (typeof Binjgb !== 'function') throw new Error("Binjgb factory not found in JS.");
+
+            const moduleConfig = {
                 canvas: romCanvas,
-                noInitialRun: true,
-                locateFile: (path) => path.endsWith('.wasm') ? 'binjgb.wasm' : path,
+                wasmBinary: wasmBinary, // Feed the data directly
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
-                onRuntimeInitialized: () => {
-                     debugLog("Global Runtime Ready");
-                     emulatorInitialized = true;
+                onRuntimeInitialized: function() {
+                    debugLog("Runtime Initialized.");
+                    emulatorInitialized = true;
                 }
             };
 
-            // 2. Load Script
-            await loadScript('binjgb.js');
+            window.Module = await Binjgb(moduleConfig);
 
-            // 3. Check for Factory Pattern (Function)
-            // If the script defines a 'Binjgb' function, we must call it manually.
-            if (typeof Binjgb === 'function') {
-                debugLog("Detected Binjgb Factory. Initializing manually...");
-                window.Module = await Binjgb({
-                    canvas: romCanvas,
-                    locateFile: (path) => path.endsWith('.wasm') ? 'binjgb.wasm' : path,
-                    print: (text) => debugLog(`[Core] ${text}`),
-                    printErr: (text) => debugLog(`[Core Error] ${text}`, 'error')
-                });
-                emulatorInitialized = true;
+            // 4. Wait for FS
+            let attempts = 0;
+            while (!window.Module.FS && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100)); attempts++;
             }
+            
+            if (!window.Module.FS) {
+                throw new Error("File System failed to mount.");
+            }
+            
+            emulatorInitialized = true;
+            debugLog("Ready to Load ROM.");
         }
 
         async function launchEmulator(romData, name) {
@@ -789,27 +821,18 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                if(loadingOverlay.innerText.includes('Error')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
+                if(!loadingOverlay.innerHTML.includes('CRITICAL')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
             }
 
             try {
-                if (!emulatorInitialized) {
-                    await initEmulator();
-                    // Wait loop for runtime
-                    let attempts = 0;
-                    while (!emulatorInitialized && attempts < 50) {
-                        await new Promise(r => setTimeout(r, 100)); 
-                        attempts++;
-                    }
-                }
+                if (!emulatorInitialized) await initEmulator();
                 
-                // Final Check
-                if (!window.Module || !window.Module.FS) {
-                    throw new Error("Emulator core failed to initialize.");
-                }
+                // Double check FS
+                if (!window.Module.FS) throw new Error("File System not ready.");
 
                 const fileName = 'rom.gb'; 
                 try {
+                    // Try to write file
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
                     debugLog(`ROM Written to FS: ${name}`);
@@ -818,7 +841,6 @@
                     throw e;
                 }
 
-                // Launch
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
