@@ -351,7 +351,7 @@
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = src + "?v=" + Date.now();
+                script.src = src; // Load directly, no cache busting to allow browser caching
                 script.crossOrigin = "anonymous";
                 script.onload = resolve;
                 script.onerror = () => reject(new Error(`Failed to load ${src}`));
@@ -363,82 +363,61 @@
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
-            if(loadingText) loadingText.innerText = "Verifying Core...";
-            debugLog("Starting Core Verification...");
+            if(loadingText) loadingText.innerText = "Booting...";
+            debugLog("Starting Standard Init...");
 
-            // 1. Manually fetch and verify WASM first
-            let wasmBlobUrl;
+            // 1. Load JS
             try {
-                const response = await fetch('binjgb.wasm');
-                if (!response.ok) throw new Error(`WASM file not found (404).`);
-                const buffer = await response.arrayBuffer();
-                
-                // Verify Magic Bytes
-                const header = new Uint8Array(buffer, 0, 4);
-                if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
-                    const textPreview = new TextDecoder().decode(header);
-                    if (textPreview.includes('<') || textPreview.includes('!')) {
-                        throw new Error(`CRITICAL: binjgb.wasm is HTML. Please replace it with the RAW file.`);
-                    }
-                    throw new Error(`Invalid WASM header: ${header}`);
-                }
-                
-                // FIX: Create a Blob URL instead of passing raw binary. 
-                // This is much more stable for Emscripten FS initialization.
-                const blob = new Blob([buffer], { type: 'application/wasm' });
-                wasmBlobUrl = URL.createObjectURL(blob);
-                debugLog(`WASM Validated & Blob created.`);
-            } catch (e) {
-                if(loadingText) loadingText.innerHTML = `<span style="color:#ff5555">${e.message}</span>`;
-                debugLog(e.message, 'error');
-                throw e;
-            }
-
-            // 2. Load JS
-            try {
+                // We assume binjgb.js is in the same folder
                 await loadScript('binjgb.js');
                 debugLog("binjgb.js loaded.");
             } catch(e) {
                 if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
-                throw e;
+                throw new Error("binjgb.js not found. Please ensure it is in your repo root.");
             }
 
-            // 3. Initialize Factory
-            if (typeof Binjgb !== 'function') throw new Error("Binjgb factory not found in JS.");
+            // 2. Initialize Factory
+            if (typeof Binjgb !== 'function') {
+                throw new Error("binjgb.js loaded, but 'Binjgb' function missing. File may be corrupt.");
+            }
 
+            // 3. Configure & Launch
+            // We do NOT manually fetch WASM. We let the emulator do it.
             const moduleConfig = {
                 canvas: romCanvas,
-                // CRITICAL: Use locateFile with the Blob URL
                 locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return wasmBlobUrl;
+                    if (path.endsWith('.wasm')) {
+                        return 'binjgb.wasm'; // Force it to look in root
+                    }
                     return path;
                 },
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
                 onRuntimeInitialized: function() {
-                    debugLog("Runtime Initialized.");
+                    debugLog("Runtime Initialized callback fired.");
                     emulatorInitialized = true;
                 }
             };
 
+            // Call the factory. This returns a Promise.
             window.Module = await Binjgb(moduleConfig);
 
-            // 4. Wait for FS
+            // 4. Verification Loop
+            // Even after the promise resolves, sometimes FS takes a split second
             let attempts = 0;
-            // Increased timeout and frequency
-            while (!window.Module.FS && attempts < 100) {
-                await new Promise(r => setTimeout(r, 50)); 
+            while (!window.Module.FS && attempts < 20) {
+                await new Promise(r => setTimeout(r, 100)); 
                 attempts++;
             }
             
             if (!window.Module.FS) {
-                // Debugging aid: Print keys to see what we actually got
-                debugLog("Module Keys: " + Object.keys(window.Module).join(", "), 'warn');
-                throw new Error("File System failed to mount. (FS object missing)");
+                // If FS is still missing, it means WASM failed to link.
+                // Usually this is a 404 on the .wasm file or a MIME type issue.
+                throw new Error("FS Object Missing. Check if binjgb.wasm exists and is being served.");
             }
             
             emulatorInitialized = true;
-            debugLog("Ready to Load ROM.");
+            debugLog("Ready. File System Mounted.");
         }
 
         async function launchEmulator(romData, name) {
@@ -446,7 +425,10 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                if(!loadingOverlay.innerHTML.includes('CRITICAL')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
+                // Reset text
+                if(loadingOverlay.innerText.includes('Error') || loadingOverlay.innerText.includes('Missing')) {
+                    loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                }
             }
 
             try {
