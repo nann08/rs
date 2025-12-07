@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -1095,14 +1095,32 @@
             const loadingText = document.getElementById('loading-text');
 
             // 1. Manually fetch the WASM file properly
-            // This prevents the glue code from trying to guess the URL and failing
+            // Hybrid Strategy: Try Local -> Fail -> Try CDN
             let wasmBinary = null;
+            
+            // Define sources
+            const localWasm = 'mgba.wasm';
+            const cdnWasm = 'https://rawcdn.githack.com/mgba-emu/mgba.js/gh-pages/mgba.wasm';
+            const cdnJs = 'https://rawcdn.githack.com/mgba-emu/mgba.js/gh-pages/mgba.js';
+
             try {
                 if(loadingText) loadingText.innerText = "Downloading Core...";
-                const wasmUrl = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
-                const response = await fetch(wasmUrl);
-                if (!response.ok) throw new Error(`WASM fetch failed: ${response.status}`);
-                wasmBinary = await response.arrayBuffer();
+                
+                // Attempt 1: Local File (Best for Vercel if uploaded)
+                try {
+                    const response = await fetch(localWasm);
+                    if (!response.ok) throw new Error('Local file not found');
+                    wasmBinary = await response.arrayBuffer();
+                    console.log("Loaded mGBA from local storage.");
+                } catch (localErr) {
+                    console.log("Local core not found, switching to CDN...", localErr);
+                    // Attempt 2: CDN (Backup)
+                    const response = await fetch(cdnWasm);
+                    if (!response.ok) throw new Error(`CDN download failed: ${response.status}`);
+                    wasmBinary = await response.arrayBuffer();
+                    console.log("Loaded mGBA from CDN.");
+                }
+
             } catch (e) {
                 console.error("WASM Download Failed", e);
                 if(loadingText) loadingText.innerText = "Core Download Failed";
@@ -1120,7 +1138,7 @@
             try {
                 // 3. Load the main mGBA JS glue code
                 if(loadingText) loadingText.innerText = "Starting Engine...";
-                await loadScript('https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js');
+                await loadScript(cdnJs); // The JS is small/text, CDN is fine for this usually
                 mgbaInitialized = true;
                 
                 // Wait slightly for Module to fully hydrate
@@ -1373,3 +1391,5 @@
     </script>
 </body>
 </html>
+
+
