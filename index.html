@@ -1193,21 +1193,22 @@
             if(loadingText) loadingText.innerText = "Connecting to Core...";
             
             // --- CDN Fallback Strategy ---
+            // UPDATED: Verified path for thenick775/gbajs3 on branch 'main'
             const CDN_URLS = [
-                // Pair 1: JSDelivr (Fastest, Demo Repo)
+                // Pair 1: gbajs3 (Primary - using 'main' branch)
+                {
+                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/assets/wasm/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/assets/wasm/mgba.js'
+                },
+                // Pair 2: gbajs3 (Backup - using 'master' branch just in case)
+                {
+                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/assets/wasm/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/assets/wasm/mgba.js'
+                },
+                // Pair 3: JSDelivr (Demo Repo backup)
                 {
                     wasm: 'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.wasm',
                     js:   'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.js'
-                },
-                // Pair 2: Githack RawCDN (Backup - Reliable but slower)
-                {
-                    wasm: 'https://rawcdn.githack.com/mgba-emu/mgba.js/master/mgba.wasm',
-                    js:   'https://rawcdn.githack.com/mgba-emu/mgba.js/master/mgba.js'
-                },
-                // Pair 3: JSDelivr Main (Fallback, might be unstable on master)
-                {
-                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.js'
                 }
             ];
 
