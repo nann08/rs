@@ -562,15 +562,6 @@
                     <div id="styles-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2>
                         <div class="w-full max-h-64 overflow-y-auto px-4">
-                            <!-- Nann Boy Style -->
-                            <div class="theme-option" data-theme="nannboy">
-                                <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;">
-                                    <!-- Updated preview dot to darker red -->
-                                    <div style="position: absolute; width: 8px; height: 8px; background: #8b0000; border-radius: 50%; bottom: 2px; right: 2px;"></div>
-                                </div>
-                                <span class="font-bold text-gray-700">Nann Boy</span>
-                            </div>
-
                             <div class="theme-option" data-theme="red">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div>
                                 <span class="font-bold text-gray-700">Original Red</span>
@@ -789,13 +780,13 @@
             } else if (themeName === 'white') {
                 // Polar White
                 mainColor = '#f3f4f6';
-            } else if (themeName === 'nannboy') {
-                // Nann Boy (White Body, Dark Red Buttons)
-                mainColor = '#f3f4f6';
                 darkColor = '#9ca3af'; 
-                bgColor = '#374151'; 
-                btnColor = '#8b0000'; // Changed to Dark Red (Deep Crimson)
-                dpadColor = '#8b0000'; // Changed to Dark Red
+                bgColor = '#374151'; // Dark gray bg for contrast
+            } else if (themeName === 'black') {
+                // Midnight Black - Adjusted to be slightly lighter
+                mainColor = '#27272a'; // zinc-800
+                darkColor = '#18181b'; // zinc-900 (was #000000)
+                bgColor = '#09090b';   // zinc-950 (was #000000)
             }
 
             root.style.setProperty('--console-main', mainColor);
