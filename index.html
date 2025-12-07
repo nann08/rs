@@ -1190,13 +1190,13 @@
             const loadingText = document.getElementById('loading-text');
 
             // 1. Manually fetch the WASM file properly
-            // Hybrid Strategy: Try Local -> Fail -> Try CDN
+            // Hybrid Strategy: Try Local -> Fail -> Try CDN (JsDelivr)
             let wasmBinary = null;
             
-            // Define sources
+            // Define sources - Updated to JsDelivr for better uptime
             const localWasm = 'mgba.wasm';
-            const cdnWasm = 'https://rawcdn.githack.com/mgba-emu/mgba.js/gh-pages/mgba.wasm';
-            const cdnJs = 'https://rawcdn.githack.com/mgba-emu/mgba.js/gh-pages/mgba.js';
+            const cdnWasm = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
+            const cdnJs = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js';
 
             try {
                 if(loadingText) loadingText.innerText = "Downloading Core...";
