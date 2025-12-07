@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -639,12 +639,12 @@
                             LOAD HTML (WEB)
                         </label>
                         
-                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip">
+                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.zip">
                         <label for="file-input-rom" class="upload-label rom-label">
-                            LOAD ROM (.ZIP/.GBA)
+                            LOAD ROM (.ZIP/.GBC)
                         </label>
                         
-                        <p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC/GBA</p>
+                        <p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p>
                         <button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button>
                     </div>
                     
@@ -709,15 +709,17 @@
         let userId = null;
         let gameMode = 'html'; 
         let currentRomName = 'unknown_game'; 
-        let mgbaInitialized = false;
+        let emulatorInitialized = false;
 
+        // Key map adjusted for Binjgb defaults if needed, but standard SDL keys usually work
+        // Binjgb Defaults: Arrows, Z(A), X(B), Enter(Start), Backspace(Select)
         let keyMap = {
-            'Up': { key: 'w', code: 'KeyW', keyCode: 87 },
-            'Down': { key: 's', code: 'KeyS', keyCode: 83 },
-            'Left': { key: 'a', code: 'KeyA', keyCode: 65 },
-            'Right': { key: 'd', code: 'KeyD', keyCode: 68 }, 
-            'A': { key: ' ', code: 'Space', keyCode: 32 }, 
-            'B': { key: 'j', code: 'KeyJ', keyCode: 74 }, // Mapped to suit generic play
+            'Up': { key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
+            'Down': { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40 },
+            'Left': { key: 'ArrowLeft', code: 'ArrowLeft', keyCode: 37 },
+            'Right': { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 }, 
+            'A': { key: 'x', code: 'KeyX', keyCode: 88 },  // Binjgb Default A
+            'B': { key: 'z', code: 'KeyZ', keyCode: 90 },  // Binjgb Default B
             'Start': { key: 'Enter', code: 'Enter', keyCode: 13 },
             'Select': { key: 'Backspace', code: 'Backspace', keyCode: 8 },
         };
@@ -1171,39 +1173,38 @@
             reader.readAsText(file);
         }
 
-        // --- NEW: mGBA CORE INTEGRATION ---
+        // --- NEW: BINJGB CORE INTEGRATION ---
         
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
                 script.src = src;
-                script.crossOrigin = "anonymous"; // Fix CORS issues
+                script.crossOrigin = "anonymous"; 
                 script.onload = resolve;
                 script.onerror = reject;
                 document.head.appendChild(script);
             });
         }
 
-        async function initMgba() {
-            if (mgbaInitialized) return;
+        async function initEmulator() {
+            if (emulatorInitialized) return;
 
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Connecting to Core...";
+            if(loadingText) loadingText.innerText = "Downloading Binjgb...";
             
-            // --- CDN Fallback Strategy ---
-            // UPDATED: Using the Official mGBA 'gh-pages' branch (Verified compiled binaries)
+            // --- CDN Fallback Strategy for BINJGB ---
             const CDN_URLS = [
-                // Pair 1: Official mGBA.js (gh-pages branch) - The 'Gold Standard' source
+                // Pair 1: Official Binjgb Repo (via JSDelivr)
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.js'
                 },
-                // Pair 2: Simon Katz Demo (A very stable, known-good backup repo)
+                // Pair 2: Githack Fallback
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.js'
+                    wasm: 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.wasm',
+                    js:   'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.js'
                 }
             ];
 
@@ -1225,7 +1226,7 @@
                     jsContent = await resJs.text();
                     
                     console.log("Download successful.");
-                    break; // Stop loop on success
+                    break; 
                 } catch (e) {
                     console.warn(`Failed to download from ${urls.wasm}`, e);
                 }
@@ -1239,21 +1240,19 @@
                         <div style="font-weight:bold; margin-bottom:5px;">⚠️ Auto-download failed</div>
                         <div style="font-size:12px; margin-bottom:10px; color:#ddd;">
                             Please upload the core files manually.<br>
-                            <a href="https://github.com/mgba-emu/mgba.js/raw/gh-pages/mgba.wasm" target="_blank" style="color:#60a5fa; text-decoration:underline;">Download WASM</a> | 
-                            <a href="https://github.com/mgba-emu/mgba.js/raw/gh-pages/mgba.js" target="_blank" style="color:#60a5fa; text-decoration:underline;">Download JS</a>
+                            Files: <b>binjgb.js</b> and <b>binjgb.wasm</b>
                         </div>
                         
                         <input type="file" id="manual-core-js" accept=".js" style="display:none">
-                        <label for="manual-core-js" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">1. Upload mgba.js</label>
+                        <label for="manual-core-js" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">1. Upload binjgb.js</label>
                         <div id="js-status" style="font-size:10px; color:#4ade80; display:none;">✓ JS Ready</div>
                         
                         <input type="file" id="manual-core-wasm" accept=".wasm" style="display:none">
-                        <label for="manual-core-wasm" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">2. Upload mgba.wasm</label>
+                        <label for="manual-core-wasm" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">2. Upload binjgb.wasm</label>
                         <div id="wasm-status" style="font-size:10px; color:#4ade80; display:none;">✓ WASM Ready</div>
                     </div>`;
                 }
                 
-                // Setup Manual Listeners
                 return new Promise((resolve, reject) => {
                     let manualJs = null;
                     let manualWasm = null;
@@ -1293,7 +1292,7 @@
                 });
             }
 
-            // Normal Path (Auto-download success)
+            // Normal Path
             const script = document.createElement('script');
             script.text = jsContent;
             document.head.appendChild(script);
@@ -1304,26 +1303,27 @@
         async function setupModule(wasmBinary) {
              const romCanvas = document.getElementById('rom-canvas');
              
+             // Binjgb Module Config
              window.Module = {
                 canvas: romCanvas,
                 wasmBinary: wasmBinary, 
-                print: function(text) { console.log('[mGBA]', text); },
-                printErr: function(text) { console.error('[mGBA]', text); }
+                print: function(text) { console.log('[Binjgb]', text); },
+                printErr: function(text) { console.error('[Binjgb]', text); },
+                // Binjgb specific arguments might be needed here or in callMain
+                arguments: [] 
             };
 
             // Wait for runtime
-            mgbaInitialized = true;
+            emulatorInitialized = true;
             await new Promise(r => setTimeout(r, 500));
         }
 
-        async function launchMgba(romData, name) {
-            // FIX: Close menus immediately so user can see underlying status/errors
+        async function launchEmulator(romData, name) {
             closeAllMenus();
             
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                // Reset to default loading message
                 if(!loadingOverlay.innerHTML.includes('Upload')) {
                     loadingOverlay.innerHTML = `
                     <svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1335,22 +1335,17 @@
             }
 
             try {
-                // Ensure core is loaded
-                if (!mgbaInitialized) {
-                    await initMgba();
+                if (!emulatorInitialized) {
+                    await initEmulator();
                 }
                 
                 // Emscripten File System operations
-                // 1. Ensure /data directory exists (optional, root usually fine)
-                // 2. Write ROM to virtual FS
-                const fileName = 'game.rom';
+                const fileName = 'rom.gb'; // Binjgb doesn't care about extension much, but safe to use .gb
                 
-                // Wait for runtime initialized if Module exists but FS doesn't
                 if (window.Module && !window.Module.FS) {
                      await new Promise(resolve => {
                          if(window.Module.calledRun) resolve();
                          else window.Module.onRuntimeInitialized = resolve;
-                         // Timeout fallback
                          setTimeout(resolve, 3000);
                      });
                 }
@@ -1360,17 +1355,25 @@
                 }
 
                 try {
+                    // Cleanup previous run
+                    try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
+                    // Write new ROM
                     window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
                 } catch(e) {
-                    // File might exist from previous run, unlink (delete) it first
-                    try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
-                    window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
+                    console.error("FS Error:", e);
                 }
 
-                // 3. Call Main with arguments
-                window.Module.callMain([fileName]);
+                // Launch
+                // Binjgb takes the filename as an argument
+                if (window.Module.callMain) {
+                    window.Module.callMain([fileName]);
+                } else {
+                    // Some builds auto-run, but usually require args. 
+                    // If callMain is missing, we might need to rely on Module.arguments pushed earlier, 
+                    // but typically callMain is exposed.
+                    throw new Error("Emulator entry point not found.");
+                }
                 
-                // Force canvas to show
                 const romCanvas = document.getElementById('rom-canvas');
                 romCanvas.style.display = 'block';
                 document.getElementById('start-screen').style.display = 'none';
@@ -1396,12 +1399,12 @@
 
             if (!file) return;
             
-            // Added .gba support
+            // Allow .gb, .gbc, .zip
             const isZip = file.name.match(/\.zip$/i);
-            const isRom = file.name.match(/\.(gb|gbc|gba)$/i);
+            const isRom = file.name.match(/\.(gb|gbc)$/i);
 
             if (!isZip && !isRom) {
-                fileStatus.textContent = "Error: Invalid file type.";
+                fileStatus.textContent = "Error: Invalid file type (GB/GBC only).";
                 return;
             }
 
@@ -1415,25 +1418,23 @@
                     
                     JSZip.loadAsync(arrayBuffer).then(async function(zip) {
                         const files = Object.keys(zip.files);
-                        
-                        // Allow .gba in zip
                         const romCandidates = files.filter(name => {
-                            const isRom = name.match(/\.(gb|gbc|gba)$/i);
+                            const isRom = name.match(/\.(gb|gbc)$/i);
                             const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.');
                             return isRom && !isMacJunk;
                         });
 
                         if (romCandidates.length === 0) {
-                            fileStatus.textContent = "Error: No ROM found in zip.";
+                            if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found.";
                             return;
                         }
 
                         const chosenFile = romCandidates[0];
-                        fileStatus.textContent = `Extracting ${chosenFile}...`;
+                        if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
                         
                         const content = await zip.file(chosenFile).async("arraybuffer");
-                        launchMgba(content, chosenFile);
+                        launchEmulator(content, chosenFile);
 
                     }).catch(function(err) {
                         console.error(err);
@@ -1445,7 +1446,7 @@
                 currentRomName = file.name;
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    launchMgba(e.target.result, file.name);
+                    launchEmulator(e.target.result, file.name);
                 };
                 reader.readAsArrayBuffer(file);
             }
