@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -496,6 +496,11 @@
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
+        .install-icon { font-size: 24px; margin-bottom: 10px; }
+        .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
+        .share-icon-img { width: 20px; height: 20px; vertical-align: middle; display: inline-block; margin: 0 5px; }
+        #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
+        
         #toast-notification {
             position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
             background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px;
@@ -730,47 +735,53 @@
             reader.readAsText(file);
         }
 
-        // --- NEW: BINJGB CORE INTEGRATION (GLOBAL MODULE) ---
-        // This is the standard "Homebrew Hub" compatible loading method.
-        
+        // --- HYBRID LOADER (Detects if binjgb.js is Factory or Global) ---
+        async function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src; 
+                script.crossOrigin = "anonymous"; 
+                script.onload = resolve;
+                script.onerror = () => reject(new Error(`Failed to load ${src}`));
+                document.head.appendChild(script);
+            });
+        }
+
         async function initEmulator() {
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
             if(loadingText) loadingText.innerText = "Booting...";
-            debugLog("Starting Standard Init...");
+            debugLog("Starting Init...");
 
-            // 1. Define Module Global
-            // This object configures Emscripten before the script runs
+            // 1. Setup Global Module Config (for "Global" variant)
             window.Module = {
                 canvas: romCanvas,
-                noInitialRun: true, // We will call main manually
-                locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return 'binjgb.wasm';
-                    return path;
-                },
+                noInitialRun: true,
+                locateFile: (path) => path.endsWith('.wasm') ? 'binjgb.wasm' : path,
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
-                onRuntimeInitialized: function() {
-                    debugLog("Runtime Initialized callback fired.");
-                    emulatorInitialized = true;
+                onRuntimeInitialized: () => {
+                     debugLog("Global Runtime Ready");
+                     emulatorInitialized = true;
                 }
             };
 
             // 2. Load Script
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'binjgb.js'; 
-                script.async = true;
-                script.onload = () => {
-                    debugLog("Script loaded. Waiting for Runtime...");
-                    resolve();
-                };
-                script.onerror = () => {
-                    reject(new Error("Failed to load binjgb.js"));
-                };
-                document.body.appendChild(script);
-            });
+            await loadScript('binjgb.js');
+
+            // 3. Check for Factory Pattern (Function)
+            // If the script defines a 'Binjgb' function, we must call it manually.
+            if (typeof Binjgb === 'function') {
+                debugLog("Detected Binjgb Factory. Initializing manually...");
+                window.Module = await Binjgb({
+                    canvas: romCanvas,
+                    locateFile: (path) => path.endsWith('.wasm') ? 'binjgb.wasm' : path,
+                    print: (text) => debugLog(`[Core] ${text}`),
+                    printErr: (text) => debugLog(`[Core Error] ${text}`, 'error')
+                });
+                emulatorInitialized = true;
+            }
         }
 
         async function launchEmulator(romData, name) {
