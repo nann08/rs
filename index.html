@@ -1063,42 +1063,68 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Loading Core...";
+            if(loadingText) loadingText.innerText = "Verifying Core...";
             
-            // 1. Load the script file (binjgb.js)
+            // 1. Validate WASM Integrity BEFORE loading
+            // This fixes the "Secrets" / "FS Mount" mystery: checking if file is actually HTML.
+            let wasmBinary;
+            try {
+                const response = await fetch('binjgb.wasm');
+                if (!response.ok) throw new Error(`WASM file missing (404)`);
+                
+                const buffer = await response.arrayBuffer();
+                
+                // Check Magic Number: \0asm (0x00 0x61 0x73 0x6D)
+                const header = new Uint8Array(buffer, 0, 4);
+                if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
+                    const textPreview = new TextDecoder().decode(header);
+                    if (textPreview.includes('<') || textPreview.includes('!')) {
+                        throw new Error(`Your binjgb.wasm is corrupted (It contains HTML/Text). Please delete it and re-download the RAW file.`);
+                    }
+                    throw new Error(`Your binjgb.wasm is invalid. Header: ${header}`);
+                }
+                
+                wasmBinary = buffer;
+                console.log(`WASM Validated. Size: ${buffer.byteLength} bytes`);
+            } catch(e) {
+                if(loadingText) loadingText.innerHTML = `<span style="color:red; font-size:10px">${e.message}</span>`;
+                throw e; // Stop execution
+            }
+
+            // 2. Load the script file (binjgb.js)
             try {
                 await loadScript('binjgb.js');
             } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: binjgb.js not found in folder.";
+                if(loadingText) loadingText.innerHTML = "Error: binjgb.js not found.";
                 throw new Error("Missing binjgb.js");
             }
 
-            // 2. Initialize using the Factory Pattern from your file
+            // 3. Initialize Factory
             if (typeof Binjgb !== 'function') {
                 throw new Error("binjgb.js loaded but Binjgb function not found.");
             }
 
-            // The factory returns a Promise that resolves to the Module instance
+            // 4. Inject Validated Binary Directly
             window.Module = await Binjgb({
                 canvas: romCanvas,
+                wasmBinary: wasmBinary, // Use the verified buffer directly
                 print: console.log,
                 printErr: console.error,
-                locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return 'binjgb.wasm';
-                    return path;
+                onRuntimeInitialized: function() {
+                    console.log('Binjgb Runtime Initialized via Callback');
+                    emulatorInitialized = true;
                 }
             });
 
-            // 3. CRITICAL FIX: Wait specifically for the File System (FS) to mount
-            // Sometimes the Module resolves before the virtual HD is ready.
+            // 5. Wait for FS
             let attempts = 0;
             while (!window.Module.FS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100)); // Wait 100ms
+                await new Promise(r => setTimeout(r, 100)); 
                 attempts++;
             }
 
             if (!window.Module.FS) {
-                throw new Error("Core loaded, but File System failed to mount. Check binjgb.wasm file size.");
+                throw new Error("File System failed to mount even with valid WASM.");
             }
             
             emulatorInitialized = true;
@@ -1111,7 +1137,10 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                // Reset text only if not showing a critical error from init
+                if(!loadingOverlay.innerHTML.includes('corrupted')) {
+                    loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                }
             }
 
             try {
@@ -1138,11 +1167,9 @@
                 }
 
                 // Launch the emulator
-                // If callMain exists, use it. If not, check if args were processed.
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    // Some Binjgb builds auto-run if arguments are present
                     console.warn("callMain not found, checking if auto-run works...");
                 }
                 
