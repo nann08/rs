@@ -569,6 +569,7 @@
                             <!-- Nann Boy Option -->
                             <div class="theme-option" data-theme="nannboy">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;">
+                                    <!-- Use #800000 Maroon for preview -->
                                     <div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div>
                                 </div>
                                 <span class="font-bold text-gray-700">Nann Boy</span>
@@ -824,12 +825,12 @@
                 darkColor = '#18181b'; // zinc-900 (was #000000)
                 bgColor = '#09090b';   // zinc-950 (was #000000)
             } else if (themeName === 'nannboy') {
-                // Nann Boy (White Body, Maroon Red Buttons)
+                // Nann Boy (White Body, Dark Maroon Buttons)
                 mainColor = '#f3f4f6';
                 darkColor = '#9ca3af'; 
                 bgColor = '#374151'; 
-                btnColor = '#800000'; // Maroon Red
-                dpadColor = '#800000'; // Maroon Red
+                btnColor = '#800000'; // Maroon/Deep Crimson
+                dpadColor = '#800000'; // Maroon/Deep Crimson
             }
 
             root.style.setProperty('--console-main', mainColor);
@@ -1189,37 +1190,49 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            // 1. Manually fetch the WASM file properly
-            // Hybrid Strategy: Try Local -> Fail -> Try CDN (JsDelivr)
-            let wasmBinary = null;
+            if(loadingText) loadingText.innerText = "Connecting to Core...";
             
-            // Define sources - Updated to JsDelivr for better uptime
-            const localWasm = 'mgba.wasm';
-            const cdnWasm = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
-            const cdnJs = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js';
-
-            try {
-                if(loadingText) loadingText.innerText = "Downloading Core...";
-                
-                // Attempt 1: Local File (Best for Vercel if uploaded)
-                try {
-                    const response = await fetch(localWasm);
-                    if (!response.ok) throw new Error('Local file not found');
-                    wasmBinary = await response.arrayBuffer();
-                    console.log("Loaded mGBA from local storage.");
-                } catch (localErr) {
-                    console.log("Local core not found, switching to CDN...", localErr);
-                    // Attempt 2: CDN (Backup)
-                    const response = await fetch(cdnWasm);
-                    if (!response.ok) throw new Error(`CDN download failed: ${response.status}`);
-                    wasmBinary = await response.arrayBuffer();
-                    console.log("Loaded mGBA from CDN.");
+            // --- CDN Fallback Strategy ---
+            const CDN_URLS = [
+                // Pair 1: JSDelivr (Fastest, Demo Repo)
+                {
+                    wasm: 'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.js'
+                },
+                // Pair 2: Githack RawCDN (Backup - Reliable but slower)
+                {
+                    wasm: 'https://rawcdn.githack.com/mgba-emu/mgba.js/master/mgba.wasm',
+                    js:   'https://rawcdn.githack.com/mgba-emu/mgba.js/master/mgba.js'
+                },
+                // Pair 3: JSDelivr Main (Fallback, might be unstable on master)
+                {
+                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.js'
                 }
+            ];
 
-            } catch (e) {
-                console.error("WASM Download Failed", e);
+            let wasmBinary = null;
+            let successJsUrl = null;
+
+            // Try sources sequentially
+            for (const urls of CDN_URLS) {
+                try {
+                    console.log(`Attempting to download core from: ${urls.wasm}`);
+                    const response = await fetch(urls.wasm);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    wasmBinary = await response.arrayBuffer();
+                    successJsUrl = urls.js; // Store the matching JS URL
+                    console.log("Download successful.");
+                    break; // Stop loop on success
+                } catch (e) {
+                    console.warn(`Failed to download from ${urls.wasm}`, e);
+                }
+            }
+
+            if (!wasmBinary || !successJsUrl) {
                 if(loadingText) loadingText.innerText = "Core Download Failed";
-                throw e;
+                throw new Error("Could not download mGBA Core from any source.");
             }
 
             // 2. Setup the global Module object with the binary pre-loaded
@@ -1231,9 +1244,9 @@
             };
 
             try {
-                // 3. Load the main mGBA JS glue code
+                // 3. Load the main mGBA JS glue code from the SAME source
                 if(loadingText) loadingText.innerText = "Starting Engine...";
-                await loadScript(cdnJs); // The JS is small/text, CDN is fine for this usually
+                await loadScript(successJsUrl); 
                 mgbaInitialized = true;
                 
                 // Wait slightly for Module to fully hydrate
