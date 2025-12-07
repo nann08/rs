@@ -1178,11 +1178,18 @@
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = src;
-                script.crossOrigin = "anonymous"; 
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
+                // Check if src is a URL or inline code
+                if (src.startsWith('var Module') || src.includes('function')) {
+                    script.text = src;
+                    document.head.appendChild(script);
+                    resolve();
+                } else {
+                    script.src = src;
+                    script.crossOrigin = "anonymous"; 
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                }
             });
         }
 
@@ -1192,16 +1199,21 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Downloading Binjgb...";
+            if(loadingText) loadingText.innerText = "Loading Core...";
             
-            // --- CDN Fallback Strategy for BINJGB ---
+            // --- CORE SOURCE STRATEGY ---
             const CDN_URLS = [
-                // Pair 1: Official Binjgb Repo (via JSDelivr)
+                // Pair 1: Local / Repo Files (Highest Priority)
+                {
+                    wasm: 'binjgb.wasm',
+                    js:   'binjgb.js'
+                },
+                // Pair 2: Official Binjgb Repo (via JSDelivr)
                 {
                     wasm: 'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.wasm',
                     js:   'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.js'
                 },
-                // Pair 2: Githack Fallback
+                // Pair 3: Githack Fallback
                 {
                     wasm: 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.wasm',
                     js:   'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.js'
@@ -1214,7 +1226,7 @@
             // Try sources sequentially
             for (const urls of CDN_URLS) {
                 try {
-                    console.log(`Attempting to download core from: ${urls.wasm}`);
+                    console.log(`Checking for core at: ${urls.wasm}`);
                     const [resWasm, resJs] = await Promise.all([
                         fetch(urls.wasm),
                         fetch(urls.js)
@@ -1225,10 +1237,10 @@
                     wasmBinary = await resWasm.arrayBuffer();
                     jsContent = await resJs.text();
                     
-                    console.log("Download successful.");
+                    console.log("Core found!");
                     break; 
                 } catch (e) {
-                    console.warn(`Failed to download from ${urls.wasm}`, e);
+                    // console.warn(`Skipping source ${urls.wasm}`, e);
                 }
             }
 
@@ -1237,10 +1249,11 @@
                 if(loadingText) {
                     loadingText.innerHTML = `
                     <div style="color: #f87171; font-size: 14px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 8px;">
-                        <div style="font-weight:bold; margin-bottom:5px;">⚠️ Auto-download failed</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">⚠️ Core Missing</div>
                         <div style="font-size:12px; margin-bottom:10px; color:#ddd;">
-                            Please upload the core files manually.<br>
-                            Files: <b>binjgb.js</b> and <b>binjgb.wasm</b>
+                            Put <b>binjgb.js</b> & <b>binjgb.wasm</b> in your folder,<br>or upload them below.<br>
+                            <a href="https://github.com/binji/binjgb/raw/master/docs/binjgb.wasm" target="_blank" style="color:#60a5fa; text-decoration:underline;">Get WASM</a> | 
+                            <a href="https://github.com/binji/binjgb/raw/master/docs/binjgb.js" target="_blank" style="color:#60a5fa; text-decoration:underline;">Get JS</a>
                         </div>
                         
                         <input type="file" id="manual-core-js" accept=".js" style="display:none">
@@ -1260,13 +1273,16 @@
                     const checkLoad = () => {
                         if (manualJs && manualWasm) {
                             console.log("Manual core files loaded. Booting...");
-                            wasmBinary = manualWasm;
-                            // Execute JS
+                            // 1. Configure Module FIRST
+                            configureModule(manualWasm);
+                            
+                            // 2. Then Inject Script
                             const script = document.createElement('script');
                             script.text = manualJs;
                             document.head.appendChild(script);
                             
-                            setupModule(wasmBinary).then(resolve).catch(reject);
+                            // 3. Wait for Runtime
+                            waitForRuntime().then(resolve).catch(reject);
                         }
                     };
 
@@ -1293,29 +1309,49 @@
             }
 
             // Normal Path
+            // 1. Configure Module FIRST
+            configureModule(wasmBinary);
+
+            // 2. Then Inject Script
             const script = document.createElement('script');
             script.text = jsContent;
             document.head.appendChild(script);
             
-            await setupModule(wasmBinary);
+            // 3. Wait for Runtime
+            await waitForRuntime();
         }
 
-        async function setupModule(wasmBinary) {
+        // Helper to set up window.Module BEFORE script execution
+        function configureModule(wasmBinary) {
              const romCanvas = document.getElementById('rom-canvas');
              
-             // Binjgb Module Config
              window.Module = {
                 canvas: romCanvas,
                 wasmBinary: wasmBinary, 
                 print: function(text) { console.log('[Binjgb]', text); },
                 printErr: function(text) { console.error('[Binjgb]', text); },
-                // Binjgb specific arguments might be needed here or in callMain
-                arguments: [] 
+                onRuntimeInitialized: function() {
+                    console.log('Binjgb Runtime Initialized via Callback');
+                    emulatorInitialized = true;
+                }
             };
+        }
 
-            // Wait for runtime
-            emulatorInitialized = true;
-            await new Promise(r => setTimeout(r, 500));
+        // Helper to wait for the flag
+        async function waitForRuntime() {
+            let attempts = 0;
+            // Loop for up to 5 seconds
+            while (!emulatorInitialized && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                // Safety check: sometimes Module.FS exists even if callback didn't fire
+                if (window.Module && window.Module.FS) {
+                    emulatorInitialized = true;
+                }
+                attempts++;
+            }
+            if (!emulatorInitialized) {
+                console.warn("Runtime initialization timeout, but continuing to try launch...");
+            }
         }
 
         async function launchEmulator(romData, name) {
@@ -1339,20 +1375,23 @@
                     await initEmulator();
                 }
                 
+                // FINAL SAFETY CHECK: Wait specifically for File System
+                // This waits for the emulator to fully boot its internal OS
+                let fsReady = false;
+                for(let i=0; i<30; i++) { // Wait up to 3 seconds for FS
+                    if(window.Module && window.Module.FS) {
+                        fsReady = true;
+                        break;
+                    }
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                if (!fsReady) {
+                    throw new Error("Emulator File System failed to mount. Please reload.");
+                }
+
                 // Emscripten File System operations
-                const fileName = 'rom.gb'; // Binjgb doesn't care about extension much, but safe to use .gb
-                
-                if (window.Module && !window.Module.FS) {
-                     await new Promise(resolve => {
-                         if(window.Module.calledRun) resolve();
-                         else window.Module.onRuntimeInitialized = resolve;
-                         setTimeout(resolve, 3000);
-                     });
-                }
-                
-                if (!window.Module || !window.Module.FS) {
-                    throw new Error("Core initialized but file system not ready.");
-                }
+                const fileName = 'rom.gb'; 
 
                 try {
                     // Cleanup previous run
@@ -1368,10 +1407,7 @@
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    // Some builds auto-run, but usually require args. 
-                    // If callMain is missing, we might need to rely on Module.arguments pushed earlier, 
-                    // but typically callMain is exposed.
-                    throw new Error("Emulator entry point not found.");
+                    throw new Error("Emulator entry point not found. Try refreshing.");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
@@ -1385,7 +1421,12 @@
             } catch (err) {
                 console.error(err);
                 if(loadingOverlay) {
-                    loadingOverlay.innerHTML += `<br><div style="font-size:10px; color:red; margin-top:5px;">${err.message}</div>`;
+                    loadingOverlay.innerHTML = `<div style="font-size:12px; color:#f87171; text-align:center; padding:10px;">
+                        <div style="font-size:24px; margin-bottom:10px;">❌</div>
+                        ${err.message}
+                        <br><br>
+                        <button onclick="location.reload()" style="background:#444; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Reload App</button>
+                    </div>`;
                 }
             }
         }
