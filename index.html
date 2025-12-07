@@ -743,17 +743,39 @@
 
         function playHapticSound() {
             if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+
+            // 1. The "Click" (High frequency snap - Mechanical feel)
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.05);
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.05);
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1200, t);
+            osc.frequency.exponentialRampToValueAtTime(600, t + 0.01);
+            
+            gain.gain.setValueAtTime(0.03, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.01);
+            
+            osc.start(t);
+            osc.stop(t + 0.01);
+
+            // 2. The "Thud" (Plastic body sound)
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(200, t);
+            osc2.frequency.exponentialRampToValueAtTime(50, t + 0.05);
+            
+            gain2.gain.setValueAtTime(0.08, t);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+            
+            osc2.start(t);
+            osc2.stop(t + 0.05);
         }
 
         // --- THEME ENGINE ---
