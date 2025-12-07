@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -544,7 +544,7 @@
                         <div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div>
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
-                    <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Cancel</button></div>
+                    <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
                     <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
@@ -563,6 +563,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // DEBUG SYSTEM
         function debugLog(msg, type='info') {
             const consoleEl = document.getElementById('debug-console');
             if (consoleEl) {
@@ -606,6 +607,7 @@
         let virtualKeyStates = {};
         let isAuthReady = false;
 
+        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -626,6 +628,7 @@
             osc2.start(t); osc2.stop(t + 0.05);
         }
 
+        // --- THEME ENGINE ---
         function applyTheme(themeName) {
             const root = document.documentElement;
             let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
@@ -696,6 +699,7 @@
             } else if (gameMode === 'rom') { sendMgbaInput(label, isDown); }
         }
 
+        // --- MENU HANDLING ---
         function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
         function showKeySelection(label) {
             currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
@@ -726,61 +730,47 @@
             reader.readAsText(file);
         }
 
-        // --- NEW: BINJGB CORE INTEGRATION (MODULARIZED VERSION) ---
-        async function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src; 
-                script.crossOrigin = "anonymous"; 
-                script.onload = resolve;
-                script.onerror = () => reject(new Error(`Failed to load ${src}`));
-                document.head.appendChild(script);
-            });
-        }
-
+        // --- NEW: BINJGB CORE INTEGRATION (GLOBAL MODULE) ---
+        // This is the standard "Homebrew Hub" compatible loading method.
+        
         async function initEmulator() {
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
             if(loadingText) loadingText.innerText = "Booting...";
-            debugLog("Starting Modular Init...");
+            debugLog("Starting Standard Init...");
 
-            // 1. Load JS
-            try {
-                await loadScript('binjgb.js');
-                debugLog("binjgb.js loaded.");
-            } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
-                throw new Error("binjgb.js not found. Please ensure it is in your repo root.");
-            }
-
-            // 2. Initialize using the SPECIFIC syntax for the modularized build
-            // The file provided defines 'Binjgb' as a global function that returns a Promise.
-            if (typeof Binjgb !== 'function') {
-                throw new Error("binjgb.js loaded, but 'Binjgb' factory is missing.");
-            }
-
-            const moduleConfig = {
+            // 1. Define Module Global
+            // This object configures Emscripten before the script runs
+            window.Module = {
                 canvas: romCanvas,
-                // locateFile is key: it tells the module where to find the wasm
+                noInitialRun: true, // We will call main manually
                 locateFile: function(path) {
                     if (path.endsWith('.wasm')) return 'binjgb.wasm';
                     return path;
                 },
                 print: (text) => debugLog(`[Core] ${text}`),
-                printErr: (text) => debugLog(`[Core Error] ${text}`, 'error')
+                printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
+                onRuntimeInitialized: function() {
+                    debugLog("Runtime Initialized callback fired.");
+                    emulatorInitialized = true;
+                }
             };
 
-            // 3. Call the factory
-            try {
-                // The modular build usually returns a Promise that resolves to the Module
-                window.Module = await Binjgb(moduleConfig);
-                emulatorInitialized = true;
-                debugLog("Module Ready.");
-            } catch(e) {
-                debugLog(`Init Error: ${e.message}`, 'error');
-                throw e;
-            }
+            // 2. Load Script
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'binjgb.js'; 
+                script.async = true;
+                script.onload = () => {
+                    debugLog("Script loaded. Waiting for Runtime...");
+                    resolve();
+                };
+                script.onerror = () => {
+                    reject(new Error("Failed to load binjgb.js"));
+                };
+                document.body.appendChild(script);
+            });
         }
 
         async function launchEmulator(romData, name) {
@@ -792,14 +782,23 @@
             }
 
             try {
-                if (!emulatorInitialized) await initEmulator();
+                if (!emulatorInitialized) {
+                    await initEmulator();
+                    // Wait loop for runtime
+                    let attempts = 0;
+                    while (!emulatorInitialized && attempts < 50) {
+                        await new Promise(r => setTimeout(r, 100)); 
+                        attempts++;
+                    }
+                }
                 
-                // Double check FS
-                if (!window.Module.FS) throw new Error("File System not ready.");
+                // Final Check
+                if (!window.Module || !window.Module.FS) {
+                    throw new Error("Emulator core failed to initialize.");
+                }
 
                 const fileName = 'rom.gb'; 
                 try {
-                    // Write ROM to virtual file system
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
                     debugLog(`ROM Written to FS: ${name}`);
@@ -808,13 +807,11 @@
                     throw e;
                 }
 
-                // Launch the emulator
-                // Check if callMain is available directly on Module
+                // Launch
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    // Fallback: Some modular builds expose 'run' or similar
-                    console.warn("callMain not found, checking alternatives...");
+                    console.warn("callMain not found, checking auto-run...");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
