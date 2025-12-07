@@ -1178,7 +1178,6 @@
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                // Check if src is a URL or inline code
                 if (src.startsWith('var Module') || src.includes('function')) {
                     script.text = src;
                     document.head.appendChild(script);
@@ -1212,11 +1211,6 @@
                 {
                     wasm: 'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.wasm',
                     js:   'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.js'
-                },
-                // Pair 3: Githack Fallback
-                {
-                    wasm: 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.wasm',
-                    js:   'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.js'
                 }
             ];
 
@@ -1273,15 +1267,12 @@
                     const checkLoad = () => {
                         if (manualJs && manualWasm) {
                             console.log("Manual core files loaded. Booting...");
-                            // 1. Configure Module FIRST
                             configureModule(manualWasm);
                             
-                            // 2. Then Inject Script
                             const script = document.createElement('script');
                             script.text = manualJs;
                             document.head.appendChild(script);
                             
-                            // 3. Wait for Runtime
                             waitForRuntime().then(resolve).catch(reject);
                         }
                     };
@@ -1309,15 +1300,12 @@
             }
 
             // Normal Path
-            // 1. Configure Module FIRST
             configureModule(wasmBinary);
 
-            // 2. Then Inject Script
             const script = document.createElement('script');
             script.text = jsContent;
             document.head.appendChild(script);
             
-            // 3. Wait for Runtime
             await waitForRuntime();
         }
 
@@ -1325,9 +1313,13 @@
         function configureModule(wasmBinary) {
              const romCanvas = document.getElementById('rom-canvas');
              
+             // CRITICAL FIX: Convert ArrayBuffer to Uint8Array. 
+             // Many emscripten versions fail silently if passed a raw buffer.
+             const binaryArray = new Uint8Array(wasmBinary);
+
              window.Module = {
                 canvas: romCanvas,
-                wasmBinary: wasmBinary, 
+                wasmBinary: binaryArray, 
                 print: function(text) { console.log('[Binjgb]', text); },
                 printErr: function(text) { console.error('[Binjgb]', text); },
                 onRuntimeInitialized: function() {
@@ -1340,10 +1332,8 @@
         // Helper to wait for the flag
         async function waitForRuntime() {
             let attempts = 0;
-            // Loop for up to 5 seconds
             while (!emulatorInitialized && attempts < 50) {
                 await new Promise(r => setTimeout(r, 100));
-                // Safety check: sometimes Module.FS exists even if callback didn't fire
                 if (window.Module && window.Module.FS) {
                     emulatorInitialized = true;
                 }
@@ -1376,7 +1366,6 @@
                 }
                 
                 // FINAL SAFETY CHECK: Wait specifically for File System
-                // This waits for the emulator to fully boot its internal OS
                 let fsReady = false;
                 for(let i=0; i<30; i++) { // Wait up to 3 seconds for FS
                     if(window.Module && window.Module.FS) {
@@ -1386,24 +1375,22 @@
                     await new Promise(r => setTimeout(r, 100));
                 }
 
-                if (!fsReady) {
+                // Soft check: If FS isn't ready but callMain is, try anyway (sometimes FS is hidden)
+                if (!fsReady && !window.Module.callMain) {
                     throw new Error("Emulator File System failed to mount. Please reload.");
                 }
 
-                // Emscripten File System operations
                 const fileName = 'rom.gb'; 
 
                 try {
-                    // Cleanup previous run
-                    try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
-                    // Write new ROM
-                    window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
+                    if (window.Module.FS) {
+                        try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
+                        window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
+                    }
                 } catch(e) {
-                    console.error("FS Error:", e);
+                    console.error("FS Error (Non-fatal if using memory stream):", e);
                 }
 
-                // Launch
-                // Binjgb takes the filename as an argument
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
