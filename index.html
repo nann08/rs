@@ -562,6 +562,15 @@
                     <div id="styles-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2>
                         <div class="w-full max-h-64 overflow-y-auto px-4">
+                            <!-- Nann Boy Style -->
+                            <div class="theme-option" data-theme="nannboy">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;">
+                                    <!-- Updated preview dot to darker red -->
+                                    <div style="position: absolute; width: 8px; height: 8px; background: #8b0000; border-radius: 50%; bottom: 2px; right: 2px;"></div>
+                                </div>
+                                <span class="font-bold text-gray-700">Nann Boy</span>
+                            </div>
+
                             <div class="theme-option" data-theme="red">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div>
                                 <span class="font-bold text-gray-700">Original Red</span>
@@ -573,6 +582,31 @@
                             <div class="theme-option" data-theme="glacier">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div>
                                 <span class="font-bold text-gray-700">Glacier Blue</span>
+                            </div>
+                            <!-- Added Pink -->
+                            <div class="theme-option" data-theme="pink">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #f472b6, #db2777);"></div>
+                                <span class="font-bold text-gray-700">Berry Pink</span>
+                            </div>
+                            <!-- Added Leaf Green -->
+                            <div class="theme-option" data-theme="green">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #84cc16, #4d7c0f);"></div>
+                                <span class="font-bold text-gray-700">Leaf Green</span>
+                            </div>
+                            <!-- Added June Orange -->
+                            <div class="theme-option" data-theme="orange">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #f97316, #c2410c);"></div>
+                                <span class="font-bold text-gray-700">June Orange</span>
+                            </div>
+                            <!-- Added White -->
+                            <div class="theme-option" data-theme="white">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div>
+                                <span class="font-bold text-gray-700">Polar White</span>
+                            </div>
+                            <!-- Added Black -->
+                            <div class="theme-option" data-theme="black">
+                                <div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div>
+                                <span class="font-bold text-gray-700">Midnight Black</span>
                             </div>
                         </div>
                         <button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button>
@@ -737,6 +771,31 @@
                 mainColor = '#a5f3fc';
                 darkColor = '#0891b2';
                 bgColor = '#164e63';
+            } else if (themeName === 'pink') {
+                // Berry Pink
+                mainColor = '#f472b6';
+                darkColor = '#db2777';
+                bgColor = '#831843';
+            } else if (themeName === 'green') {
+                // Leaf Green
+                mainColor = '#84cc16'; // Lime-500
+                darkColor = '#4d7c0f'; // Lime-700
+                bgColor = '#14532d';   // Green-900 (Forest background)
+            } else if (themeName === 'orange') {
+                // June Orange
+                mainColor = '#f97316'; // Orange-500
+                darkColor = '#c2410c'; // Orange-700
+                bgColor = '#7c2d12';   // Orange-900
+            } else if (themeName === 'white') {
+                // Polar White
+                mainColor = '#f3f4f6';
+            } else if (themeName === 'nannboy') {
+                // Nann Boy (White Body, Dark Red Buttons)
+                mainColor = '#f3f4f6';
+                darkColor = '#9ca3af'; 
+                bgColor = '#374151'; 
+                btnColor = '#8b0000'; // Changed to Dark Red (Deep Crimson)
+                dpadColor = '#8b0000'; // Changed to Dark Red
             }
 
             root.style.setProperty('--console-main', mainColor);
@@ -1391,5 +1450,3 @@
     </script>
 </body>
 </html>
-
-
