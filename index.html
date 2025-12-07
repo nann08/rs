@@ -367,10 +367,10 @@
             debugLog("Starting Core Verification...");
 
             // 1. Manually fetch and verify WASM first
-            let wasmBinary;
+            let wasmBlobUrl;
             try {
                 const response = await fetch('binjgb.wasm');
-                if (!response.ok) throw new Error(`WASM file not found (404). Ensure binjgb.wasm is in root.`);
+                if (!response.ok) throw new Error(`WASM file not found (404).`);
                 const buffer = await response.arrayBuffer();
                 
                 // Verify Magic Bytes
@@ -378,14 +378,16 @@
                 if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
                     const textPreview = new TextDecoder().decode(header);
                     if (textPreview.includes('<') || textPreview.includes('!')) {
-                        throw new Error(`CRITICAL: binjgb.wasm is HTML. You downloaded the GitHub page, not the raw file.`);
+                        throw new Error(`CRITICAL: binjgb.wasm is HTML. Please replace it with the RAW file.`);
                     }
                     throw new Error(`Invalid WASM header: ${header}`);
                 }
                 
-                // CRITICAL FIX: Convert to Uint8Array for Emscripten
-                wasmBinary = new Uint8Array(buffer);
-                debugLog(`WASM Validated (${buffer.byteLength} bytes).`);
+                // FIX: Create a Blob URL instead of passing raw binary. 
+                // This is much more stable for Emscripten FS initialization.
+                const blob = new Blob([buffer], { type: 'application/wasm' });
+                wasmBlobUrl = URL.createObjectURL(blob);
+                debugLog(`WASM Validated & Blob created.`);
             } catch (e) {
                 if(loadingText) loadingText.innerHTML = `<span style="color:#ff5555">${e.message}</span>`;
                 debugLog(e.message, 'error');
@@ -401,21 +403,21 @@
                 throw e;
             }
 
-            // 3. Initialize Factory using DIRECT INJECTION
-            // We pass 'wasmBinary' directly so it doesn't try to load files
+            // 3. Initialize Factory
             if (typeof Binjgb !== 'function') throw new Error("Binjgb factory not found in JS.");
 
             const moduleConfig = {
                 canvas: romCanvas,
-                wasmBinary: wasmBinary, // Feed the data directly
+                // CRITICAL: Use locateFile with the Blob URL
+                locateFile: function(path) {
+                    if (path.endsWith('.wasm')) return wasmBlobUrl;
+                    return path;
+                },
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
                 onRuntimeInitialized: function() {
                     debugLog("Runtime Initialized.");
                     emulatorInitialized = true;
-                },
-                onAbort: function(msg) {
-                    debugLog(`Aborted: ${msg}`, 'error');
                 }
             };
 
@@ -423,17 +425,16 @@
 
             // 4. Wait for FS
             let attempts = 0;
-            while (!window.Module.FS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100)); attempts++;
+            // Increased timeout and frequency
+            while (!window.Module.FS && attempts < 100) {
+                await new Promise(r => setTimeout(r, 50)); 
+                attempts++;
             }
             
             if (!window.Module.FS) {
-                // Last ditch effort: Check if it's running anyway
-                if(emulatorInitialized) {
-                    console.warn("FS missing but Runtime Initialized flag set. Proceeding carefully.");
-                } else {
-                    throw new Error("File System failed to mount.");
-                }
+                // Debugging aid: Print keys to see what we actually got
+                debugLog("Module Keys: " + Object.keys(window.Module).join(", "), 'warn');
+                throw new Error("File System failed to mount. (FS object missing)");
             }
             
             emulatorInitialized = true;
