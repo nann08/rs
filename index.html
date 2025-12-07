@@ -1193,22 +1193,22 @@
             if(loadingText) loadingText.innerText = "Connecting to Core...";
             
             // --- CDN Fallback Strategy ---
-            // UPDATED: Verified path for thenick775/gbajs3 on branch 'main'
+            // CORRECTED PATHS: 'public/wasm/' instead of 'public/assets/wasm/'
             const CDN_URLS = [
-                // Pair 1: gbajs3 (Primary - using 'main' branch)
+                // Pair 1: gbajs3 (Main Branch - Verified Path)
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/assets/wasm/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/assets/wasm/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/wasm/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/wasm/mgba.js'
                 },
-                // Pair 2: gbajs3 (Backup - using 'master' branch just in case)
+                // Pair 2: gbajs3 (Master Branch - Fallback)
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/assets/wasm/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/assets/wasm/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/wasm/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/wasm/mgba.js'
                 },
-                // Pair 3: JSDelivr (Demo Repo backup)
+                // Pair 3: Official mGBA Demo (Final Backup)
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.js'
                 }
             ];
 
