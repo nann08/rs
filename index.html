@@ -15,7 +15,7 @@
 
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -99,7 +99,7 @@
         <div id="close-install">✕</div>
         <div class="install-icon">📲</div>
         <div class="font-bold text-lg mb-2">Install App</div>
-        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
+        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4" width="20" height="20"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
     </div>
 
     <div id="console-wrapper">
@@ -130,7 +130,7 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip,.gba"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBA)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GBA/GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
@@ -148,7 +148,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // DEBUG SYSTEM
         function debugLog(msg, type='info') {
             const consoleEl = document.getElementById('debug-console');
             if (consoleEl) {
@@ -312,10 +311,7 @@
             reader.readAsText(file);
         }
 
-        // --- QUEUE-BASED EMULATOR LOADER (Fixes File System Race Conditions) ---
-        let binjgbModule = null; // Holds the runtime instance
-        let pendingRom = null;   // Queues the ROM if runtime isn't ready
-        
+        // --- OFFICIAL MGBA LOADER (JSDelivr) ---
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -331,75 +327,31 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
             if(loadingText) loadingText.innerText = "Booting...";
-            debugLog("Loading binjgb.js...");
-
-            try {
-                await loadScript('binjgb.js');
-                debugLog("binjgb.js loaded.");
-            } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
-                throw new Error("binjgb.js not found in folder.");
-            }
-
-            if (typeof Binjgb !== 'function') throw new Error("binjgb.js loaded but Binjgb factory is missing.");
-
-            // Configure Module with runtime hook
-            const moduleConfig = {
+            
+            // 1. Configure Module
+            window.Module = {
                 canvas: romCanvas,
                 noInitialRun: true,
                 locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return 'binjgb.wasm';
+                    if (path.endsWith('.wasm')) return 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
                     return path;
                 },
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
                 onRuntimeInitialized: function() {
-                    debugLog("Runtime Initialized.");
+                    debugLog("Runtime Ready.");
                     emulatorInitialized = true;
-                    // IF there is a pending ROM, launch it now
-                    if (pendingRom) {
-                        debugLog("Found pending ROM. Launching...");
-                        runGame(binjgbModule, pendingRom.data, pendingRom.name);
-                        pendingRom = null; // Clear queue
-                    }
                 }
             };
 
-            // Start initialization
+            // 2. Load mGBA from JSDelivr
             try {
-                binjgbModule = await Binjgb(moduleConfig);
+                await loadScript('https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js');
+                debugLog("mGBA loaded.");
             } catch(e) {
-                debugLog(`Init Error: ${e.message}`, 'error');
+                if(loadingText) loadingText.innerHTML = "Error: mGBA failed to load.";
                 throw e;
             }
-        }
-
-        // Helper to perform the actual write and run
-        function runGame(instance, romData, name) {
-            const fileName = 'rom.gb'; 
-            try {
-                try { instance.FS.unlink(fileName); } catch(e) {} 
-                instance.FS.writeFile(fileName, new Uint8Array(romData));
-                debugLog(`ROM Written: ${name}`);
-            } catch(e) {
-                debugLog(`FS Write Error: ${e.message}`, 'error');
-                return;
-            }
-
-            if (instance.callMain) {
-                instance.callMain([fileName]);
-            } else {
-                console.warn("callMain not found.");
-            }
-
-            // Show screen
-            const romCanvas = document.getElementById('rom-canvas');
-            const loadingOverlay = document.getElementById('loading-overlay');
-            romCanvas.style.display = 'block';
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('game-iframe').style.display = 'none';
-            document.getElementById('power-led').classList.add('on');
-            if(loadingOverlay) loadingOverlay.style.display = 'none';
         }
 
         async function launchEmulator(romData, name) {
@@ -410,35 +362,69 @@
                 if(loadingOverlay.innerText.includes('Error')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
             }
 
-            // 1. Start Init if not started
-            if (!emulatorInitialized && !binjgbModule) {
-                await initEmulator();
-            }
+            try {
+                if (!emulatorInitialized) {
+                    await initEmulator();
+                    let attempts = 0;
+                    while (!emulatorInitialized && attempts < 100) {
+                        await new Promise(r => setTimeout(r, 100)); 
+                        attempts++;
+                    }
+                }
+                
+                if (!window.Module || !window.Module.FS) {
+                    throw new Error("Emulator core failed to initialize.");
+                }
 
-            // 2. Check State
-            if (emulatorInitialized && binjgbModule && binjgbModule.FS) {
-                // Ready now? Run immediately.
-                runGame(binjgbModule, romData, name);
-            } else {
-                // Not ready? Queue it.
-                debugLog("Runtime not ready yet. Queuing ROM...");
-                pendingRom = { data: romData, name: name };
+                const fileName = 'game.gba'; 
+                try {
+                    try { window.Module.FS.unlink(fileName); } catch(e) {} 
+                    window.Module.FS.writeFile(fileName, new Uint8Array(romData));
+                    debugLog(`ROM Written: ${name}`);
+                } catch(e) {
+                    debugLog(`FS Write Error: ${e.message}`, 'error');
+                    throw e;
+                }
+
+                if (window.Module.callMain) {
+                    window.Module.callMain([fileName]);
+                } else {
+                    console.warn("callMain not found.");
+                }
+                
+                const romCanvas = document.getElementById('rom-canvas');
+                romCanvas.style.display = 'block';
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('game-iframe').style.display = 'none';
+                document.getElementById('power-led').classList.add('on');
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                if(loadingOverlay) {
+                    loadingOverlay.innerHTML = `<div style="font-size:12px; color:#ff5555; padding:10px;">${err.message}<br><button onclick="location.reload()" style="margin-top:10px; padding:5px;">Reload</button></div>`;
+                }
             }
         }
 
         function handleRomUpload(event) {
             const file = event.target.files[0]; const fileStatus = document.getElementById('file-status'); const powerLed = document.getElementById('power-led');
             powerLed.classList.remove('on'); if (!file) return;
-            const isZip = file.name.match(/\.zip$/i); const isRom = file.name.match(/\.(gb|gbc)$/i);
+            
+            // Accept GBA, GB, GBC, ZIP
+            const isZip = file.name.match(/\.zip$/i); 
+            const isRom = file.name.match(/\.(gba|gbc|gb)$/i);
+
             if (!isZip && !isRom) { fileStatus.textContent = "Error: Invalid file type."; return; }
             fileStatus.textContent = `Reading ${file.name}...`; gameMode = 'rom';
+            
             if (isZip) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     JSZip.loadAsync(e.target.result).then(async function(zip) {
                         const files = Object.keys(zip.files);
-                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gb|gbc)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
-                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found."; return; }
+                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gba|gbc|gb)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
+                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No ROM found."; return; }
                         const chosenFile = romCandidates[0];
                         if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
