@@ -1049,10 +1049,10 @@
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = src;
+                script.src = src + "?v=" + Date.now(); // Cache buster to ensure we get the fresh file
                 script.crossOrigin = "anonymous"; 
                 script.onload = resolve;
-                script.onerror = reject;
+                script.onerror = () => reject(new Error(`Failed to load ${src}`));
                 document.head.appendChild(script);
             });
         }
@@ -1063,72 +1063,44 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Verifying Core...";
+            if(loadingText) loadingText.innerText = "Booting Emulator...";
             
-            // 1. Validate WASM Integrity BEFORE loading
-            // This fixes the "Secrets" / "FS Mount" mystery: checking if file is actually HTML.
-            let wasmBinary;
+            // 1. Load binjgb.js
             try {
-                const response = await fetch('binjgb.wasm');
-                if (!response.ok) throw new Error(`WASM file missing (404)`);
-                
-                const buffer = await response.arrayBuffer();
-                
-                // Check Magic Number: \0asm (0x00 0x61 0x73 0x6D)
-                const header = new Uint8Array(buffer, 0, 4);
-                if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
-                    const textPreview = new TextDecoder().decode(header);
-                    if (textPreview.includes('<') || textPreview.includes('!')) {
-                        throw new Error(`Your binjgb.wasm is corrupted (It contains HTML/Text). Please delete it and re-download the RAW file.`);
-                    }
-                    throw new Error(`Your binjgb.wasm is invalid. Header: ${header}`);
-                }
-                
-                wasmBinary = buffer;
-                console.log(`WASM Validated. Size: ${buffer.byteLength} bytes`);
-            } catch(e) {
-                if(loadingText) loadingText.innerHTML = `<span style="color:red; font-size:10px">${e.message}</span>`;
-                throw e; // Stop execution
-            }
-
-            // 2. Load the script file (binjgb.js)
-            try {
+                // We assume the file is named binjgb.js in the same folder
                 await loadScript('binjgb.js');
             } catch(e) {
                 if(loadingText) loadingText.innerHTML = "Error: binjgb.js not found.";
-                throw new Error("Missing binjgb.js");
+                throw new Error("Missing binjgb.js. Please ensure it is in your repository.");
             }
 
-            // 3. Initialize Factory
+            // 2. Initialize Factory
             if (typeof Binjgb !== 'function') {
-                throw new Error("binjgb.js loaded but Binjgb function not found.");
+                throw new Error("binjgb.js loaded, but 'Binjgb' function is missing. The file might be corrupt.");
             }
 
-            // 4. Inject Validated Binary Directly
+            // 3. Standard Initialization (Let Binjgb handle the WASM loading)
+            // We do NOT pass 'wasmBinary' here. We let locateFile find it.
             window.Module = await Binjgb({
                 canvas: romCanvas,
-                wasmBinary: wasmBinary, // Use the verified buffer directly
                 print: console.log,
                 printErr: console.error,
-                onRuntimeInitialized: function() {
-                    console.log('Binjgb Runtime Initialized via Callback');
-                    emulatorInitialized = true;
+                locateFile: function(path) {
+                    if (path.endsWith('.wasm')) {
+                        return 'binjgb.wasm'; // Look for binjgb.wasm in the same folder
+                    }
+                    return path;
                 }
             });
 
-            // 5. Wait for FS
-            let attempts = 0;
-            while (!window.Module.FS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100)); 
-                attempts++;
-            }
-
+            // 4. Verification
             if (!window.Module.FS) {
-                throw new Error("File System failed to mount even with valid WASM.");
+                // If FS is still missing, it means the WASM failed to link/compile in the browser
+                throw new Error("WASM failed to initialize. Check browser console (F12) for details.");
             }
             
             emulatorInitialized = true;
-            console.log("Binjgb Initialized Successfully with FS");
+            console.log("Binjgb Initialized Successfully");
         }
 
         async function launchEmulator(romData, name) {
@@ -1137,8 +1109,8 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                // Reset text only if not showing a critical error from init
-                if(!loadingOverlay.innerHTML.includes('corrupted')) {
+                // Reset text
+                if(loadingOverlay.innerText.includes('Error')) {
                     loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
                 }
             }
@@ -1151,7 +1123,6 @@
                 // Emscripten File System operations
                 const fileName = 'rom.gb'; 
 
-                // Double check FS (initEmulator should have caught this, but safety first)
                 if (!window.Module.FS) {
                     throw new Error("Emulator File System not ready.");
                 }
@@ -1170,7 +1141,7 @@
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    console.warn("callMain not found, checking if auto-run works...");
+                    console.warn("callMain not found, attempting auto-run fallback...");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
