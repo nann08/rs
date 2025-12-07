@@ -3,514 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- iOS PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Nann Boy">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#7f1d1d">
-    
     <title>Nann Emulator</title>
-
-    <!-- UTILITY: JSZip for handling .zip ROMs -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    <!-- PWA Setup Script -->
     <script>
         (function() {
-            // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
-            const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
-
-            const linkIcon = document.createElement('link');
-            linkIcon.rel = 'apple-touch-icon';
-            linkIcon.href = iconUrl;
-            document.head.appendChild(linkIcon);
-
-            const linkFav32 = document.createElement('link');
-            linkFav32.rel = 'icon';
-            linkFav32.type = 'image/png';
-            linkFav32.sizes = '32x32';
-            linkFav32.href = iconUrl;
-            document.head.appendChild(linkFav32);
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-            if (!isIOS) {
-                const manifest = {
-                    "name": "Nann Boy",
-                    "short_name": "NannBoy",
-                    "start_url": ".",
-                    "display": "standalone",
-                    "background_color": "#7f1d1d",
-                    "theme_color": "#7f1d1d",
-                    "orientation": "portrait",
-                    "icons": [{ "src": iconUrl, "sizes": "192x192", "type": "image/png" }]
-                };
-                const linkManifest = document.createElement('link');
-                linkManifest.rel = 'manifest';
-                linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`;
-                document.head.appendChild(linkManifest);
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
+            const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
+            if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+                const manifest = { "name": "Nann Boy", "short_name": "NannBoy", "start_url": ".", "display": "standalone", "background_color": "#7f1d1d", "theme_color": "#7f1d1d", "orientation": "portrait", "icons": [{ "src": `data:image/png;base64,${ICON_BASE64}`, "sizes": "192x192", "type": "image/png" }] };
+                const linkManifest = document.createElement('link'); linkManifest.rel = 'manifest'; linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`; document.head.appendChild(linkManifest);
             }
-
-            // PERFORMANCE WARNING SUPPRESSION
-            const originalWarn = console.warn;
-            console.warn = function(...args) {
-                if (args[0] && typeof args[0] === 'string' && (args[0].includes('performance') || args[0].includes('AudioContext'))) return;
-                originalWarn.apply(console, args);
-            };
         })();
     </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
-        /* Global Reset & Touch Safety */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            user-select: none;
-        }
-
-        :root {
-            --screen-color: #ffffff;
-            --screen-shadow: #0f380f;
-            --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
-            
-            /* Dynamic Theme Variables - Default Red */
-            --console-main: #E83942;
-            --console-dark: #b91c1c;
-            --bg-color: #7f1d1d;
-
-            /* Dynamic Button Colors */
-            --btn-color: #1c1c1c;
-            --dpad-color: #1c1c1c;
-        }
-        
-        @keyframes led-glow {
-            0% { box-shadow: 0 0 5px #990000, 0 0 20px rgba(255, 0, 0, 0.4); opacity: 0.8; }
-            50% { box-shadow: 0 0 10px #ff0000, 0 0 30px rgba(255, 0, 0, 0.8); opacity: 1; }
-            100% { box-shadow: 0 0 5px #990000, 0 0 20px rgba(255, 0, 0, 0.4); opacity: 0.8; }
-        }
-
-        html {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overscroll-behavior: none;
-            position: fixed;
-            overflow: hidden;
-            background-color: var(--bg-color); 
-            transition: background-color 0.3s ease;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color); 
-            height: 100%; 
-            width: 100%;
-            display: flex;
-            align-items: flex-start; 
-            justify-content: center;
-            overscroll-behavior: none; 
-            touch-action: none;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease;
-        }
-
-        #console-wrapper {
-            transform-origin: top center; 
-            will-change: transform;
-            display: flex;
-            justify-content: center;
-            transform: translate3d(0,0,0);
-        }
-
-        .gbc-body {
-            --console-width: 440px; 
-            background: linear-gradient(145deg, var(--console-main) 0%, var(--console-dark) 100%);
-            width: var(--console-width); 
-            border-radius: 20px 20px 60px 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.3);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: calc(30px + var(--safe-top)); 
-            padding-bottom: var(--safe-bottom);
-            contain: content; 
-            transition: background 0.3s ease;
-        }
-
-        .gbc-screen-lens {
-            background-color: #3f3f46;
-            width: 380px;
-            height: 310px;
-            border-radius: 15px 15px 50px 15px;
-            padding: 20px 30px;
-            box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            flex-shrink: 0; 
-            z-index: 10;
-            transform: translate3d(0,0,0);
-        }
-
-        .lens-branding {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .power-led {
-            width: 10px;
-            height: 10px;
-            background-color: #1c1c1c; 
-            border-radius: 50%;
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7);
-            transition: background-color 0.2s;
-        }
-        .power-led.on {
-            background-color: #ff0000; 
-            box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7);
-            animation: led-glow 1.5s infinite alternate ease-in-out;
-        }
-
-        .lcd-screen {
-            background-color: var(--screen-color);
-            width: 320px;
-            height: 240px;
-            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative; 
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-            contain: paint; 
-        }
-        
-        /* Scanlines - Z-Index 200 to cover menus */
-        .lcd-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(to bottom, 
-                    rgba(0,0,0,0.05) 0px, 
-                    rgba(0,0,0,0.05) 1px, 
-                    transparent 1px, 
-                    transparent 2px
-                ),
-                repeating-linear-gradient(to right, 
-                    rgba(0,0,0,0.02) 0px, 
-                    rgba(0,0,0,0.02) 1px, 
-                    transparent 1px, 
-                    transparent 2px
-                );
-            pointer-events: none;
-            z-index: 200;
-            will-change: transform;
-        }
-        
-        /* Game Container Styles */
-        iframe, canvas#rom-canvas {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: #000; 
-            display: none; 
-            will-change: transform; 
-            image-rendering: pixelated; 
-        }
-        
-        /* Menus */
-        .menu-ui {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white; 
-            padding: 12px; 
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; 
-            z-index: 100;
-        }
-
-        #start-screen {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            text-align: center;
-            color: #000000;
-            background-color: var(--screen-color); /* Fix: Ensure visible bg */
-        }
-
-        .nann-pill {
-            border: 3px solid #000000;
-            border-radius: 50px;
-            padding: 4px 24px;
-            display: inline-block;
-            margin-bottom: 20px;
-            background: transparent;
-        }
-
-        .nann-logo-text {
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            font-size: 28px;
-            color: #000000;
-            letter-spacing: 1px;
-            line-height: 1;
-        }
-
-        /* Menu Button Styles */
-        .menu-btn {
-            width: 90%; 
-            padding: 8px 0;
-            margin: 4px 0; 
-            background-color: #f3f4f6;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-            color: #374151;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .menu-btn:active {
-            background-color: #e5e7eb;
-            transform: scale(0.98);
-        }
-        
-        /* Theme Bubbles */
-        .theme-option {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 8px; 
-            margin: 4px 0;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .theme-preview {
-            width: 24px; 
-            height: 24px;
-            border-radius: 50%;
-            margin-right: 15px;
-            border: 2px solid rgba(0,0,0,0.1);
-        }
-
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
+        :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overscroll-behavior: none; position: fixed; overflow: hidden; background-color: var(--bg-color); transition: background-color 0.3s ease; font-family: 'Inter', sans-serif; display: flex; align-items: flex-start; justify-content: center; }
+        #console-wrapper { transform-origin: top center; will-change: transform; display: flex; justify-content: center; transform: translate3d(0,0,0); }
+        .gbc-body { --console-width: 440px; background: linear-gradient(145deg, var(--console-main) 0%, var(--console-dark) 100%); width: var(--console-width); border-radius: 20px 20px 60px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.3); position: relative; display: flex; flex-direction: column; align-items: center; padding-top: calc(30px + var(--safe-top)); padding-bottom: var(--safe-bottom); contain: content; transition: background 0.3s ease; }
+        .gbc-screen-lens { background-color: #3f3f46; width: 380px; height: 310px; border-radius: 15px 15px 50px 15px; padding: 20px 30px; box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; z-index: 10; transform: translate3d(0,0,0); }
+        .lens-branding { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
+        .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
+        @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
+        .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
+        .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
+        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; }
+        .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 12px; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
+        .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
+        .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
+        .menu-btn { width: 90%; padding: 8px 0; margin: 4px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
+        .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; }
+        .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
         #file-input-html, #file-input-rom { display: none; }
-
-        .upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 10px; 
-            background-color: #dc2626; 
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 8px;
-            transition: background-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .upload-label.rom-label {
-            background-color: #2563eb;
-        }
+        .upload-label { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; background-color: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 8px; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .upload-label.rom-label { background-color: #2563eb; }
         .upload-label:hover { opacity: 0.9; }
-
-        .nann-brand {
-            font-family: 'Inter', sans-serif;
-            font-style: italic;
-            font-weight: 900;
-            color: rgba(0,0,0,0.6); 
-            font-size: 28px;
-            letter-spacing: 1px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2);  
-        }
-
-        .controls-area {
-            width: 100%;
-            flex-grow: 1; 
-            position: relative;
-            transform: translate3d(0,0,0);
-        }
-
-        .speaker-grille {
-            position: absolute; bottom: 40px; right: 25px;
-            display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10;
-        }
-        .vent-slot {
-            width: 8px; height: 60px;
-            background-color: rgba(0,0,0,0.25);
-            border-radius: 4px;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 1px 1px 0 rgba(255,255,255,0.15);
-        }
-
-        .dpad {
-            position: absolute; top: 40px; left: 40px; width: 130px; height: 130px;
-        }
+        .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
+        .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
+        .speaker-grille { position: absolute; bottom: 40px; right: 25px; display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10; }
+        .vent-slot { width: 8px; height: 60px; background-color: rgba(0,0,0,0.25); border-radius: 4px; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 1px 1px 0 rgba(255,255,255,0.15); }
+        .dpad { position: absolute; top: 40px; left: 40px; width: 130px; height: 130px; }
         .dpad-cross { width: 100%; height: 100%; position: relative; }
-        
-        .dpad-arm {
-            background-color: var(--dpad-color); 
-            position: absolute; border-radius: 6px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.4); 
-            transition: transform 0.05s; 
-            will-change: transform;
-            contain: content;
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-        }
-        
-        .dpad-arm::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 6px;
-            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8);
-            pointer-events: none;
-        }
-
-        .dpad-arm.pressed-arm {
-            transform: translateY(2px) translate3d(0,0,0) !important;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.4); 
-        }
+        .dpad-arm { background-color: var(--dpad-color); position: absolute; border-radius: 6px; box-shadow: 2px 4px 6px rgba(0,0,0,0.4); transition: transform 0.05s; }
+        .dpad-arm::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .dpad-arm.pressed-arm { transform: translateY(2px) !important; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
         .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
         .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
-        
-        .dpad-center {
-            position: absolute; 
-            width: 40px; 
-            height: 40px; 
-            background-color: var(--dpad-color); 
-            top: 45px; 
-            left: 45px; 
-            z-index: 15;
-            border-radius: 4px; 
-            background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%);
-        }
-        
-        .dpad-center::after {
-            content: ''; 
-            position: absolute; 
-            top: 6px; left: 6px; 
-            width: 28px; height: 28px; 
-            border-radius: 50%; 
-            background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%);
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1);
-        }
-        
-        .dpad-btn { 
-            position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer;
-            will-change: transform; 
-        }
+        .dpad-center { position: absolute; width: 40px; height: 40px; background-color: var(--dpad-color); top: 45px; left: 45px; z-index: 15; border-radius: 4px; background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%); }
+        .dpad-center::after { content: ''; position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%); box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1); }
+        .dpad-btn { position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer; }
         .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
-        .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } 
-        .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
-
-        .action-buttons {
-            position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg);
-        }
-        .btn-round {
-            width: 60px; height: 60px; 
-            background-color: var(--btn-color); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: absolute; 
-            transition: transform 0.05s, box-shadow 0.05s;
-            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4);
-            color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900;
-            will-change: transform; 
-            contain: content;
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-        }
-        .btn-round.pressed {
-            transform: translateY(3px) translate3d(0,0,0) !important; 
-            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.4); 
-        }
-        .btn-b { bottom: 0; left: 0; } 
-        .btn-a { top: 0; right: 0; }
+        .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
+        .action-buttons { position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg); }
+        .btn-round { width: 60px; height: 60px; background-color: var(--btn-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; transition: transform 0.05s, box-shadow 0.05s; box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4); color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900; }
+        .btn-round.pressed { transform: translateY(3px) !important; box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.4); }
+        .btn-b { bottom: 0; left: 0; } .btn-a { top: 0; right: 0; }
+        .meta-buttons { position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; }
+        .btn-pill { width: 70px; height: 18px; background-color: #4b5563; border-radius: 12px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 2px rgba(0,0,0,0.8), 2px 3px 4px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.05s, box-shadow 0.05s; transform: rotate(-25deg); }
+        .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
+        .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
         
-        .meta-buttons {
-            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; 
-        }
-        .btn-pill {
-            width: 70px; height: 18px; background-color: #4b5563; border-radius: 12px; 
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 2px rgba(0,0,0,0.8), 2px 3px 4px rgba(0,0,0,0.3); 
-            cursor: pointer; 
-            transition: transform 0.05s, box-shadow 0.05s;
-            transform: rotate(-25deg) translate3d(0,0,0);
-            will-change: transform;
-            contain: content;
-        }
-        .btn-pill.pressed {
-            transform: rotate(-25deg) translateY(2px) translate3d(0,0,0);
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); 
-        }
-        
-        .meta-label {
-            font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px;
-            font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2);
-            margin-top: 10px; transform: rotate(-25deg); text-align: center;
-        }
-
-        #install-prompt {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px;
-            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 1000; display: none; flex-direction: column; align-items: center; text-align: center;
-            border: 2px solid #3b82f6; animation: slideUp 0.5s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
-        }
+        #install-prompt { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; align-items: center; text-align: center; border: 2px solid #3b82f6; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .install-icon { font-size: 24px; margin-bottom: 10px; }
         .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
         .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
+        #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
         
-        #toast-notification {
-            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px;
-            font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300;
-        }
         /* Debug Console */
         #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
         .debug-error { color: #ff5555; font-weight: bold; }
-        .debug-warn { color: #ffaa00; }
-        .debug-info { color: #88ccff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -519,7 +94,7 @@
         <div id="close-install">✕</div>
         <div class="install-icon">📲</div>
         <div class="font-bold text-lg mb-2">Install App</div>
-        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
+        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4" width="20" height="20"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
     </div>
 
     <div id="console-wrapper">
@@ -550,7 +125,7 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip,.gba"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBA)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GBA/GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
@@ -731,7 +306,7 @@
             reader.readAsText(file);
         }
 
-        // --- OFFICIAL MGBA LOADER (JSDelivr) ---
+        // --- CORE EMULATOR LOGIC (Binjgb via CDN) ---
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -746,14 +321,18 @@
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
-            if(loadingText) loadingText.innerText = "Booting...";
+            if(loadingText) loadingText.innerText = "Loading Core...";
             
             // 1. Configure Module
+            // We use the RawGithack CDN because JSDelivr can sometimes block WASM fetch on certain referrers
+            const WASM_URL = 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.wasm';
+            const JS_URL = 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.js';
+
             window.Module = {
                 canvas: romCanvas,
                 noInitialRun: true,
                 locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
+                    if (path.endsWith('.wasm')) return WASM_URL;
                     return path;
                 },
                 print: (text) => debugLog(`[Core] ${text}`),
@@ -764,12 +343,12 @@
                 }
             };
 
-            // 2. Load mGBA from JSDelivr
+            // 2. Load Binjgb JS
             try {
-                await loadScript('https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js');
-                debugLog("mGBA loaded.");
+                await loadScript(JS_URL);
+                debugLog("Binjgb JS loaded.");
             } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: mGBA failed to load.";
+                if(loadingText) loadingText.innerHTML = "Error: Failed to load emulator script.";
                 throw e;
             }
         }
@@ -792,11 +371,9 @@
                     }
                 }
                 
-                if (!window.Module || !window.Module.FS) {
-                    throw new Error("Emulator core failed to initialize.");
-                }
+                if (!window.Module || !window.Module.FS) throw new Error("Emulator core failed to initialize.");
 
-                const fileName = 'game.gba'; 
+                const fileName = 'rom.gb'; 
                 try {
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
@@ -830,21 +407,16 @@
         function handleRomUpload(event) {
             const file = event.target.files[0]; const fileStatus = document.getElementById('file-status'); const powerLed = document.getElementById('power-led');
             powerLed.classList.remove('on'); if (!file) return;
-            
-            // Accept GBA, GB, GBC, ZIP
-            const isZip = file.name.match(/\.zip$/i); 
-            const isRom = file.name.match(/\.(gba|gbc|gb)$/i);
-
+            const isZip = file.name.match(/\.zip$/i); const isRom = file.name.match(/\.(gb|gbc)$/i);
             if (!isZip && !isRom) { fileStatus.textContent = "Error: Invalid file type."; return; }
             fileStatus.textContent = `Reading ${file.name}...`; gameMode = 'rom';
-            
             if (isZip) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     JSZip.loadAsync(e.target.result).then(async function(zip) {
                         const files = Object.keys(zip.files);
-                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gba|gbc|gb)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
-                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No ROM found."; return; }
+                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gb|gbc)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
+                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found."; return; }
                         const chosenFile = romCandidates[0];
                         if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
