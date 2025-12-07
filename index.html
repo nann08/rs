@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -33,32 +33,6 @@
             linkFav32.sizes = '32x32';
             linkFav32.href = iconUrl;
             document.head.appendChild(linkFav32);
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-            if (!isIOS) {
-                const manifest = {
-                    "name": "Nann Boy",
-                    "short_name": "NannBoy",
-                    "start_url": ".",
-                    "display": "standalone",
-                    "background_color": "#7f1d1d",
-                    "theme_color": "#7f1d1d",
-                    "orientation": "portrait",
-                    "icons": [{ "src": iconUrl, "sizes": "192x192", "type": "image/png" }]
-                };
-                const linkManifest = document.createElement('link');
-                linkManifest.rel = 'manifest';
-                linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`;
-                document.head.appendChild(linkManifest);
-            }
-
-            // PERFORMANCE WARNING SUPPRESSION
-            const originalWarn = console.warn;
-            console.warn = function(...args) {
-                if (args[0] && typeof args[0] === 'string' && (args[0].includes('performance') || args[0].includes('AudioContext'))) return;
-                originalWarn.apply(console, args);
-            };
         })();
     </script>
 
@@ -79,13 +53,9 @@
             --screen-shadow: #0f380f;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
-            
-            /* Dynamic Theme Variables - Default Red */
             --console-main: #E83942;
             --console-dark: #b91c1c;
             --bg-color: #7f1d1d;
-
-            /* Dynamic Button Colors */
             --btn-color: #1c1c1c;
             --dpad-color: #1c1c1c;
         }
@@ -96,39 +66,17 @@
             100% { box-shadow: 0 0 5px #990000, 0 0 20px rgba(255, 0, 0, 0.4); opacity: 0.8; }
         }
 
-        html {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overscroll-behavior: none;
-            position: fixed;
-            overflow: hidden;
-            background-color: var(--bg-color); 
-            transition: background-color 0.3s ease;
-        }
-
-        body {
+        html, body {
+            width: 100%; height: 100%; margin: 0; padding: 0;
+            overscroll-behavior: none; position: fixed; overflow: hidden;
+            background-color: var(--bg-color); transition: background-color 0.3s ease;
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color); 
-            height: 100%; 
-            width: 100%;
-            display: flex;
-            align-items: flex-start; 
-            justify-content: center;
-            overscroll-behavior: none; 
-            touch-action: none;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease;
+            display: flex; align-items: flex-start; justify-content: center;
         }
 
         #console-wrapper {
-            transform-origin: top center; 
-            will-change: transform;
-            display: flex;
-            justify-content: center;
-            transform: translate3d(0,0,0);
+            transform-origin: top center; will-change: transform;
+            display: flex; justify-content: center; transform: translate3d(0,0,0);
         }
 
         .gbc-body {
@@ -137,46 +85,27 @@
             width: var(--console-width); 
             border-radius: 20px 20px 60px 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.3);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: calc(30px + var(--safe-top)); 
-            padding-bottom: var(--safe-bottom);
-            contain: content; 
-            transition: background 0.3s ease;
+            position: relative; display: flex; flex-direction: column; align-items: center;
+            padding-top: calc(30px + var(--safe-top)); padding-bottom: var(--safe-bottom);
+            contain: content; transition: background 0.3s ease;
         }
 
         .gbc-screen-lens {
-            background-color: #3f3f46;
-            width: 380px;
-            height: 310px;
-            border-radius: 15px 15px 50px 15px;
-            padding: 20px 30px;
+            background-color: #3f3f46; width: 380px; height: 310px;
+            border-radius: 15px 15px 50px 15px; padding: 20px 30px;
             box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            flex-shrink: 0; 
-            z-index: 10;
-            transform: translate3d(0,0,0);
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; flex-shrink: 0; z-index: 10; transform: translate3d(0,0,0);
         }
 
         .lens-branding {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            width: 100%; display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 10px;
         }
         
         .power-led {
-            width: 10px;
-            height: 10px;
-            background-color: #1c1c1c; 
-            border-radius: 50%;
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7);
+            width: 10px; height: 10px; background-color: #1c1c1c; 
+            border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7);
             transition: background-color 0.2s;
         }
         .power-led.on {
@@ -186,255 +115,123 @@
         }
 
         .lcd-screen {
-            background-color: var(--screen-color);
-            width: 320px;
-            height: 240px;
-            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative; 
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-            contain: paint; 
+            background-color: var(--screen-color); width: 320px; height: 240px;
+            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transform: translate3d(0,0,0);
+            backface-visibility: hidden; contain: paint; 
         }
         
-        /* Scanlines - Z-Index 200 to cover menus */
         .lcd-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(to bottom, 
-                    rgba(0,0,0,0.05) 0px, 
-                    rgba(0,0,0,0.05) 1px, 
-                    transparent 1px, 
-                    transparent 2px
-                ),
-                repeating-linear-gradient(to right, 
-                    rgba(0,0,0,0.02) 0px, 
-                    rgba(0,0,0,0.02) 1px, 
-                    transparent 1px, 
-                    transparent 2px
-                );
-            pointer-events: none;
-            z-index: 200;
-            will-change: transform;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px),
+                        repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px);
+            pointer-events: none; z-index: 200; will-change: transform;
         }
         
-        /* Game Container Styles */
         iframe, canvas#rom-canvas {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: #000; 
-            display: none; 
-            will-change: transform; 
-            image-rendering: pixelated; 
+            width: 100%; height: 100%; border: none; background-color: #000; 
+            display: none; will-change: transform; image-rendering: pixelated; 
         }
         
         /* Menus */
         .menu-ui {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white; 
-            padding: 12px; 
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; 
-            z-index: 100;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white; padding: 12px; display: none;
+            flex-direction: column; align-items: center; justify-content: center; z-index: 100;
         }
 
         #start-screen {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            text-align: center;
-            color: #000000;
-            background-color: var(--screen-color); /* Fix: Ensure visible bg */
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color);
         }
 
         .nann-pill {
-            border: 3px solid #000000;
-            border-radius: 50px;
-            padding: 4px 24px;
-            display: inline-block;
-            margin-bottom: 20px;
-            background: transparent;
+            border: 3px solid #000000; border-radius: 50px; padding: 4px 24px;
+            display: inline-block; margin-bottom: 20px; background: transparent;
         }
 
         .nann-logo-text {
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            font-size: 28px;
-            color: #000000;
-            letter-spacing: 1px;
-            line-height: 1;
+            font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px;
+            color: #000000; letter-spacing: 1px; line-height: 1;
         }
 
-        /* Menu Button Styles */
         .menu-btn {
-            width: 90%; 
-            padding: 8px 0;
-            margin: 4px 0; 
-            background-color: #f3f4f6;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-            color: #374151;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 90%; padding: 8px 0; margin: 4px 0; 
+            background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px;
+            font-weight: bold; font-size: 13px; color: #374151; text-align: center;
+            cursor: pointer; transition: all 0.2s;
         }
-        .menu-btn:active {
-            background-color: #e5e7eb;
-            transform: scale(0.98);
-        }
+        .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
         
-        /* Theme Bubbles */
         .theme-option {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 8px; 
-            margin: 4px 0;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            cursor: pointer;
+            display: flex; align-items: center; width: 100%; padding: 8px; 
+            margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer;
         }
         .theme-preview {
-            width: 24px; 
-            height: 24px;
-            border-radius: 50%;
-            margin-right: 15px;
+            width: 24px; height: 24px; border-radius: 50%; margin-right: 15px;
             border: 2px solid rgba(0,0,0,0.1);
         }
 
         #file-input-html, #file-input-rom { display: none; }
 
         .upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 10px; 
-            background-color: #dc2626; 
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 8px;
-            transition: background-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex; align-items: center; justify-content: center; width: 100%;
+            padding: 10px; background-color: #dc2626; color: white; border-radius: 8px;
+            cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .upload-label.rom-label {
-            background-color: #2563eb;
-        }
+        .upload-label.rom-label { background-color: #2563eb; }
         .upload-label:hover { opacity: 0.9; }
 
         .nann-brand {
-            font-family: 'Inter', sans-serif;
-            font-style: italic;
-            font-weight: 900;
-            color: rgba(0,0,0,0.6); 
-            font-size: 28px;
-            letter-spacing: 1px;
-            margin-top: 20px;
-            margin-bottom: 10px;
+            font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900;
+            color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px;
+            margin-top: 20px; margin-bottom: 10px;
             text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2);  
         }
 
-        .controls-area {
-            width: 100%;
-            flex-grow: 1; 
-            position: relative;
-            transform: translate3d(0,0,0);
-        }
+        .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
 
         .speaker-grille {
             position: absolute; bottom: 40px; right: 25px;
             display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10;
         }
         .vent-slot {
-            width: 8px; height: 60px;
-            background-color: rgba(0,0,0,0.25);
-            border-radius: 4px;
+            width: 8px; height: 60px; background-color: rgba(0,0,0,0.25); border-radius: 4px;
             box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 1px 1px 0 rgba(255,255,255,0.15);
         }
 
-        .dpad {
-            position: absolute; top: 40px; left: 40px; width: 130px; height: 130px;
-        }
+        .dpad { position: absolute; top: 40px; left: 40px; width: 130px; height: 130px; }
         .dpad-cross { width: 100%; height: 100%; position: relative; }
         
         .dpad-arm {
-            background-color: var(--dpad-color); 
-            position: absolute; border-radius: 6px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.4); 
-            transition: transform 0.05s; 
-            will-change: transform;
-            contain: content;
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
+            background-color: var(--dpad-color); position: absolute; border-radius: 6px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.4); transition: transform 0.05s; 
+            will-change: transform; contain: content; transform: translate3d(0,0,0); backface-visibility: hidden;
         }
-        
         .dpad-arm::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 6px;
-            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8);
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 6px; box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8);
             pointer-events: none;
         }
-
-        .dpad-arm.pressed-arm {
-            transform: translateY(2px) translate3d(0,0,0) !important;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.4); 
-        }
+        .dpad-arm.pressed-arm { transform: translateY(2px) translate3d(0,0,0) !important; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
         .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
         .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
         
         .dpad-center {
-            position: absolute; 
-            width: 40px; 
-            height: 40px; 
-            background-color: var(--dpad-color); 
-            top: 45px; 
-            left: 45px; 
-            z-index: 15;
-            border-radius: 4px; 
+            position: absolute; width: 40px; height: 40px; background-color: var(--dpad-color); 
+            top: 45px; left: 45px; z-index: 15; border-radius: 4px; 
             background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%);
         }
-        
         .dpad-center::after {
-            content: ''; 
-            position: absolute; 
-            top: 6px; left: 6px; 
-            width: 28px; height: 28px; 
-            border-radius: 50%; 
+            content: ''; position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; 
             background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%);
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1);
         }
         
-        .dpad-btn { 
-            position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer;
-            will-change: transform; 
-        }
+        .dpad-btn { position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer; will-change: transform; }
         .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
         .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } 
         .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
@@ -443,25 +240,18 @@
             position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg);
         }
         .btn-round {
-            width: 60px; height: 60px; 
-            background-color: var(--btn-color); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: absolute; 
+            width: 60px; height: 60px; background-color: var(--btn-color); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; 
             transition: transform 0.05s, box-shadow 0.05s;
             box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4);
             color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900;
-            will-change: transform; 
-            contain: content;
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
+            will-change: transform; contain: content; transform: translate3d(0,0,0); backface-visibility: hidden;
         }
         .btn-round.pressed {
             transform: translateY(3px) translate3d(0,0,0) !important; 
             box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.4); 
         }
-        .btn-b { bottom: 0; left: 0; } 
-        .btn-a { top: 0; right: 0; }
+        .btn-b { bottom: 0; left: 0; } .btn-a { top: 0; right: 0; }
         
         .meta-buttons {
             position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; 
@@ -469,11 +259,8 @@
         .btn-pill {
             width: 70px; height: 18px; background-color: #4b5563; border-radius: 12px; 
             box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 2px rgba(0,0,0,0.8), 2px 3px 4px rgba(0,0,0,0.3); 
-            cursor: pointer; 
-            transition: transform 0.05s, box-shadow 0.05s;
-            transform: rotate(-25deg) translate3d(0,0,0);
-            will-change: transform;
-            contain: content;
+            cursor: pointer; transition: transform 0.05s, box-shadow 0.05s;
+            transform: rotate(-25deg) translate3d(0,0,0); will-change: transform; contain: content;
         }
         .btn-pill.pressed {
             transform: rotate(-25deg) translateY(2px) translate3d(0,0,0);
@@ -498,6 +285,7 @@
         }
         .install-icon { font-size: 24px; margin-bottom: 10px; }
         .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
+        /* FIXED: Force size on share icon to prevent it from blowing up */
         .share-icon-img { width: 20px; height: 20px; vertical-align: middle; display: inline-block; margin: 0 5px; }
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
         
@@ -519,7 +307,11 @@
         <div id="close-install">✕</div>
         <div class="install-icon">📲</div>
         <div class="font-bold text-lg mb-2">Install App</div>
-        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
+        <div class="install-text">
+            To install Nann Boy on iOS:<br>
+            1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>
+            2. Tap <strong>"Add to Home Screen"</strong>
+        </div>
     </div>
 
     <div id="console-wrapper">
@@ -568,7 +360,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // DEBUG SYSTEM
         function debugLog(msg, type='info') {
             const consoleEl = document.getElementById('debug-console');
             if (consoleEl) {
@@ -612,7 +403,6 @@
         let virtualKeyStates = {};
         let isAuthReady = false;
 
-        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -633,7 +423,6 @@
             osc2.start(t); osc2.stop(t + 0.05);
         }
 
-        // --- THEME ENGINE ---
         function applyTheme(themeName) {
             const root = document.documentElement;
             let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
@@ -704,7 +493,6 @@
             } else if (gameMode === 'rom') { sendMgbaInput(label, isDown); }
         }
 
-        // --- MENU HANDLING ---
         function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
         function showKeySelection(label) {
             currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
@@ -735,8 +523,7 @@
             reader.readAsText(file);
         }
 
-        // --- NEW: BINJGB CORE INTEGRATION ---
-        
+        // --- STANDARD EMULATOR INIT (ROBUST) ---
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -753,67 +540,65 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
             if(loadingText) loadingText.innerText = "Booting...";
-            debugLog("Starting Init...");
+            debugLog("Init...");
 
-            // 1. Manually fetch and verify WASM first
-            let wasmBinary;
-            try {
-                const response = await fetch('binjgb.wasm');
-                if (!response.ok) throw new Error(`WASM file not found (404). Ensure binjgb.wasm is in root.`);
-                const buffer = await response.arrayBuffer();
-                
-                // Verify Magic Bytes
-                const header = new Uint8Array(buffer, 0, 4);
-                if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
-                    throw new Error(`CRITICAL: binjgb.wasm is corrupt.`);
-                }
-                
-                // CRITICAL FIX: Convert to Uint8Array for Emscripten
-                wasmBinary = new Uint8Array(buffer);
-                debugLog(`WASM Validated (${buffer.byteLength} bytes).`);
-            } catch (e) {
-                if(loadingText) loadingText.innerHTML = `<span style="color:#ff5555">${e.message}</span>`;
-                debugLog(e.message, 'error');
-                throw e;
-            }
-
-            // 2. Load JS
-            try {
-                await loadScript('binjgb.js');
-                debugLog("binjgb.js loaded.");
-            } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
-                throw e;
-            }
-
-            // 3. Initialize Factory using DIRECT INJECTION
-            if (typeof Binjgb !== 'function') throw new Error("Binjgb factory not found in JS.");
-
-            const moduleConfig = {
+            // 1. DEFINE MODULE GLOBAL
+            // This works for both Global and Factory patterns usually if done right.
+            // But if it IS a factory, we handle it after script load.
+            window.Module = {
                 canvas: romCanvas,
-                wasmBinary: wasmBinary, // Feed the data directly
+                noInitialRun: true,
+                locateFile: function(path) {
+                    if (path.endsWith('.wasm')) return 'binjgb.wasm';
+                    return path;
+                },
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
                 onRuntimeInitialized: function() {
-                    debugLog("Runtime Initialized.");
+                    debugLog("Runtime Ready (Callback)");
                     emulatorInitialized = true;
                 }
             };
 
-            window.Module = await Binjgb(moduleConfig);
+            // 2. Load Script
+            try {
+                await loadScript('binjgb.js');
+                debugLog("Script Loaded.");
+            } catch(e) {
+                if(loadingText) loadingText.innerHTML = "Error: binjgb.js missing.";
+                throw new Error("binjgb.js not found.");
+            }
 
-            // 4. Wait for FS
+            // 3. Factory Handshake
+            // If the script didn't auto-execute (Factory pattern), we call it now.
+            if (typeof Binjgb === 'function') {
+                debugLog("Factory detected. Executing...");
+                try {
+                    window.Module = await Binjgb(window.Module);
+                    emulatorInitialized = true;
+                    debugLog("Factory Init Complete.");
+                } catch(e) {
+                    debugLog("Factory Init Failed: " + e.message, 'error');
+                    throw e;
+                }
+            }
+
+            // 4. Wait for Runtime
             let attempts = 0;
-            while (!window.Module.FS && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100)); attempts++;
+            while (!emulatorInitialized && attempts < 100) { // Extended wait (10s)
+                await new Promise(r => setTimeout(r, 100)); 
+                attempts++;
             }
             
-            if (!window.Module.FS) {
-                throw new Error("File System failed to mount.");
+            if (!emulatorInitialized) {
+                 // Final check: sometimes FS exists even if flag didn't flip
+                 if (window.Module && window.Module.FS) {
+                     emulatorInitialized = true;
+                     debugLog("Force-confirmed FS.");
+                 } else {
+                     throw new Error("Core failed to initialize.");
+                 }
             }
-            
-            emulatorInitialized = true;
-            debugLog("Ready to Load ROM.");
         }
 
         async function launchEmulator(romData, name) {
@@ -821,18 +606,16 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                if(!loadingOverlay.innerHTML.includes('CRITICAL')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
+                if(loadingOverlay.innerText.includes('Error')) loadingOverlay.innerHTML = `<span id="loading-text">Starting Engine...</span>`;
             }
 
             try {
                 if (!emulatorInitialized) await initEmulator();
                 
-                // Double check FS
                 if (!window.Module.FS) throw new Error("File System not ready.");
 
                 const fileName = 'rom.gb'; 
                 try {
-                    // Try to write file
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
                     debugLog(`ROM Written to FS: ${name}`);
@@ -844,7 +627,7 @@
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    console.warn("callMain not found, checking auto-run...");
+                    console.warn("callMain not found.");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
