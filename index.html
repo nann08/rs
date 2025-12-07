@@ -1176,88 +1176,53 @@
             });
         }
 
+        // --- NEW: BINJGB CORE INTEGRATION (STANDARD METHOD) ---
+        
         async function initEmulator() {
             if (emulatorInitialized) return;
 
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Loading Local Core...";
+            if(loadingText) loadingText.innerText = "Booting Core...";
             
-            // --- STRICT LOCAL LOAD STRATEGY ---
-            // Prioritize loading files from the same directory (repo root)
-            // Fallback to CDN only if local fails completely
-            const CDN_URLS = [
-                { wasm: 'binjgb.wasm', js: 'binjgb.js' }
-            ];
+            return new Promise((resolve, reject) => {
+                // 1. Define the Emscripten Module object globally BEFORE loading the script.
+                // This is how the working emulator does it.
+                window.Module = {
+                    canvas: romCanvas,
+                    noInitialRun: true, // Wait for us to call main()
+                    print: function(text) { console.log('[Binjgb]', text); },
+                    printErr: function(text) { console.error('[Binjgb]', text); },
+                    onRuntimeInitialized: function() {
+                        console.log('Binjgb Runtime Initialized');
+                        emulatorInitialized = true;
+                        resolve();
+                    }
+                };
 
-            let wasmBinary = null;
-            let jsContent = null;
-            let foundWasmUrl = null;
+                // 2. Load the script tag normally.
+                // This allows binjgb.js to automatically find binjgb.wasm in the same folder.
+                const script = document.createElement('script');
+                script.src = 'binjgb.js'; 
+                script.async = true;
+                
+                script.onerror = () => {
+                    if(loadingText) {
+                        loadingText.innerHTML = `
+                        <div style="color: #f87171; font-size: 14px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 8px;">
+                            <div style="font-weight:bold; margin-bottom:5px;">⚠️ Core Not Found</div>
+                            <div style="font-size:12px; margin-bottom:10px; color:#ddd;">
+                                Could not load <b>binjgb.js</b>.<br>
+                                Make sure <b>binjgb.js</b> and <b>binjgb.wasm</b> are in the root folder.
+                            </div>
+                        </div>`;
+                    }
+                    reject(new Error("Failed to load binjgb.js"));
+                };
 
-            // Try to load
-            for (const urls of CDN_URLS) {
-                try {
-                    console.log(`Checking for core at: ${urls.wasm}`);
-                    
-                    // We try to fetch the JS. If it works, we assume WASM is there too for locateFile
-                    const resJs = await fetch(urls.js);
-                    if (!resJs.ok) throw new Error('JS not found locally');
-                    
-                    jsContent = await resJs.text();
-                    foundWasmUrl = urls.wasm; // We'll pass this string to locateFile
-                    
-                    console.log("Local Core found!");
-                    break; 
-                } catch (e) {
-                    console.warn(`Skipping source ${urls.wasm}`, e);
-                }
-            }
-
-            if (!jsContent) {
-                if(loadingText) loadingText.innerText = "Error: binjgb.js not found in repo.";
-                throw new Error("Core files missing");
-            }
-
-            // Normal Path: We have JS content and a URL for WASM
-            configureModule(foundWasmUrl);
-
-            const script = document.createElement('script');
-            script.text = jsContent;
-            document.head.appendChild(script);
-            
-            await waitForRuntime();
-        }
-
-        function configureModule(wasmUrl) {
-             const romCanvas = document.getElementById('rom-canvas');
-             
-             window.Module = {
-                canvas: romCanvas,
-                // STANDARD EMSCRIPTEN LOADING:
-                locateFile: function(path, prefix) {
-                    if (path.endsWith('.wasm')) return wasmUrl;
-                    return prefix + path;
-                },
-                print: function(text) { console.log('[Binjgb]', text); },
-                printErr: function(text) { console.error('[Binjgb]', text); },
-                onRuntimeInitialized: function() {
-                    console.log('Binjgb Runtime Initialized via Callback');
-                    emulatorInitialized = true;
-                }
-            };
-        }
-
-        async function waitForRuntime() {
-            let attempts = 0;
-            while (!emulatorInitialized && attempts < 100) {
-                await new Promise(r => setTimeout(r, 100));
-                if (window.Module && window.Module.FS) emulatorInitialized = true;
-                attempts++;
-            }
-            if (!emulatorInitialized) {
-                console.warn("Runtime initialization timeout, but continuing to try launch...");
-            }
+                document.body.appendChild(script);
+            });
         }
 
         async function launchEmulator(romData, name) {
@@ -1266,7 +1231,10 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                // Only show spinner if not showing an error
+                if(!loadingOverlay.innerText.includes('Error') && !loadingOverlay.innerText.includes('Core Not Found')) {
+                    loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                }
             }
 
             try {
@@ -1274,36 +1242,31 @@
                     await initEmulator();
                 }
                 
-                // FINAL SAFETY CHECK: Wait specifically for File System
-                let fsReady = false;
-                for(let i=0; i<30; i++) { // Wait up to 3 seconds for FS
-                    if(window.Module && window.Module.FS) {
-                        fsReady = true;
-                        break;
-                    }
-                    await new Promise(r => setTimeout(r, 100));
-                }
-
-                // Soft check: If FS isn't ready but callMain is, try anyway (sometimes FS is hidden)
-                if (!fsReady && !window.Module.callMain) {
-                    throw new Error("Emulator File System failed to mount. Please reload.");
-                }
-
+                // Emscripten File System operations
                 const fileName = 'rom.gb'; 
 
-                try {
-                    if (window.Module.FS) {
-                        try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
-                        window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
-                    }
-                } catch(e) {
-                    console.error("FS Error (Non-fatal if using memory stream):", e);
+                // Ensure FS is ready (it should be if initEmulator resolved)
+                if (!window.Module.FS) {
+                    throw new Error("Emulator File System not ready.");
                 }
 
+                try {
+                    // Write ROM to virtual file system
+                    // Note: We use FS.writeFile or createDataFile
+                    window.Module.FS.writeFile(fileName, new Uint8Array(romData));
+                } catch(e) {
+                    console.error("FS Write Error:", e);
+                    // Try cleanup and rewrite
+                    try { window.Module.FS.unlink(fileName); } catch(err) {}
+                    window.Module.FS.writeFile(fileName, new Uint8Array(romData));
+                }
+
+                // Launch the emulator
+                // Binjgb typically uses callMain passing the filename
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    throw new Error("Emulator entry point not found. Try refreshing.");
+                    throw new Error("Emulator entry point not found.");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
