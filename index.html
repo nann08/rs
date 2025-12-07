@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -90,12 +90,6 @@
             --dpad-color: #1c1c1c;
         }
         
-        @keyframes led-glow {
-            0% { box-shadow: 0 0 5px #990000, 0 0 20px rgba(255, 0, 0, 0.4); opacity: 0.8; }
-            50% { box-shadow: 0 0 10px #ff0000, 0 0 30px rgba(255, 0, 0, 0.8); opacity: 1; }
-            100% { box-shadow: 0 0 5px #990000, 0 0 20px rgba(255, 0, 0, 0.4); opacity: 0.8; }
-        }
-
         html {
             width: 100%;
             height: 100%;
@@ -496,16 +490,16 @@
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
-        .install-icon { font-size: 24px; margin-bottom: 10px; }
-        .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
-        .share-icon-img { width: 20px; height: 20px; vertical-align: middle; display: inline-block; margin: 0 5px; }
-        #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
+        #toast-notification {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300;
+        }
         
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <!-- Install Prompt for iOS -->
     <div id="install-prompt">
         <div id="close-install">✕</div>
         <div class="install-icon">📲</div>
@@ -535,7 +529,6 @@
                         <span id="loading-text">Initializing...</span>
                     </div>
 
-                    <!-- Start Screen Overlay -->
                     <div id="start-screen">
                         <div class="nann-pill">
                             <div class="nann-logo-text">NANN BOY</div>
@@ -557,7 +550,6 @@
                     <!-- NEW: Start Menu (Save/Load) -->
                     <div id="start-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2>
-                        <!-- Disabled for mGBA core initially as it uses internal battery saves -->
                         <div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div>
                         <button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button>
                     </div>
@@ -569,7 +561,6 @@
                             <!-- Nann Boy Option -->
                             <div class="theme-option" data-theme="nannboy">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;">
-                                    <!-- Use #800000 Maroon for preview -->
                                     <div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div>
                                 </div>
                                 <span class="font-bold text-gray-700">Nann Boy</span>
@@ -579,6 +570,7 @@
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div>
                                 <span class="font-bold text-gray-700">Original Red</span>
                             </div>
+                            <!-- ... other styles ... -->
                             <div class="theme-option" data-theme="purple">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #7c3aed, #4c1d95);"></div>
                                 <span class="font-bold text-gray-700">Atomic Purple</span>
@@ -587,27 +579,22 @@
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div>
                                 <span class="font-bold text-gray-700">Glacier Blue</span>
                             </div>
-                            <!-- Added Pink -->
                             <div class="theme-option" data-theme="pink">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #f472b6, #db2777);"></div>
                                 <span class="font-bold text-gray-700">Berry Pink</span>
                             </div>
-                            <!-- Added Leaf Green -->
                             <div class="theme-option" data-theme="green">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #84cc16, #4d7c0f);"></div>
                                 <span class="font-bold text-gray-700">Leaf Green</span>
                             </div>
-                            <!-- Added June Orange -->
                             <div class="theme-option" data-theme="orange">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #f97316, #c2410c);"></div>
                                 <span class="font-bold text-gray-700">June Orange</span>
                             </div>
-                            <!-- Added White -->
                             <div class="theme-option" data-theme="white">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div>
                                 <span class="font-bold text-gray-700">Polar White</span>
                             </div>
-                            <!-- Added Black -->
                             <div class="theme-option" data-theme="black">
                                 <div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div>
                                 <span class="font-bold text-gray-700">Midnight Black</span>
@@ -648,10 +635,7 @@
                         <button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button>
                     </div>
                     
-                    <!-- NEW: Toast Notification for Saves -->
-                    <div id="toast-notification" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none" style="z-index: 300;">
-                        GAME SAVED
-                    </div>
+                    <div id="toast-notification">GAME SAVED</div>
                     
                 </div>
             </div>
@@ -669,7 +653,6 @@
                         <div class="dpad-arm dpad-h"></div>
                         <div class="dpad-arm dpad-v"></div>
                         <div class="dpad-center"></div>
-                        <!-- Increased touch targets -->
                         <div class="dpad-btn dpad-up" data-label="Up"></div>
                         <div class="dpad-btn dpad-down" data-label="Down"></div>
                         <div class="dpad-btn dpad-left" data-label="Left"></div>
@@ -711,14 +694,13 @@
         let currentRomName = 'unknown_game'; 
         let emulatorInitialized = false;
 
-        // UPDATED: Key map to match Binjgb default SDL key expectations
         let keyMap = {
             'Up': { key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
             'Down': { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40 },
             'Left': { key: 'ArrowLeft', code: 'ArrowLeft', keyCode: 37 },
             'Right': { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 }, 
-            'A': { key: 'x', code: 'KeyX', keyCode: 88 },  // Binjgb Default A
-            'B': { key: 'z', code: 'KeyZ', keyCode: 90 },  // Binjgb Default B
+            'A': { key: 'x', code: 'KeyX', keyCode: 88 },  
+            'B': { key: 'z', code: 'KeyZ', keyCode: 90 },  
             'Start': { key: 'Enter', code: 'Enter', keyCode: 13 },
             'Select': { key: 'Backspace', code: 'Backspace', keyCode: 8 },
         };
@@ -746,8 +728,6 @@
         function playHapticSound() {
             if (!audioCtx) return;
             const t = audioCtx.currentTime;
-
-            // 1. The "Click" (High frequency snap - Mechanical feel)
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -763,7 +743,6 @@
             osc.start(t);
             osc.stop(t + 0.01);
 
-            // 2. The "Thud" (Plastic body sound)
             const osc2 = audioCtx.createOscillator();
             const gain2 = audioCtx.createGain();
             osc2.connect(gain2);
@@ -780,58 +759,32 @@
             osc2.stop(t + 0.05);
         }
 
-        // --- THEME ENGINE ---
         function applyTheme(themeName) {
             const root = document.documentElement;
             // Defaults (Red)
             let mainColor = '#E83942';
             let darkColor = '#b91c1c';
             let bgColor = '#7f1d1d';
-            let btnColor = '#1c1c1c'; // Default Button Color
-            let dpadColor = '#1c1c1c'; // Default Dpad Color
+            let btnColor = '#1c1c1c'; 
+            let dpadColor = '#1c1c1c';
 
             if (themeName === 'purple') {
-                // Atomic Purple
-                mainColor = '#7c3aed';
-                darkColor = '#4c1d95';
-                bgColor = '#4c1d95';
+                mainColor = '#7c3aed'; darkColor = '#4c1d95'; bgColor = '#4c1d95';
             } else if (themeName === 'glacier') {
-                // Glacier Blue
-                mainColor = '#a5f3fc';
-                darkColor = '#0891b2';
-                bgColor = '#164e63';
+                mainColor = '#a5f3fc'; darkColor = '#0891b2'; bgColor = '#164e63';
             } else if (themeName === 'pink') {
-                // Berry Pink
-                mainColor = '#f472b6';
-                darkColor = '#db2777';
-                bgColor = '#831843';
+                mainColor = '#f472b6'; darkColor = '#db2777'; bgColor = '#831843';
             } else if (themeName === 'green') {
-                // Leaf Green
-                mainColor = '#84cc16'; // Lime-500
-                darkColor = '#4d7c0f'; // Lime-700
-                bgColor = '#14532d';   // Green-900 (Forest background)
+                mainColor = '#84cc16'; darkColor = '#4d7c0f'; bgColor = '#14532d';
             } else if (themeName === 'orange') {
-                // June Orange
-                mainColor = '#f97316'; // Orange-500
-                darkColor = '#c2410c'; // Orange-700
-                bgColor = '#7c2d12';   // Orange-900
+                mainColor = '#f97316'; darkColor = '#c2410c'; bgColor = '#7c2d12';
             } else if (themeName === 'white') {
-                // Polar White
-                mainColor = '#f3f4f6';
-                darkColor = '#9ca3af'; 
-                bgColor = '#374151'; // Dark gray bg for contrast
+                mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151';
             } else if (themeName === 'black') {
-                // Midnight Black - Adjusted to be slightly lighter
-                mainColor = '#27272a'; // zinc-800
-                darkColor = '#18181b'; // zinc-900 (was #000000)
-                bgColor = '#09090b';   // zinc-950 (was #000000)
+                mainColor = '#27272a'; darkColor = '#18181b'; bgColor = '#09090b';
             } else if (themeName === 'nannboy') {
-                // Nann Boy (White Body, Dark Maroon Buttons)
-                mainColor = '#f3f4f6';
-                darkColor = '#9ca3af'; 
-                bgColor = '#374151'; 
-                btnColor = '#800000'; // Maroon/Deep Crimson
-                dpadColor = '#800000'; // Maroon/Deep Crimson
+                mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; 
+                btnColor = '#800000'; dpadColor = '#800000';
             }
 
             root.style.setProperty('--console-main', mainColor);
@@ -848,19 +801,8 @@
             if (savedTheme) applyTheme(savedTheme);
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast-notification');
-            toast.textContent = msg;
-            toast.style.opacity = '1';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 2000);
-        }
-
-        // --- LOGIC ---
-
         async function initFirebase() {
-            loadTheme(); // Load theme immediately
+            loadTheme();
             const loadingOverlay = document.getElementById('loading-overlay');
             
             if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
@@ -873,10 +815,8 @@
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
-                
                 if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
                 else await signInAnonymously(auth);
-                
                 onAuthStateChanged(auth, (user) => {
                     userId = user ? user.uid : null;
                     isAuthReady = true;
@@ -892,9 +832,7 @@
 
         function loadKeyMap() {
             const storedMap = localStorage.getItem(keyMapStorageKey);
-            if (storedMap) {
-                try { keyMap = JSON.parse(storedMap); } catch (e) { }
-            }
+            if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } }
             renderBindings();
         }
 
@@ -962,35 +900,21 @@
         
         function handleVirtualPress(label, isDown, shouldSendMessage = true) {
             const currentState = virtualKeyStates[label] || false;
-            
             if (isDown !== currentState) {
                 virtualKeyStates[label] = isDown;
                 if (shouldSendMessage) sendKey(label, isDown);
             }
         }
 
-        // --- EMULATOR INPUT DISPATCHER ---
-        function sendEmulatorInput(label, isDown) {
-            // Updated to be generic so it works for Binjgb/mGBA
+        function sendMgbaInput(label, isDown) {
             const mapping = keyMap[label];
             if (!mapping) return;
-
             const eventType = isDown ? 'keydown' : 'keyup';
-            
-            // Dispatch to Window (Emulator SDL listens here)
             const event = new KeyboardEvent(eventType, {
-                key: mapping.key,
-                code: mapping.code,
-                keyCode: mapping.keyCode,
-                which: mapping.keyCode,
-                bubbles: true,
-                cancelable: true,
-                view: window
+                key: mapping.key, code: mapping.code, keyCode: mapping.keyCode,
+                which: mapping.keyCode, bubbles: true, cancelable: true, view: window
             });
-            
             window.dispatchEvent(event);
-            
-            // Also dispatch to canvas just in case focus is there
             const canvas = document.getElementById('rom-canvas');
             if (canvas) canvas.dispatchEvent(event);
         }
@@ -1001,20 +925,13 @@
                 if (!iframe || !iframe.contentWindow || currentMenu !== null) return;
                 const mappedKey = keyMap[label];
                 if (!mappedKey) return;
-                
                 iframe.contentWindow.postMessage({
-                    type: isDown ? 'keydown' : 'keyup',
-                    key: mappedKey.key,
-                    code: mappedKey.code,
-                    keyCode: mappedKey.keyCode
+                    type: isDown ? 'keydown' : 'keyup', key: mappedKey.key, code: mappedKey.code, keyCode: mappedKey.keyCode
                 }, '*');
             } else if (gameMode === 'rom') {
-                // Use the Emulator input handler
-                sendEmulatorInput(label, isDown);
+                sendMgbaInput(label, isDown);
             }
         }
-
-        // --- MENU HANDLING ---
 
         function startKeyBinding(label) {
             activeBindingLabel = label;
@@ -1028,7 +945,6 @@
             document.getElementById('binding-label-display').textContent = label;
             const keypad = document.getElementById('virtual-keypad');
             keypad.innerHTML = ''; 
-            
             const keys = [
                 {k:'1',c:'Digit1',d:'1'},{k:'2',c:'Digit2',d:'2'},{k:'3',c:'Digit3',d:'3'},{k:'4',c:'Digit4',d:'4'},{k:'5',c:'Digit5',d:'5'},
                 {k:'6',c:'Digit6',d:'6'},{k:'7',c:'Digit7',d:'7'},{k:'8',c:'Digit8',d:'8'},{k:'9',c:'Digit9',d:'9'},{k:'0',c:'Digit0',d:'0'},
@@ -1042,19 +958,15 @@
                 {k:'ArrowUp',c:'ArrowUp',d:'↑'},{k:'ArrowDown',c:'ArrowDown',d:'↓'},
                 {k:'ArrowLeft',c:'ArrowLeft',d:'←'},{k:'ArrowRight',c:'ArrowRight',d:'→'}
             ];
-
             keys.forEach(vKey => {
                 const btn = document.createElement('div');
                 btn.className = 'virtual-key-btn';
                 btn.textContent = vKey.display || vKey.d;
                 btn.addEventListener('click', () => {
                     keyMap[label] = { 
-                        key: vKey.k, 
-                        code: vKey.c, 
-                        keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) 
+                        key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) 
                     }; 
-                    saveKeyMap();
-                    hideKeySelection();
+                    saveKeyMap(); hideKeySelection();
                 });
                 keypad.appendChild(btn);
             });
@@ -1067,40 +979,28 @@
             currentMenu = 'keymap';
         }
 
-        // Generic Menu Opener
         function openMenu(menuId) {
             document.querySelectorAll('.menu-ui').forEach(el => {
-                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
-                    el.style.display = 'none';
-                }
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') el.style.display = 'none';
             });
-            
             const menu = document.getElementById(menuId);
             if (menu) {
                 menu.style.display = 'flex';
                 currentMenu = menuId;
-                
-                if (menuId === 'key-binding-menu') {
-                    renderBindings();
-                }
+                if (menuId === 'key-binding-menu') renderBindings();
             }
         }
 
         function closeAllMenus() {
             document.querySelectorAll('.menu-ui').forEach(el => {
-                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
-                    el.style.display = 'none';
-                }
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') el.style.display = 'none';
             });
             currentMenu = null;
         }
 
         function toggleMenu(menuId) {
-            if (currentMenu === menuId) {
-                closeAllMenus();
-            } else {
-                openMenu(menuId);
-            }
+            if (currentMenu === menuId) closeAllMenus();
+            else openMenu(menuId);
         }
         
         function handleHtmlUpload(event) {
@@ -1112,68 +1012,30 @@
             const startScreen = document.getElementById('start-screen');
 
             powerLed.classList.remove('on'); 
-            
-            // Note: mGBA doesn't have a simple pause API like WasmBoy, so we reload to stop it if needed
-            // But for now we just hide it.
-
             if (!file) return;
             if (file.type !== 'text/html' && !file.name.endsWith('.html')) { 
                 fileStatus.textContent = "Error: Invalid HTML file."; 
                 return; 
             }
-
             fileStatus.textContent = `Loading ${file.name}...`;
             const reader = new FileReader();
-
             reader.onload = function(e) {
                 let htmlContent = e.target.result;
                 const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
                 const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
-
                 htmlContent = fitStyle + htmlContent + bridgeScript;
-
                 try {
                     const blob = new Blob([htmlContent], { type: 'text/html' });
                     const blobUrl = URL.createObjectURL(blob);
-                    
                     iframe.onload = () => {
-                         URL.revokeObjectURL(blobUrl);
-                         closeAllMenus();
-                         iframe.onload = null;
-                         
-                         gameMode = 'html';
-                         iframe.style.display = 'block';
-                         romCanvas.style.display = 'none';
-                         startScreen.style.display = 'none'; 
-                         
-                         iframe.contentWindow.focus();
-                         powerLed.classList.add('on');
+                         URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null;
+                         gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.display = 'none';
+                         startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on');
                     };
                     iframe.src = blobUrl;
-                } catch (error) {
-                    fileStatus.textContent = "Error loading file.";
-                }
+                } catch (error) { fileStatus.textContent = "Error loading file."; }
             };
             reader.readAsText(file);
-        }
-
-        // --- NEW: BINJGB CORE INTEGRATION (LOCAL FILES) ---
-        
-        async function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                if (src.startsWith('var Module') || src.includes('function')) {
-                    script.text = src;
-                    document.head.appendChild(script);
-                    resolve();
-                } else {
-                    script.src = src;
-                    script.crossOrigin = "anonymous"; 
-                    script.onload = resolve;
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                }
-            });
         }
 
         async function initEmulator() {
@@ -1182,48 +1044,92 @@
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
 
-            if(loadingText) loadingText.innerText = "Loading Local Core...";
+            if(loadingText) loadingText.innerText = "Loading Core...";
             
-            // --- STRICT LOCAL LOAD STRATEGY ---
-            // Prioritize loading files from the same directory (repo root)
-            // Fallback to CDN only if local fails completely
             const CDN_URLS = [
-                { wasm: 'binjgb.wasm', js: 'binjgb.js' }
+                { wasm: 'binjgb.wasm', js: 'binjgb.js' },
+                { wasm: 'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.wasm', js: 'https://cdn.jsdelivr.net/gh/binji/binjgb@master/docs/binjgb.js' }
             ];
 
-            let wasmBinary = null;
-            let jsContent = null;
             let foundWasmUrl = null;
+            let foundJsUrl = null;
 
-            // Try to load
+            // Try sources
             for (const urls of CDN_URLS) {
                 try {
                     console.log(`Checking for core at: ${urls.wasm}`);
-                    
-                    // We try to fetch the JS. If it works, we assume WASM is there too for locateFile
                     const resJs = await fetch(urls.js);
-                    if (!resJs.ok) throw new Error('JS not found locally');
+                    if (!resJs.ok) throw new Error('JS not found');
                     
-                    jsContent = await resJs.text();
-                    foundWasmUrl = urls.wasm; // We'll pass this string to locateFile
+                    foundJsUrl = urls.js;
+                    foundWasmUrl = urls.wasm;
                     
-                    console.log("Local Core found!");
+                    console.log("Core found!");
                     break; 
                 } catch (e) {
-                    console.warn(`Skipping source ${urls.wasm}`, e);
+                    console.warn(`Skipped ${urls.js}: ${e.message}`);
                 }
             }
 
-            if (!jsContent) {
-                if(loadingText) loadingText.innerText = "Error: binjgb.js not found in repo.";
-                throw new Error("Core files missing");
+            if (!foundJsUrl) {
+                if(loadingText) {
+                    loadingText.innerHTML = `
+                    <div style="color: #f87171; font-size: 14px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 8px;">
+                        <div style="font-weight:bold; margin-bottom:5px;">⚠️ Core Missing</div>
+                        <div style="font-size:12px; margin-bottom:10px; color:#ddd;">
+                            Auto-load failed. Use Manual Upload.<br>
+                            <a href="https://github.com/binji/binjgb/raw/master/docs/binjgb.wasm" target="_blank" style="color:#60a5fa;">Get WASM</a> | 
+                            <a href="https://github.com/binji/binjgb/raw/master/docs/binjgb.js" target="_blank" style="color:#60a5fa;">Get JS</a>
+                        </div>
+                        <input type="file" id="manual-core-js" accept=".js" style="display:none">
+                        <label for="manual-core-js" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">1. Upload binjgb.js</label>
+                        <div id="js-status" style="font-size:10px; color:#4ade80; display:none;">✓ JS Ready</div>
+                        <input type="file" id="manual-core-wasm" accept=".wasm" style="display:none">
+                        <label for="manual-core-wasm" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">2. Upload binjgb.wasm</label>
+                        <div id="wasm-status" style="font-size:10px; color:#4ade80; display:none;">✓ WASM Ready</div>
+                    </div>`;
+                }
+                
+                return new Promise((resolve, reject) => {
+                    let manualJs = null;
+                    let manualWasm = null; 
+
+                    const checkLoad = () => {
+                        if (manualJs) {
+                            console.log("Booting from Manual Files...");
+                            if(manualWasm) {
+                                const wasmBlob = new Blob([manualWasm], {type: 'application/wasm'});
+                                const wasmUrl = URL.createObjectURL(wasmBlob);
+                                configureModule(wasmUrl);
+                            } else {
+                                configureModule('binjgb.wasm'); 
+                            }
+                            
+                            const script = document.createElement('script');
+                            script.text = manualJs;
+                            document.head.appendChild(script);
+                            waitForRuntime().then(resolve).catch(reject);
+                        }
+                    };
+
+                    document.getElementById('manual-core-js').addEventListener('change', (e) => {
+                        const r = new FileReader();
+                        r.onload = (ev) => { manualJs = ev.target.result; document.getElementById('js-status').style.display = 'block'; checkLoad(); };
+                        r.readAsText(e.target.files[0]);
+                    });
+                    document.getElementById('manual-core-wasm').addEventListener('change', (e) => {
+                        const r = new FileReader(); 
+                        r.onload = (ev) => { manualWasm = ev.target.result; document.getElementById('wasm-status').style.display = 'block'; checkLoad(); };
+                        r.readAsArrayBuffer(e.target.files[0]);
+                    });
+                });
             }
 
-            // Normal Path: We have JS content and a URL for WASM
+            // Normal Path: We have JS URL and a URL for WASM
             configureModule(foundWasmUrl);
 
             const script = document.createElement('script');
-            script.text = jsContent;
+            script.src = foundJsUrl;
             document.head.appendChild(script);
             
             await waitForRuntime();
@@ -1231,10 +1137,10 @@
 
         function configureModule(wasmUrl) {
              const romCanvas = document.getElementById('rom-canvas');
-             
+             console.log(`Configuring Module. WASM Location: ${wasmUrl}`);
+
              window.Module = {
                 canvas: romCanvas,
-                // STANDARD EMSCRIPTEN LOADING:
                 locateFile: function(path, prefix) {
                     if (path.endsWith('.wasm')) return wasmUrl;
                     return prefix + path;
@@ -1255,9 +1161,7 @@
                 if (window.Module && window.Module.FS) emulatorInitialized = true;
                 attempts++;
             }
-            if (!emulatorInitialized) {
-                console.warn("Runtime initialization timeout, but continuing to try launch...");
-            }
+            if (!emulatorInitialized) console.warn("Runtime initialization timeout...");
         }
 
         async function launchEmulator(romData, name) {
@@ -1266,44 +1170,34 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                if(!loadingOverlay.innerHTML.includes('Upload')) {
+                    loadingOverlay.innerHTML = `<svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loading-text">Starting Engine...</span>`;
+                }
             }
 
             try {
-                if (!emulatorInitialized) {
-                    await initEmulator();
-                }
+                if (!emulatorInitialized) await initEmulator();
                 
-                // FINAL SAFETY CHECK: Wait specifically for File System
                 let fsReady = false;
-                for(let i=0; i<30; i++) { // Wait up to 3 seconds for FS
-                    if(window.Module && window.Module.FS) {
-                        fsReady = true;
-                        break;
-                    }
+                for(let i=0; i<100; i++) { // Extended timeout (10s)
+                    if(window.Module && window.Module.FS) { fsReady = true; break; }
                     await new Promise(r => setTimeout(r, 100));
                 }
 
-                // Soft check: If FS isn't ready but callMain is, try anyway (sometimes FS is hidden)
-                if (!fsReady && !window.Module.callMain) {
-                    throw new Error("Emulator File System failed to mount. Please reload.");
-                }
+                if (!fsReady && !window.Module.callMain) throw new Error("Emulator FS failed to mount.");
 
                 const fileName = 'rom.gb'; 
-
                 try {
                     if (window.Module.FS) {
                         try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
                         window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
                     }
-                } catch(e) {
-                    console.error("FS Error (Non-fatal if using memory stream):", e);
-                }
+                } catch(e) { console.error("FS Error:", e); }
 
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    throw new Error("Emulator entry point not found. Try refreshing.");
+                    throw new Error("Emulator entry point not found.");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
@@ -1319,9 +1213,8 @@
                 if(loadingOverlay) {
                     loadingOverlay.innerHTML = `<div style="font-size:12px; color:#f87171; text-align:center; padding:10px;">
                         <div style="font-size:24px; margin-bottom:10px;">❌</div>
-                        ${err.message}
-                        <br><br>
-                        <button onclick="location.reload()" style="background:#444; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Reload App</button>
+                        ${err.message}<br><br>
+                        <button onclick="location.reload()" style="background:#444; border:none; color:white; padding:5px; margin-top:5px;">Reload</button>
                     </div>`;
                 }
             }
@@ -1331,12 +1224,9 @@
             const file = event.target.files[0];
             const fileStatus = document.getElementById('file-status');
             const powerLed = document.getElementById('power-led');
-
             powerLed.classList.remove('on');
-
             if (!file) return;
             
-            // Allow .gb, .gbc, .zip
             const isZip = file.name.match(/\.zip$/i);
             const isRom = file.name.match(/\.(gb|gbc)$/i);
 
@@ -1344,7 +1234,6 @@
                 fileStatus.textContent = "Error: Invalid file type (GB/GBC only).";
                 return;
             }
-
             fileStatus.textContent = `Reading ${file.name}...`;
             gameMode = 'rom';
             
@@ -1352,7 +1241,6 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const arrayBuffer = e.target.result;
-                    
                     JSZip.loadAsync(arrayBuffer).then(async function(zip) {
                         const files = Object.keys(zip.files);
                         const romCandidates = files.filter(name => {
@@ -1360,36 +1248,25 @@
                             const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.');
                             return isRom && !isMacJunk;
                         });
-
                         if (romCandidates.length === 0) {
                             if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found.";
                             return;
                         }
-
                         const chosenFile = romCandidates[0];
                         if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
-                        
                         const content = await zip.file(chosenFile).async("arraybuffer");
                         launchEmulator(content, chosenFile);
-
-                    }).catch(function(err) {
-                        console.error(err);
-                        fileStatus.textContent = `Zip Error: ${err.message}`;
-                    });
+                    }).catch(function(err) { console.error(err); fileStatus.textContent = `Zip Error: ${err.message}`; });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
                 currentRomName = file.name;
                 const reader = new FileReader();
-                reader.onload = async function(e) {
-                    launchEmulator(e.target.result, file.name);
-                };
+                reader.onload = async function(e) { launchEmulator(e.target.result, file.name); };
                 reader.readAsArrayBuffer(file);
             }
         }
-
-        // --- TOUCH & INPUT HANDLING ---
 
         function setupControlListeners() {
             const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill');
@@ -1397,36 +1274,19 @@
 
             const handleStart = (e) => {
                 e.preventDefault(); 
-                
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
-
-                if (currentMenu !== null && label !== 'Start' && label !== 'Select') {
-                    return;
-                }
-                
-                initAudio();
-                playHapticSound();
-                if (navigator.vibrate) navigator.vibrate(15);
-                
-                control.pressTime = Date.now();
-                control.isTap = true;
-                
-                handleVisualPress(control, true);
-                updateDpadVisuals(label, true);
-                handleVirtualPress(label, true, true); 
+                if (currentMenu !== null && label !== 'Start' && label !== 'Select') return;
+                initAudio(); playHapticSound(); if (navigator.vibrate) navigator.vibrate(15);
+                control.pressTime = Date.now(); control.isTap = true;
+                handleVisualPress(control, true); updateDpadVisuals(label, true); handleVirtualPress(label, true, true); 
             };
 
             const handleEnd = (e) => {
                 e.preventDefault();
-                
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
-                
-                handleVirtualPress(label, false, true); 
-                handleVisualPress(control, false);
-                updateDpadVisuals(label, false);
-                
+                handleVirtualPress(label, false, true); handleVisualPress(control, false); updateDpadVisuals(label, false);
                 if (['Select', 'Start'].includes(label) && control.isTap) {
                     const duration = Date.now() - (control.pressTime || 0);
                     if (duration < TAP_THRESHOLD_MS) {
@@ -1446,26 +1306,16 @@
             });
             
             document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu'));
-            
             document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
             document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
             document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
-            
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection);
-            document.getElementById('close-install')?.addEventListener('click', () => {
-                document.getElementById('install-prompt').style.display = 'none';
-            });
-
+            document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu'));
             document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
-
             document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus);
-            // Save/Load disabled for now
-            // document.getElementById('btn-menu-save')?.addEventListener('click', saveStateToDB);
-            // document.getElementById('btn-menu-load-state')?.addEventListener('click', loadStateFromDB);
-
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', () => {
@@ -1473,7 +1323,6 @@
                     applyTheme(theme);
                 });
             });
-
             window.addEventListener('keydown', handleGlobalKey);
             window.addEventListener('keyup', handleGlobalKey);
         }
@@ -1481,11 +1330,8 @@
         function checkStandalone() {
             const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
             if (isIOS && !isStandalone) {
-                setTimeout(() => {
-                    document.getElementById('install-prompt').style.display = 'flex';
-                }, 3000);
+                setTimeout(() => { document.getElementById('install-prompt').style.display = 'flex'; }, 3000);
             }
         }
 
@@ -1493,33 +1339,23 @@
             const wrapper = document.getElementById('console-wrapper');
             const gbcBody = document.getElementById('gbc-body');
             if (!wrapper || !gbcBody) return;
-
             const designWidth = 440; 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
-            
             const scale = Math.min(1, windowWidth / designWidth);
             wrapper.style.transform = `scale(${scale})`;
-            
             const requiredHeight = windowHeight / scale;
             gbcBody.style.height = `${requiredHeight}px`;
         }
         
-        // --- FIXED INITIALIZATION LOGIC ---
         function appMain() {
-            initFirebase();
-            setupControlListeners();
-            scaleConsole(); 
+            initFirebase(); setupControlListeners(); scaleConsole(); 
             window.addEventListener('resize', scaleConsole);
             if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleConsole);
             checkStandalone();
         }
 
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', appMain);
-        } else {
-            appMain();
-        }
+        if (document.readyState === 'loading') { window.addEventListener('DOMContentLoaded', appMain); } else { appMain(); }
     </script>
 </body>
 </html>
