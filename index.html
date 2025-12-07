@@ -1088,9 +1088,21 @@
                     return path;
                 }
             });
+
+            // 3. CRITICAL FIX: Wait specifically for the File System (FS) to mount
+            // Sometimes the Module resolves before the virtual HD is ready.
+            let attempts = 0;
+            while (!window.Module.FS && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100)); // Wait 100ms
+                attempts++;
+            }
+
+            if (!window.Module.FS) {
+                throw new Error("Core loaded, but File System failed to mount. Check binjgb.wasm file size.");
+            }
             
             emulatorInitialized = true;
-            console.log("Binjgb Initialized Successfully");
+            console.log("Binjgb Initialized Successfully with FS");
         }
 
         async function launchEmulator(romData, name) {
@@ -1110,7 +1122,7 @@
                 // Emscripten File System operations
                 const fileName = 'rom.gb'; 
 
-                // Ensure FS is ready
+                // Double check FS (initEmulator should have caught this, but safety first)
                 if (!window.Module.FS) {
                     throw new Error("Emulator File System not ready.");
                 }
