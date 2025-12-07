@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -1193,37 +1193,37 @@
             if(loadingText) loadingText.innerText = "Connecting to Core...";
             
             // --- CDN Fallback Strategy ---
-            // CORRECTED PATHS: 'public/wasm/' instead of 'public/assets/wasm/'
+            // UPDATED: Using the Official mGBA 'gh-pages' branch (Verified compiled binaries)
             const CDN_URLS = [
-                // Pair 1: gbajs3 (Main Branch - Verified Path)
+                // Pair 1: Official mGBA.js (gh-pages branch) - The 'Gold Standard' source
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/wasm/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@main/public/wasm/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js'
                 },
-                // Pair 2: gbajs3 (Master Branch - Fallback)
+                // Pair 2: Simon Katz Demo (A very stable, known-good backup repo)
                 {
-                    wasm: 'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/wasm/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/thenick775/gbajs3@master/public/wasm/mgba.js'
-                },
-                // Pair 3: Official mGBA Demo (Final Backup)
-                {
-                    wasm: 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.wasm',
-                    js:   'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@master/mgba.js'
+                    wasm: 'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.wasm',
+                    js:   'https://cdn.jsdelivr.net/gh/simon-katz/mgba-wasm-demo@master/mgba.js'
                 }
             ];
 
             let wasmBinary = null;
-            let successJsUrl = null;
+            let jsContent = null;
 
             // Try sources sequentially
             for (const urls of CDN_URLS) {
                 try {
                     console.log(`Attempting to download core from: ${urls.wasm}`);
-                    const response = await fetch(urls.wasm);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const [resWasm, resJs] = await Promise.all([
+                        fetch(urls.wasm),
+                        fetch(urls.js)
+                    ]);
+
+                    if (!resWasm.ok || !resJs.ok) throw new Error(`HTTP Error`);
                     
-                    wasmBinary = await response.arrayBuffer();
-                    successJsUrl = urls.js; // Store the matching JS URL
+                    wasmBinary = await resWasm.arrayBuffer();
+                    jsContent = await resJs.text();
+                    
                     console.log("Download successful.");
                     break; // Stop loop on success
                 } catch (e) {
@@ -1231,49 +1231,115 @@
                 }
             }
 
-            if (!wasmBinary || !successJsUrl) {
-                if(loadingText) loadingText.innerText = "Core Download Failed";
-                throw new Error("Could not download mGBA Core from any source.");
+            if (!wasmBinary || !jsContent) {
+                // FALLBACK: Manual Upload UI
+                if(loadingText) {
+                    loadingText.innerHTML = `
+                    <div style="color: #f87171; font-size: 14px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 8px;">
+                        <div style="font-weight:bold; margin-bottom:5px;">⚠️ Auto-download failed</div>
+                        <div style="font-size:12px; margin-bottom:10px; color:#ddd;">
+                            Please upload the core files manually.<br>
+                            <a href="https://github.com/mgba-emu/mgba.js/raw/gh-pages/mgba.wasm" target="_blank" style="color:#60a5fa; text-decoration:underline;">Download WASM</a> | 
+                            <a href="https://github.com/mgba-emu/mgba.js/raw/gh-pages/mgba.js" target="_blank" style="color:#60a5fa; text-decoration:underline;">Download JS</a>
+                        </div>
+                        
+                        <input type="file" id="manual-core-js" accept=".js" style="display:none">
+                        <label for="manual-core-js" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">1. Upload mgba.js</label>
+                        <div id="js-status" style="font-size:10px; color:#4ade80; display:none;">✓ JS Ready</div>
+                        
+                        <input type="file" id="manual-core-wasm" accept=".wasm" style="display:none">
+                        <label for="manual-core-wasm" class="upload-label" style="background:#4b5563; font-size:11px; margin: 5px 0;">2. Upload mgba.wasm</label>
+                        <div id="wasm-status" style="font-size:10px; color:#4ade80; display:none;">✓ WASM Ready</div>
+                    </div>`;
+                }
+                
+                // Setup Manual Listeners
+                return new Promise((resolve, reject) => {
+                    let manualJs = null;
+                    let manualWasm = null;
+
+                    const checkLoad = () => {
+                        if (manualJs && manualWasm) {
+                            console.log("Manual core files loaded. Booting...");
+                            wasmBinary = manualWasm;
+                            // Execute JS
+                            const script = document.createElement('script');
+                            script.text = manualJs;
+                            document.head.appendChild(script);
+                            
+                            setupModule(wasmBinary).then(resolve).catch(reject);
+                        }
+                    };
+
+                    document.getElementById('manual-core-js').addEventListener('change', (e) => {
+                        const r = new FileReader();
+                        r.onload = (ev) => { 
+                            manualJs = ev.target.result; 
+                            document.getElementById('js-status').style.display = 'block'; 
+                            checkLoad(); 
+                        };
+                        r.readAsText(e.target.files[0]);
+                    });
+
+                    document.getElementById('manual-core-wasm').addEventListener('change', (e) => {
+                        const r = new FileReader();
+                        r.onload = (ev) => { 
+                            manualWasm = ev.target.result; 
+                            document.getElementById('wasm-status').style.display = 'block'; 
+                            checkLoad(); 
+                        };
+                        r.readAsArrayBuffer(e.target.files[0]);
+                    });
+                });
             }
 
-            // 2. Setup the global Module object with the binary pre-loaded
-            window.Module = {
+            // Normal Path (Auto-download success)
+            const script = document.createElement('script');
+            script.text = jsContent;
+            document.head.appendChild(script);
+            
+            await setupModule(wasmBinary);
+        }
+
+        async function setupModule(wasmBinary) {
+             const romCanvas = document.getElementById('rom-canvas');
+             
+             window.Module = {
                 canvas: romCanvas,
-                wasmBinary: wasmBinary, // Hand-feed the binary!
+                wasmBinary: wasmBinary, 
                 print: function(text) { console.log('[mGBA]', text); },
                 printErr: function(text) { console.error('[mGBA]', text); }
             };
 
-            try {
-                // 3. Load the main mGBA JS glue code from the SAME source
-                if(loadingText) loadingText.innerText = "Starting Engine...";
-                await loadScript(successJsUrl); 
-                mgbaInitialized = true;
-                
-                // Wait slightly for Module to fully hydrate
-                await new Promise(r => setTimeout(r, 100));
-            } catch (e) {
-                console.error("mGBA Load Failed", e);
-                if(loadingText) loadingText.innerText = "Error Loading Core";
-                throw new Error("Could not download mGBA Core.");
-            }
+            // Wait for runtime
+            mgbaInitialized = true;
+            await new Promise(r => setTimeout(r, 500));
         }
 
         async function launchMgba(romData, name) {
             try {
-                await initMgba();
+                // Ensure core is loaded
+                if (!mgbaInitialized) {
+                    await initMgba();
+                }
                 
                 // Emscripten File System operations
                 // 1. Ensure /data directory exists (optional, root usually fine)
                 // 2. Write ROM to virtual FS
                 const fileName = 'game.rom';
                 
-                // Wait for runtime initialized
-                if (!window.Module.FS) {
+                // Wait for runtime initialized if Module exists but FS doesn't
+                if (window.Module && !window.Module.FS) {
                      await new Promise(resolve => {
                          if(window.Module.calledRun) resolve();
                          else window.Module.onRuntimeInitialized = resolve;
+                         // Timeout fallback
+                         setTimeout(resolve, 3000);
                      });
+                }
+                
+                if (!window.Module || !window.Module.FS) {
+                    throw new Error("Core initialized but file system not ready.");
                 }
 
                 try {
@@ -1298,7 +1364,8 @@
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('file-status').textContent = "Emulator Crash: " + err.message;
+                document.getElementById('file-status').textContent = "Error: " + err.message;
+                document.getElementById('loading-overlay').innerHTML += `<br><div style="font-size:10px; color:red">${err.message}</div>`;
             }
         }
 
