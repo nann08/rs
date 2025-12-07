@@ -1101,7 +1101,7 @@
                 locateFile: function(path, prefix) {
                     if (path.endsWith('.wasm')) {
                         // Use the official mGBA JS demo source for the WASM
-                        return 'https://mgba-emu.github.io/mgba.js/mgba.wasm';
+                        return 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
                     }
                     return prefix + path;
                 },
@@ -1113,7 +1113,7 @@
                 if(loadingText) loadingText.innerText = "Downloading Core...";
                 
                 // Load the main mGBA JS
-                await loadScript('https://mgba-emu.github.io/mgba.js/mgba.js');
+                await loadScript('https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js');
                 mgbaInitialized = true;
                 
                 if(loadingText) loadingText.innerText = "Starting Engine...";
