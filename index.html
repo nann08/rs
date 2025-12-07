@@ -366,22 +366,25 @@
             if(loadingText) loadingText.innerText = "Verifying Core...";
             debugLog("Starting Core Verification...");
 
-            // 1. Manually fetch and verify WASM first (Pre-flight check)
+            // 1. Manually fetch and verify WASM first
             let wasmBinary;
             try {
                 const response = await fetch('binjgb.wasm');
                 if (!response.ok) throw new Error(`WASM file not found (404). Ensure binjgb.wasm is in root.`);
                 const buffer = await response.arrayBuffer();
-                // Check Magic Bytes (\0asm)
+                
+                // Verify Magic Bytes
                 const header = new Uint8Array(buffer, 0, 4);
                 if (header[0] !== 0 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6D) {
                     const textPreview = new TextDecoder().decode(header);
                     if (textPreview.includes('<') || textPreview.includes('!')) {
-                        throw new Error(`CRITICAL: binjgb.wasm contains HTML/Text. You downloaded the GitHub page, not the raw file.`);
+                        throw new Error(`CRITICAL: binjgb.wasm is HTML. You downloaded the GitHub page, not the raw file.`);
                     }
                     throw new Error(`Invalid WASM header: ${header}`);
                 }
-                wasmBinary = buffer;
+                
+                // CRITICAL FIX: Convert to Uint8Array for Emscripten
+                wasmBinary = new Uint8Array(buffer);
                 debugLog(`WASM Validated (${buffer.byteLength} bytes).`);
             } catch (e) {
                 if(loadingText) loadingText.innerHTML = `<span style="color:#ff5555">${e.message}</span>`;
@@ -398,32 +401,40 @@
                 throw e;
             }
 
-            // 3. Initialize Factory with Blob URL to bypass path issues
+            // 3. Initialize Factory using DIRECT INJECTION
+            // We pass 'wasmBinary' directly so it doesn't try to load files
             if (typeof Binjgb !== 'function') throw new Error("Binjgb factory not found in JS.");
 
-            const wasmBlob = new Blob([wasmBinary], { type: 'application/wasm' });
-            const wasmUrl = URL.createObjectURL(wasmBlob);
-
-            window.Module = await Binjgb({
+            const moduleConfig = {
                 canvas: romCanvas,
-                locateFile: function(path) {
-                    if (path.endsWith('.wasm')) return wasmUrl; 
-                    return path;
-                },
+                wasmBinary: wasmBinary, // Feed the data directly
                 print: (text) => debugLog(`[Core] ${text}`),
                 printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
                 onRuntimeInitialized: function() {
                     debugLog("Runtime Initialized.");
                     emulatorInitialized = true;
+                },
+                onAbort: function(msg) {
+                    debugLog(`Aborted: ${msg}`, 'error');
                 }
-            });
+            };
+
+            window.Module = await Binjgb(moduleConfig);
 
             // 4. Wait for FS
             let attempts = 0;
             while (!window.Module.FS && attempts < 50) {
                 await new Promise(r => setTimeout(r, 100)); attempts++;
             }
-            if (!window.Module.FS) throw new Error("File System failed to mount.");
+            
+            if (!window.Module.FS) {
+                // Last ditch effort: Check if it's running anyway
+                if(emulatorInitialized) {
+                    console.warn("FS missing but Runtime Initialized flag set. Proceeding carefully.");
+                } else {
+                    throw new Error("File System failed to mount.");
+                }
+            }
             
             emulatorInitialized = true;
             debugLog("Ready to Load ROM.");
