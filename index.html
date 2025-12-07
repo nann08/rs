@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -1317,6 +1317,23 @@
         }
 
         async function launchMgba(romData, name) {
+            // FIX: Close menus immediately so user can see underlying status/errors
+            closeAllMenus();
+            
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if(loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+                // Reset to default loading message
+                if(!loadingOverlay.innerHTML.includes('Upload')) {
+                    loadingOverlay.innerHTML = `
+                    <svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="loading-text">Starting Engine...</span>`;
+                }
+            }
+
             try {
                 // Ensure core is loaded
                 if (!mgbaInitialized) {
@@ -1360,12 +1377,13 @@
                 document.getElementById('game-iframe').style.display = 'none';
                 document.getElementById('power-led').classList.add('on');
                 
-                closeAllMenus();
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('file-status').textContent = "Error: " + err.message;
-                document.getElementById('loading-overlay').innerHTML += `<br><div style="font-size:10px; color:red">${err.message}</div>`;
+                if(loadingOverlay) {
+                    loadingOverlay.innerHTML += `<br><div style="font-size:10px; color:red; margin-top:5px;">${err.message}</div>`;
+                }
             }
         }
 
