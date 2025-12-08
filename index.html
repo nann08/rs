@@ -17,7 +17,7 @@
 
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -41,7 +41,10 @@
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
-        canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; }
+        
+        /* UPDATED: Iframe Supercharged */
+        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; }
+        
         .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 12px; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
         #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
@@ -50,9 +53,10 @@
         .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
         .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; }
         .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
-        #file-input-html, #file-input-rom { display: none; }
+        #file-input-html, #file-input-rom, #file-input-folder { display: none; } /* Added folder input */
         .upload-label { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; background-color: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 8px; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .upload-label.rom-label { background-color: #2563eb; }
+        .upload-label.folder-label { background-color: #16a34a; } /* Green for Folder */
         .upload-label:hover { opacity: 0.9; }
         .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
         .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
@@ -83,7 +87,7 @@
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .install-icon { font-size: 24px; margin-bottom: 10px; }
         .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
-        /* Share Icon fixed size */
+        /* FIXED: Force share icon size */
         .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
         #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
@@ -91,8 +95,6 @@
         /* Debug Console */
         #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
         .debug-error { color: #ff5555; font-weight: bold; }
-        .debug-warn { color: #ffaa00; }
-        .debug-info { color: #88ccff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -115,9 +117,29 @@
                     </div>
                     <div id="debug-console"></div>
                     <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
-                    <iframe id="game-iframe" src="about:blank" allow="keyboard; game" referrerpolicy="no-referrer"></iframe>
+                    
+                    <!-- UPDATED IFRAME with better permissions for HTML5 games -->
+                    <iframe id="game-iframe" src="about:blank" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-write" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts" referrerpolicy="no-referrer"></iframe>
+                    
                     <canvas id="rom-canvas"></canvas>
-                    <div id="main-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2><div class="menu-btn" id="btn-menu-load">LOAD GAME</div><div class="menu-btn" id="btn-menu-controls">CONTROLS</div><div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div><button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button></div>
+                    <div id="main-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
+                        <!-- LOAD SINGLE HTML -->
+                        <input type="file" id="file-input-html" accept=".html,text/html">
+                        <label for="file-input-html" class="upload-label">LOAD HTML (SINGLE)</label>
+                        
+                        <!-- LOAD FOLDER -->
+                        <input type="file" id="file-input-folder" webkitdirectory directory multiple>
+                        <label for="file-input-folder" class="upload-label folder-label">LOAD FOLDER (WEB)</label>
+                        
+                        <!-- LOAD ROM -->
+                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.zip">
+                        <label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label>
+                        
+                        <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
+                        <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
+                        <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
+                    </div>
+                    
                     <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
                     <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-64 overflow-y-auto px-4">
                         <div class="theme-option" data-theme="nannboy"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;"><div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div></div><span class="font-bold text-gray-700">Nann Boy</span></div>
@@ -132,7 +154,7 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
+                    
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
@@ -260,9 +282,10 @@
 
         function handleGlobalKey(e) {
             if (currentMenu !== null) { if (e.key === "Escape") { if (currentMenu === 'keyselect') hideKeySelection(); else closeAllMenus(); } return; }
-            const entry = Object.entries(keyMap).find(([, mappedKey]) => mappedKey.code === e.code || mappedKey.key === e.key.toLowerCase());
-            if (entry) { e.preventDefault(); const label = entry[0]; const isDown = e.type === 'keydown'; handleVirtualPress(label, isDown, true); updateDpadVisuals(label, isDown); }
+            // WasmBoy listens to keys automatically, but we might want to capture for UI or preventDefault
+            // For now, let WasmBoy handle it natively or dispatch custom if needed
         }
+        
         function updateDpadVisuals(label, isDown) {
             if (!['Up', 'Down', 'Left', 'Right'].includes(label)) return;
             const dpadArmH = document.querySelector('.dpad-h'); const dpadArmV = document.querySelector('.dpad-v');
@@ -323,8 +346,140 @@
         function closeAllMenus() { document.querySelectorAll('.menu-ui').forEach(el => { if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') el.style.display = 'none'; }); currentMenu = null; }
         function toggleMenu(menuId) { if (currentMenu === menuId) closeAllMenus(); else openMenu(menuId); }
         
+        // --- NEW: FOLDER UPLOAD HANDLER ---
+        function handleFolderUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            const fileStatus = document.getElementById('file-status');
+            const iframe = document.getElementById('game-iframe');
+            const romCanvas = document.getElementById('rom-canvas');
+            const powerLed = document.getElementById('power-led');
+            const startScreen = document.getElementById('start-screen');
+            powerLed.classList.remove('on'); 
+
+            // Find index.html
+            const indexFile = files.find(f => f.name === 'index.html' || f.name === 'index.htm');
+            
+            if (!indexFile) {
+                fileStatus.textContent = "Error: No index.html found in folder.";
+                return;
+            }
+
+            fileStatus.textContent = "Loading Folder...";
+
+            // Create a Map of filenames to Blob URLs
+            const fileMap = {};
+            files.forEach(file => {
+                // To handle nested paths properly we'd need more complex logic (webkitRelativePath).
+                // For now, we map by filename. If duplicate filenames exist in diff folders, last one wins.
+                // NOTE: 'file.name' does NOT include the path. 'file.webkitRelativePath' does.
+                // We use file.name because naive games usually reference assets relatively.
+                // Ideally, we should parse the HTML and replace relative paths carefully.
+                // For this implementation, we map simple filenames to blobs.
+                fileMap[file.name] = URL.createObjectURL(file);
+                
+                // Also attempt to map the full relative path if possible, minus the root folder
+                if(file.webkitRelativePath) {
+                    const parts = file.webkitRelativePath.split('/');
+                    if(parts.length > 1) {
+                         // remove root folder name
+                         const relativePath = parts.slice(1).join('/');
+                         fileMap[relativePath] = URL.createObjectURL(file);
+                    }
+                }
+            });
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let htmlContent = e.target.result;
+                
+                // Inject Monkey Patch Script
+                // This intercepts fetch/xhr/image loading to use our Blob URLs
+                const monkeyPatchScript = `
+                <script>
+                    (function() {
+                        const assets = ${JSON.stringify(fileMap)};
+                        
+                        // Patch fetch
+                        const originalFetch = window.fetch;
+                        window.fetch = async function(input, init) {
+                            let url = input;
+                            if (typeof input === 'object' && input.url) url = input.url;
+                            
+                            // naive lookup - check if url ends with a known key
+                            // This matches "style.css" or "images/mario.png"
+                            for(const key in assets) {
+                                if(url.endsWith(key) || url === key) {
+                                    console.log('Intercepted fetch:', url, '->', assets[key]);
+                                    return originalFetch(assets[key], init);
+                                }
+                            }
+                            return originalFetch(input, init);
+                        };
+
+                        // Patch Image src
+                        // We use a MutationObserver to catch img tags being added or modified
+                        const observer = new MutationObserver(mutations => {
+                            mutations.forEach(mutation => {
+                                if (mutation.type === 'childList') {
+                                    mutation.addedNodes.forEach(node => {
+                                        if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK') {
+                                           rewriteSrc(node);
+                                        }
+                                        if(node.querySelectorAll) {
+                                            node.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                                        }
+                                    });
+                                } else if (mutation.type === 'attributes' && (mutation.attributeName === 'src' || mutation.attributeName === 'href')) {
+                                    rewriteSrc(mutation.target);
+                                }
+                            });
+                        });
+                        
+                        function rewriteSrc(node) {
+                            const attr = node.tagName === 'LINK' ? 'href' : 'src';
+                            const val = node.getAttribute(attr);
+                            if(val && assets[val]) {
+                                // prevent infinite loop if we already swapped it
+                                if(val.startsWith('blob:')) return;
+                                node.setAttribute(attr, assets[val]);
+                            }
+                        }
+
+                        observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'href'] });
+                        
+                        // Initial rewrite
+                        window.addEventListener('DOMContentLoaded', () => {
+                             document.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                        });
+                    })();
+                <\/script>
+                `;
+                
+                // Insert our script at the very top of head
+                htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
+
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                iframe.onload = () => {
+                        URL.revokeObjectURL(blobUrl);
+                        closeAllMenus();
+                        iframe.onload = null;
+                        gameMode = 'html';
+                        iframe.style.display = 'block';
+                        romCanvas.style.display = 'none';
+                        startScreen.style.display = 'none';
+                        iframe.contentWindow.focus();
+                        powerLed.classList.add('on');
+                };
+                iframe.src = blobUrl;
+            };
+            reader.readAsText(indexFile);
+        }
+
         function handleHtmlUpload(event) {
-            // HTML5 Games (iframe)
             const file = event.target.files[0]; const fileStatus = document.getElementById('file-status'); const iframe = document.getElementById('game-iframe'); const romCanvas = document.getElementById('rom-canvas'); const powerLed = document.getElementById('power-led'); const startScreen = document.getElementById('start-screen');
             powerLed.classList.remove('on'); 
             if (!file) return;
@@ -341,7 +496,7 @@
             reader.readAsText(file);
         }
 
-        // --- WASMBOY CONFIGURATION ---
+        // --- WASMBOY CONFIGURATION (LOCAL) ---
         let wasmBoyReady = false;
         
         async function initWasmBoy() {
@@ -453,7 +608,10 @@
             };
             gameControls.forEach(control => { control.addEventListener('touchstart', handleStart, { passive: false }); control.addEventListener('mousedown', handleStart); control.addEventListener('touchend', handleEnd); control.addEventListener('mouseup', handleEnd); control.addEventListener('mouseleave', handleEnd); });
             document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu')); document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
-            document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload); document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
+            document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
+            // Folder Upload
+            document.getElementById('file-input-folder')?.addEventListener('change', handleFolderUpload); 
+            document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection); document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu')); document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
