@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Nann Boy">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,8 +11,9 @@
     <title>Nann Emulator</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- WasmBoy Library -->
-    <script src="https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
+
+    <!-- LOAD LOCAL WASMBOY LIBRARY -->
+    <script src="wasmboy.min.js"></script>
 
     <script>
         (function() {
@@ -81,13 +83,16 @@
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .install-icon { font-size: 24px; margin-bottom: 10px; }
         .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
-        /* FIXED: Force share icon size */
+        /* Share Icon fixed size */
         .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
         #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
         
         /* Debug Console */
         #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
+        .debug-error { color: #ff5555; font-weight: bold; }
+        .debug-warn { color: #ffaa00; }
+        .debug-info { color: #88ccff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -110,6 +115,7 @@
                     </div>
                     <div id="debug-console"></div>
                     <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
+                    <iframe id="game-iframe" src="about:blank" allow="keyboard; game" referrerpolicy="no-referrer"></iframe>
                     <canvas id="rom-canvas"></canvas>
                     <div id="main-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2><div class="menu-btn" id="btn-menu-load">LOAD GAME</div><div class="menu-btn" id="btn-menu-controls">CONTROLS</div><div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div><button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
@@ -165,17 +171,16 @@
 
         let auth;
         let userId = null;
+        let gameMode = 'html'; 
         let currentRomName = 'unknown_game'; 
-
-        // WASMBOY STATE
-        let wasmBoyReady = false;
+        let emulatorInitialized = false;
 
         let keyMap = {
             'Up': { key: 'ArrowUp' },
             'Down': { key: 'ArrowDown' },
             'Left': { key: 'ArrowLeft' },
             'Right': { key: 'ArrowRight' }, 
-            'A': { key: 'x' },  // Wasmboy defaults usually match these or standard keyboard keys
+            'A': { key: 'x' },  
             'B': { key: 'z' },  
             'Start': { key: 'Enter' },
             'Select': { key: 'Backspace' },
@@ -255,10 +260,9 @@
 
         function handleGlobalKey(e) {
             if (currentMenu !== null) { if (e.key === "Escape") { if (currentMenu === 'keyselect') hideKeySelection(); else closeAllMenus(); } return; }
-            // WasmBoy listens to keys automatically, but we might want to capture for UI or preventDefault
-            // For now, let WasmBoy handle it natively or dispatch custom if needed
+            const entry = Object.entries(keyMap).find(([, mappedKey]) => mappedKey.code === e.code || mappedKey.key === e.key.toLowerCase());
+            if (entry) { e.preventDefault(); const label = entry[0]; const isDown = e.type === 'keydown'; handleVirtualPress(label, isDown, true); updateDpadVisuals(label, isDown); }
         }
-        
         function updateDpadVisuals(label, isDown) {
             if (!['Up', 'Down', 'Left', 'Right'].includes(label)) return;
             const dpadArmH = document.querySelector('.dpad-h'); const dpadArmV = document.querySelector('.dpad-v');
@@ -328,7 +332,6 @@
             fileStatus.textContent = `Loading ${file.name}...`;
             const reader = new FileReader();
             reader.onload = function(e) {
-                // ... (Existing iframe logic) ...
                  let htmlContent = e.target.result;
                 const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
                 const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
@@ -339,31 +342,34 @@
         }
 
         // --- WASMBOY CONFIGURATION ---
+        let wasmBoyReady = false;
+        
         async function initWasmBoy() {
             if (wasmBoyReady) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
             if(loadingText) loadingText.innerText = "Configuring WasmBoy...";
-            debugLog("Init WasmBoy...");
+            debugLog("Init WasmBoy (Local)...");
 
-            // Configure WasmBoy
+            // Configure WasmBoy to use local file
             const WasmBoyOptions = {
-                // Using CDN for the WASM file to ensure it matches the library version
-                wasmPath: 'https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.wasm',
-                workerPath: null, // Disable worker to simplify logic for now, or use CDN if needed
+                wasmPath: 'wasmboy.wasm', // Looks for file in root
+                workerPath: null, // Disable worker to keep it simple/local
                 canvas: romCanvas,
                 headless: false,
-                useWorker: false, // Run on main thread to avoid worker path issues
-                disableDefaultJoypad: false // Let it listen to keyboard
+                useWorker: false, // Run on main thread
+                disableDefaultJoypad: false 
             };
 
             try {
+                if(!window.WasmBoy) throw new Error("WasmBoy script not loaded");
                 await window.WasmBoy.config(WasmBoyOptions);
                 wasmBoyReady = true;
                 debugLog("WasmBoy Ready.");
             } catch (e) {
                 console.error(e);
                 debugLog("WasmBoy Config Failed: " + e.message, 'error');
+                if(loadingText) loadingText.innerHTML = "Error: WasmBoy config failed.";
             }
         }
 
@@ -377,7 +383,6 @@
              
              try {
                  await initWasmBoy();
-                 // WasmBoy might need a reload if a game was already playing
                  if(await window.WasmBoy.isPlaying()) {
                      await window.WasmBoy.pause();
                  }
