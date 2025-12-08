@@ -8,12 +8,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#7f1d1d">
     <title>Nann Emulator</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -22,10 +20,8 @@
             }
         })();
     </script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
@@ -81,9 +77,9 @@
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .install-icon { font-size: 24px; margin-bottom: 10px; }
         .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
-        /* FIXED: Force size on share icon to prevent it from blowing up */
         .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
+        
         #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
         
         /* Debug Console */
@@ -130,7 +126,7 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip,.gba"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBA)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GBA/GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
@@ -312,7 +308,7 @@
             reader.readAsText(file);
         }
 
-        // --- mGBA CORE INTEGRATION (JSDelivr CDN) ---
+        // --- CORE EMULATOR LOGIC (UNPKG CDN) ---
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -323,51 +319,69 @@
             });
         }
 
-        // Pre-fetch WASM to Blob to bypass 404s on relative path resolution
-        async function getWasmBlob() {
-            const url = 'https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.wasm';
-            debugLog("Fetching WASM from CDN...");
-            const res = await fetch(url);
-            if (!res.ok) throw new Error("Failed to download core.");
-            const blob = await res.blob();
-            return URL.createObjectURL(blob);
-        }
-
         async function initEmulator() {
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
-            if(loadingText) loadingText.innerText = "Booting...";
+            if(loadingText) loadingText.innerText = "Loading Binjgb...";
+            debugLog("Starting UNPKG Init...");
+
+            // 1. DEFINE MODULE GLOBAL WITH CDN PATH
+            // We use UNPKG which serves the files with correct CORS headers
+            // We hardcode the version to ensure stability (0.3.0)
+            const CDN_ROOT = 'https://unpkg.com/binjgb@0.3.0/docs/';
             
+            window.Module = {
+                canvas: romCanvas,
+                noInitialRun: true,
+                locateFile: function(path) {
+                    if (path.endsWith('.wasm')) return CDN_ROOT + 'binjgb.wasm';
+                    return path;
+                },
+                print: (text) => debugLog(`[Core] ${text}`),
+                printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
+                onRuntimeInitialized: function() {
+                    debugLog("Runtime Initialized callback fired.");
+                    emulatorInitialized = true;
+                }
+            };
+
+            // 2. Load Script from UNPKG
             try {
-                // 1. Get Blob URL for WASM
-                const wasmBlobUrl = await getWasmBlob();
-                debugLog("WASM Ready.");
-
-                // 2. Configure Module
-                window.Module = {
-                    canvas: romCanvas,
-                    noInitialRun: true,
-                    // FORCE emulator to use our Blob URL instead of looking for file
-                    locateFile: function(path) {
-                        if (path.endsWith('.wasm')) return wasmBlobUrl;
-                        return path;
-                    },
-                    print: (text) => debugLog(`[Core] ${text}`),
-                    printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
-                    onRuntimeInitialized: function() {
-                        debugLog("Runtime Ready.");
-                        emulatorInitialized = true;
-                    }
-                };
-
-                // 3. Load Script
-                await loadScript('https://cdn.jsdelivr.net/gh/mgba-emu/mgba.js@gh-pages/mgba.js');
-                debugLog("mGBA loaded.");
-
+                await loadScript(CDN_ROOT + 'binjgb.js');
+                debugLog("Script Loaded.");
             } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: Emulator crashed.";
-                throw e;
+                if(loadingText) loadingText.innerHTML = "Error: CDN load failed.";
+                throw new Error("binjgb.js failed to load from CDN.");
+            }
+
+            // 3. Factory Handshake
+            if (typeof Binjgb === 'function') {
+                debugLog("Factory detected. Executing...");
+                try {
+                    window.Module = await Binjgb(window.Module);
+                    emulatorInitialized = true;
+                    debugLog("Factory Init Complete.");
+                } catch(e) {
+                    debugLog("Factory Init Failed: " + e.message, 'error');
+                    throw e;
+                }
+            }
+
+            // 4. Wait for Runtime (Pre-init check)
+            let attempts = 0;
+            while (!emulatorInitialized && attempts < 100) { 
+                await new Promise(r => setTimeout(r, 100)); 
+                attempts++;
+            }
+            
+            if (!emulatorInitialized) {
+                 if (window.Module && window.Module.FS) {
+                     emulatorInitialized = true;
+                     debugLog("Force-confirmed FS.");
+                 } else {
+                     throw new Error("Core failed to initialize.");
+                 }
             }
         }
 
@@ -382,26 +396,31 @@
             try {
                 if (!emulatorInitialized) {
                     await initEmulator();
-                    // Wait for runtime
                     let attempts = 0;
-                    while (!emulatorInitialized && attempts < 100) {
+                    while (!emulatorInitialized && attempts < 50) {
                         await new Promise(r => setTimeout(r, 100)); 
                         attempts++;
                     }
                 }
                 
-                if (!window.Module || !window.Module.FS) {
-                    throw new Error("Emulator core failed to initialize.");
+                // CRITICAL FIX: Wait for FS. 
+                // Sometimes the runtime initializes before the FS is fully mounted.
+                // We poll for FS specifically.
+                let fsAttempts = 0;
+                while (!window.Module.FS && fsAttempts < 20) {
+                    await new Promise(r => setTimeout(r, 100));
+                    fsAttempts++;
                 }
 
-                // Wait one tick for FS
-                await new Promise(r => setTimeout(r, 50));
+                if (!window.Module || !window.Module.FS) {
+                    throw new Error("Emulator core failed to initialize (FS missing).");
+                }
 
-                const fileName = 'game.gba'; 
+                const fileName = 'rom.gb'; 
                 try {
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
-                    debugLog(`ROM Written: ${name}`);
+                    debugLog(`ROM Written to FS: ${name}`);
                 } catch(e) {
                     debugLog(`FS Write Error: ${e.message}`, 'error');
                     throw e;
@@ -410,7 +429,7 @@
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                    console.warn("callMain not found.");
+                    console.warn("callMain not found, checking auto-run...");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
@@ -431,20 +450,16 @@
         function handleRomUpload(event) {
             const file = event.target.files[0]; const fileStatus = document.getElementById('file-status'); const powerLed = document.getElementById('power-led');
             powerLed.classList.remove('on'); if (!file) return;
-            
-            const isZip = file.name.match(/\.zip$/i); 
-            const isRom = file.name.match(/\.(gba|gbc|gb)$/i);
-
+            const isZip = file.name.match(/\.zip$/i); const isRom = file.name.match(/\.(gb|gbc)$/i);
             if (!isZip && !isRom) { fileStatus.textContent = "Error: Invalid file type."; return; }
             fileStatus.textContent = `Reading ${file.name}...`; gameMode = 'rom';
-            
             if (isZip) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     JSZip.loadAsync(e.target.result).then(async function(zip) {
                         const files = Object.keys(zip.files);
-                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gba|gbc|gb)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
-                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No ROM found."; return; }
+                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gb|gbc)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
+                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found."; return; }
                         const chosenFile = romCandidates[0];
                         if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
