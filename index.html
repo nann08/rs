@@ -22,10 +22,8 @@
             }
         })();
     </script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
@@ -85,11 +83,7 @@
         #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
         #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
         
-        /* Debug Console */
         #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
-        .debug-error { color: #ff5555; font-weight: bold; }
-        .debug-warn { color: #ffaa00; }
-        .debug-info { color: #88ccff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -129,7 +123,7 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBC)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"><h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2><input type="file" id="file-input-html" accept=".html,text/html"><label for="file-input-html" class="upload-label">LOAD HTML (WEB)</label><input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip"><label for="file-input-rom" class="upload-label rom-label">LOAD ROM (.ZIP/.GBA)</label><p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GBA/GB/GBC</p><button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button></div>
                     <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
@@ -147,13 +141,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // DEBUG SYSTEM
         function debugLog(msg, type='info') {
             const consoleEl = document.getElementById('debug-console');
             if (consoleEl) {
                 consoleEl.style.display = 'block';
                 const entry = document.createElement('div');
                 entry.textContent = `> ${msg}`;
-                entry.className = `debug-${type}`;
+                entry.style.color = type === 'error' ? '#ff5555' : '#00ff00';
                 consoleEl.appendChild(entry);
                 consoleEl.scrollTop = consoleEl.scrollHeight;
             }
@@ -310,73 +305,60 @@
             reader.readAsText(file);
         }
 
-        // --- NEW: BINJGB CORE INTEGRATION (DIRECT CDN) ---
-        // Using unpkg which supports CORS
-        
+        // --- LOCAL mGBA LOADER (Standard) ---
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = src; 
-                script.crossOrigin = "anonymous"; 
+                script.src = src; script.crossOrigin = "anonymous"; 
                 script.onload = resolve;
                 script.onerror = () => reject(new Error(`Failed to load ${src}`));
                 document.head.appendChild(script);
             });
         }
 
-        // Pre-fetch WASM to Blob to bypass any relative path/CORS issues on Vercel
-        async function getWasmBlob() {
-            // Using rawcdn.githack.com for maximum reliability (CDN mirror of github)
-            const url = 'https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.wasm';
-            debugLog("Fetching WASM...");
-            const res = await fetch(url);
-            if (!res.ok) throw new Error("Failed to download core.");
-            const blob = await res.blob();
-            return URL.createObjectURL(blob);
-        }
-
         async function initEmulator() {
             if (emulatorInitialized) return;
             const romCanvas = document.getElementById('rom-canvas');
             const loadingText = document.getElementById('loading-text');
-            if(loadingText) loadingText.innerText = "Booting...";
-            
-            try {
-                // 1. Get Blob URL for WASM
-                const wasmBlobUrl = await getWasmBlob();
-                debugLog("WASM Ready.");
+            if(loadingText) loadingText.innerText = "Loading mGBA...";
+            debugLog("Initializing mGBA...");
 
-                // 2. Configure Module
-                window.Module = {
-                    canvas: romCanvas,
-                    noInitialRun: true,
-                    // FORCE emulator to use our Blob URL
-                    locateFile: function(path) {
-                        if (path.endsWith('.wasm')) return wasmBlobUrl;
-                        return path;
-                    },
-                    print: (text) => debugLog(`[Core] ${text}`),
-                    printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
-                    onRuntimeInitialized: function() {
-                        debugLog("Runtime Ready.");
-                        emulatorInitialized = true;
-                    }
-                };
-
-                // 3. Load Script
-                await loadScript('https://rawcdn.githack.com/binji/binjgb/master/docs/binjgb.js');
-                debugLog("Binjgb JS loaded.");
-                
-                 // 4. Handle Factory (If script uses it)
-                if (typeof Binjgb === 'function') {
-                    debugLog("Factory detected. Running...");
-                    window.Module = await Binjgb(window.Module);
+            // 1. DEFINE MODULE GLOBAL
+            // Standard Emscripten Module definition
+            window.Module = {
+                canvas: romCanvas,
+                noInitialRun: true,
+                print: (text) => debugLog(`[Core] ${text}`),
+                printErr: (text) => debugLog(`[Core Error] ${text}`, 'error'),
+                onRuntimeInitialized: function() {
+                    debugLog("Runtime Initialized callback fired.");
                     emulatorInitialized = true;
                 }
+            };
 
+            // 2. Load Script from Local Folder
+            try {
+                await loadScript('mgba.js');
+                debugLog("mgba.js loaded.");
             } catch(e) {
-                if(loadingText) loadingText.innerHTML = "Error: Emulator crashed.";
-                throw e;
+                if(loadingText) loadingText.innerHTML = "Error: mgba.js missing.";
+                throw new Error("mgba.js not found in local folder.");
+            }
+
+            // 3. Wait for Runtime
+            let attempts = 0;
+            while (!emulatorInitialized && attempts < 100) { 
+                await new Promise(r => setTimeout(r, 100)); 
+                attempts++;
+            }
+            
+            if (!emulatorInitialized) {
+                 if (window.Module && window.Module.FS) {
+                     emulatorInitialized = true;
+                     debugLog("Force-confirmed FS.");
+                 } else {
+                     throw new Error("Core failed to initialize.");
+                 }
             }
         }
 
@@ -391,16 +373,11 @@
             try {
                 if (!emulatorInitialized) {
                     await initEmulator();
-                    let attempts = 0;
-                    while (!emulatorInitialized && attempts < 100) {
-                        await new Promise(r => setTimeout(r, 100)); 
-                        attempts++;
-                    }
                 }
                 
-                // Wait for FS
+                // CRITICAL FIX: Wait for FS
                 let fsAttempts = 0;
-                while ((!window.Module || !window.Module.FS) && fsAttempts < 50) {
+                while (!window.Module.FS && fsAttempts < 50) {
                     await new Promise(r => setTimeout(r, 100));
                     fsAttempts++;
                 }
@@ -409,7 +386,7 @@
                     throw new Error("Emulator core failed to initialize (FS missing).");
                 }
 
-                const fileName = 'rom.gb'; 
+                const fileName = 'game.gba'; 
                 try {
                     try { window.Module.FS.unlink(fileName); } catch(e) {} 
                     window.Module.FS.writeFile(fileName, new Uint8Array(romData));
@@ -422,8 +399,7 @@
                 if (window.Module.callMain) {
                     window.Module.callMain([fileName]);
                 } else {
-                     // Auto-run might have triggered
-                     debugLog("callMain not found, checking if running...");
+                    console.warn("callMain not found.");
                 }
                 
                 const romCanvas = document.getElementById('rom-canvas');
@@ -444,7 +420,7 @@
         function handleRomUpload(event) {
             const file = event.target.files[0]; const fileStatus = document.getElementById('file-status'); const powerLed = document.getElementById('power-led');
             powerLed.classList.remove('on'); if (!file) return;
-            const isZip = file.name.match(/\.zip$/i); const isRom = file.name.match(/\.(gb|gbc)$/i);
+            const isZip = file.name.match(/\.zip$/i); const isRom = file.name.match(/\.(gba|gbc|gb)$/i);
             if (!isZip && !isRom) { fileStatus.textContent = "Error: Invalid file type."; return; }
             fileStatus.textContent = `Reading ${file.name}...`; gameMode = 'rom';
             if (isZip) {
@@ -452,8 +428,8 @@
                 reader.onload = function(e) {
                     JSZip.loadAsync(e.target.result).then(async function(zip) {
                         const files = Object.keys(zip.files);
-                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gb|gbc)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
-                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No GB/GBC ROM found."; return; }
+                        const romCandidates = files.filter(name => { const isRom = name.match(/\.(gba|gbc|gb)$/i); const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.'); return isRom && !isMacJunk; });
+                        if (romCandidates.length === 0) { if(fileStatus) fileStatus.textContent = "Error: No ROM found."; return; }
                         const chosenFile = romCandidates[0];
                         if(fileStatus) fileStatus.textContent = `Launching ${chosenFile}...`;
                         currentRomName = chosenFile;
