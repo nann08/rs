@@ -533,8 +533,12 @@
                                  const fileName = parts[parts.length - 1];
                                  if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
 
+                                 // Smart detection for index.html (prioritize root, then dist/)
                                  if (fileName.toLowerCase() === 'index.html') {
-                                     indexHtmlPath = relativePath;
+                                     // Prefer dist/index.html if we see it (common in webpack games)
+                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
+                                         indexHtmlPath = relativePath;
+                                     }
                                  }
                              });
                              promises.push(promise);
@@ -554,39 +558,71 @@
                     const indexRes = await fetch(indexBlobUrl);
                     let htmlContent = await indexRes.text();
 
-                    // 3. Inject Monkey Patch
+                    // 3. Inject Monkey Patch (The Smart Asset Patcher)
                     const monkeyPatchScript = `
                     <script>
                         (function() {
+                            // Asset Map from ZIP
                             const assets = ${JSON.stringify(fileMap)};
                             console.log("Assets loaded from ZIP:", Object.keys(assets).length);
                             
-                            // 1. Patch Fetch / XHR
-                            const originalFetch = window.fetch;
-                            window.fetch = async function(input, init) {
-                                let url = input;
-                                if (typeof input === 'object' && input.url) url = input.url;
+                            // Helper: Find blob URL for a relative path
+                            function resolve(path) {
+                                if(!path || typeof path !== 'string') return path;
+                                // Clean path: ./assets/img.png -> assets/img.png
+                                let clean = path.replace(/^\\.\\//, '').replace(/^\\//, '');
                                 
-                                // Try to match the end of the URL to our asset map
-                                // e.g. input="styles.css", map has "folder/styles.css"
-                                for(const key in assets) {
-                                    if(url.endsWith(key) || url.includes(key)) {
-                                        return originalFetch(assets[key], init);
-                                    }
+                                // 1. Direct Match
+                                if(assets[clean]) return assets[clean];
+                                
+                                // 2. Fuzzy Match (handle subfolders)
+                                // If game asks for "assets/image.png" but zip has "dist/assets/image.png"
+                                for(let key in assets) {
+                                    if(key.endsWith(clean)) return assets[key];
                                 }
+                                return path;
+                            }
+
+                            // --- PATCH 1: FETCH / XHR ---
+                            const originalFetch = window.fetch;
+                            window.fetch = function(input, init) {
+                                if(typeof input === 'string') input = resolve(input);
                                 return originalFetch(input, init);
                             };
 
-                            // 2. Patch DOM Elements (img, script, link)
+                            // --- PATCH 2: IMAGES ---
+                            // Intercept "new Image().src = ..."
+                            const originalImage = window.Image;
+                            window.Image = function(w, h) {
+                                const img = new originalImage(w, h);
+                                // We define a setter for 'src' to intercept it
+                                let srcVal = '';
+                                Object.defineProperty(img, 'src', {
+                                    get: () => srcVal,
+                                    set: (v) => { srcVal = v; img.setAttribute('src', resolve(v)); }
+                                });
+                                return img;
+                            };
+
+                            // --- PATCH 3: AUDIO ---
+                            const originalAudio = window.Audio;
+                            window.Audio = function(src) {
+                                if(src) src = resolve(src);
+                                return new originalAudio(src);
+                            };
+
+                            // --- PATCH 4: DOM ELEMENTS ---
+                            // Rewrites <img src="..."> <link href="..."> in the static HTML
+                            // Use MutationObserver to catch dynamic additions
                             const observer = new MutationObserver(mutations => {
                                 mutations.forEach(mutation => {
                                     if (mutation.type === 'childList') {
                                         mutation.addedNodes.forEach(node => {
-                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK') {
+                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
                                                rewriteSrc(node);
                                             }
                                             if(node.querySelectorAll) {
-                                                node.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
                                             }
                                         });
                                     } else if (mutation.type === 'attributes') {
@@ -596,21 +632,11 @@
                             });
                             
                             function rewriteSrc(node) {
-                                const attr = node.tagName === 'LINK' ? 'href' : 'src';
+                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
                                 const val = node.getAttribute(attr);
-                                if(val) {
-                                    // Clean the val to match keys (remove ./ or leading /)
-                                    const cleanVal = val.replace(/^\\.\\/|^\\//, '');
-                                    
-                                    // Look for match
-                                    for(const key in assets) {
-                                        if(cleanVal.endsWith(key)) {
-                                            // Check if already replaced
-                                            if(val.startsWith('blob:')) return;
-                                            node.setAttribute(attr, assets[key]);
-                                            return;
-                                        }
-                                    }
+                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
+                                    const resolved = resolve(val);
+                                    if(resolved !== val) node.setAttribute(attr, resolved);
                                 }
                             }
 
@@ -618,7 +644,7 @@
                             
                             // Initial rewrite
                             window.addEventListener('DOMContentLoaded', () => {
-                                 document.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
                             });
                         })();
                     <\/script>
