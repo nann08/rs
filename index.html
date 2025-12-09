@@ -17,7 +17,7 @@
 
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -39,11 +39,16 @@
         .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
         .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
+        /* SCREEN FIT FIX: Removed hard aspect ratio, allow content to fit */
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
-        /* UPDATED: Iframe Supercharged */
-        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; }
+        /* UPDATED: Iframe Supercharged with Scaling */
+        iframe, canvas#rom-canvas { 
+            width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; 
+            /* FORCE FIT: This ensures the inner game scales down to fit the screen */
+            object-fit: contain; 
+        }
         
         .menu-ui { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -375,17 +380,24 @@
             if (!mapping) return;
 
             const eventType = isDown ? 'keydown' : 'keyup';
+            const keyCode = mapping.keyCode || 0; // Use stored keyCode if available
 
             // 1. HTML MODE (Iframe)
             if (gameMode === 'html') {
                 const iframe = document.getElementById('game-iframe');
                 if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({
+                    // Send both standard KeyboardEvent and a custom payload
+                    // Some games check e.keyCode, some check e.key
+                    const eventData = {
                         type: eventType,
                         key: mapping.key,
-                        code: mapping.code,
-                        keyCode: mapping.keyCode
-                    }, '*');
+                        code: mapping.code || `Key${mapping.key.toUpperCase()}`,
+                        keyCode: keyCode,
+                        which: keyCode,
+                        bubbles: true
+                    };
+                    
+                    iframe.contentWindow.postMessage(eventData, '*');
                 }
                 return;
             }
@@ -396,7 +408,7 @@
                  const event = new KeyboardEvent(eventType, {
                     key: mapping.key,
                     code: mapping.code || `Key${mapping.key.toUpperCase()}`,
-                    keyCode: mapping.keyCode || 0,
+                    keyCode: keyCode,
                     bubbles: true
                 });
                 window.dispatchEvent(event);
@@ -416,7 +428,16 @@
             currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
             document.getElementById('binding-label-display').textContent = label;
             const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
-            const keys = [{k:'1',c:'Digit1',d:'1'},{k:'2',c:'Digit2',d:'2'},{k:'3',c:'Digit3',d:'3'},{k:'4',c:'Digit4',d:'4'},{k:'5',c:'Digit5',d:'5'},{k:'q',c:'KeyQ',d:'Q'},{k:'w',c:'KeyW',d:'W'},{k:'e',c:'KeyE',d:'E'},{k:'r',c:'KeyR',d:'R'},{k:'a',c:'KeyA',d:'A'},{k:'s',c:'KeyS',d:'S'},{k:'d',c:'KeyD',d:'D'},{k:'f',c:'KeyF',d:'F'},{k:'z',c:'KeyZ',d:'Z'},{k:'x',c:'KeyX',d:'X'},{k:'c',c:'KeyC',d:'C'},{k:'v',c:'KeyV',d:'V'},{k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},{k:'ArrowUp',c:'ArrowUp',d:'↑'},{k:'ArrowDown',c:'ArrowDown',d:'↓'},{k:'ArrowLeft',c:'ArrowLeft',d:'←'},{k:'ArrowRight',c:'ArrowRight',d:'→'}];
+            // Added keyCodes for better compatibility
+            const keys = [
+                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
+                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
+                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
+                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
+                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
+                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
+                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
+            ];
             keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); hideKeySelection(); }); keypad.appendChild(btn); });
         }
         function hideKeySelection() { document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding'); document.getElementById('key-selection-modal').style.display = 'none'; activeBindingLabel = null; currentMenu = 'keymap'; }
@@ -559,6 +580,7 @@
                     let htmlContent = await indexRes.text();
 
                     // 3. Inject Monkey Patch (The Smart Asset Patcher)
+                    // This is the new, robust logic
                     const monkeyPatchScript = `
                     <script>
                         (function() {
@@ -646,8 +668,59 @@
                             window.addEventListener('DOMContentLoaded', () => {
                                  document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
                             });
+
+                            // --- PATCH 5: LOCAL STORAGE BRIDGE (SAVE STATES) ---
+                            // Intercept localStorage to save to parent window
+                            try {
+                                const originalSetItem = window.localStorage.setItem;
+                                const originalGetItem = window.localStorage.getItem;
+                                
+                                // Prefix for this game session to avoid collisions
+                                const GAME_ID = "nann_boy_save_";
+
+                                window.localStorage.setItem = function(key, value) {
+                                    // Save to iframe local storage (temporary)
+                                    originalSetItem.call(window.localStorage, key, value);
+                                    // Send to parent to persist
+                                    window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
+                                };
+                                
+                                // Request load on startup
+                                window.parent.postMessage({ type: 'LOAD_REQUEST', prefix: GAME_ID }, '*');
+                                
+                                window.addEventListener('message', (e) => {
+                                    if(e.data.type === 'LOAD_DATA') {
+                                        // Restore data
+                                        const cleanKey = e.data.key.replace(GAME_ID, '');
+                                        originalSetItem.call(window.localStorage, cleanKey, e.data.value);
+                                        console.log("Restored save:", cleanKey);
+                                    }
+                                });
+
+                            } catch(e) { console.warn("Storage patch failed", e); }
+
+                            // --- PATCH 6: INPUT HANDLING ---
+                            // Ensure the iframe captures keyboard events and doesn't let them bubble out weirdly
+                            window.addEventListener('keydown', (e) => {
+                                // Prevent scrolling with arrow keys
+                                if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            });
+
                         })();
                     <\/script>
+                    <style>
+                        /* FORCE FIT STYLE */
+                        html, body { 
+                            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
+                            display: flex; align-items: center; justify-content: center; background: #000;
+                        }
+                        canvas { 
+                            max-width: 100%; max-height: 100%; 
+                            object-fit: contain; /* Maintain Aspect Ratio */
+                        }
+                    </style>
                     `;
                     
                     htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
@@ -830,6 +903,39 @@
             document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
             window.addEventListener('keydown', handleGlobalKey); window.addEventListener('keyup', handleGlobalKey);
+
+            // SAVE STATE LISTENER (Parent Window)
+            window.addEventListener('message', (e) => {
+                if (e.data.type === 'SAVE_STATE') {
+                    // Save to actual local storage
+                    try {
+                        localStorage.setItem(e.data.key, e.data.value);
+                        // Show toast
+                        const toast = document.getElementById('toast-notification');
+                        if(toast) {
+                            toast.textContent = "GAME SAVED";
+                            toast.style.opacity = 1;
+                            setTimeout(() => toast.style.opacity = 0, 2000);
+                        }
+                    } catch(err) { console.error("Save failed", err); }
+                } else if (e.data.type === 'LOAD_REQUEST') {
+                    // Search local storage for matching keys
+                    const iframe = document.getElementById('game-frame');
+                    if (iframe && iframe.contentWindow) {
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key.startsWith(e.data.prefix)) {
+                                const value = localStorage.getItem(key);
+                                iframe.contentWindow.postMessage({
+                                    type: 'LOAD_DATA',
+                                    key: key,
+                                    value: value
+                                }, '*');
+                            }
+                        }
+                    }
+                }
+            });
             
             // Initial call to attach sounds
             setupMenuSounds();
