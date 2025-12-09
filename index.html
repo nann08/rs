@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Nann Boy">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#7f1d1d">
     <title>Nann Emulator (mGBA)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -20,13 +26,20 @@
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
+        /* CANVAS STYLING FOR mGBA */
         canvas#rom-canvas { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; display: none; }
         
         .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
+        
+        .menu-ui::-webkit-scrollbar { width: 4px; }
+        .menu-ui::-webkit-scrollbar-track { background: #f1f1f1; }
+        .menu-ui::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
         #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
         .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
+        
         .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
         .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
         .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
@@ -56,16 +69,16 @@
         .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
         .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
         
-        #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
     <div id="console-wrapper">
         <div class="gbc-body" id="gbc-body">
             <div class="gbc-screen-lens">
                 <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
                 <div class="lcd-screen" id="lcd-screen">
-                    <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30;">
+                    <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30; display: none;">
                         <span id="loading-text">Ready</span>
                     </div>
                     
@@ -83,11 +96,12 @@
 
                     <div id="load-game-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
+                        <!-- This ID matches the Python Builder -->
                         <div class="menu-btn" id="btn-load-rom-action">ROM FILE</div>
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
                     </div>
                     
-                    <!-- Hidden Inputs -->
+                    <!-- Hidden Inputs (ID matches Builder) -->
                     <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
 
                     <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-[140px] overflow-y-auto px-4">
@@ -98,7 +112,6 @@
                         <div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div>
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     
-                    <div id="toast-notification"></div>
                 </div>
             </div>
             <div class="nann-brand">NANN BOY</div>
@@ -111,16 +124,17 @@
         </div>
     </div>
     
-    <!-- UI LOGIC ONLY (Engine logic will be injected by builder) -->
+    <!-- PURE UI LOGIC (Menus, Themes, Resizing) -->
+    <!-- The Engine Logic is injected by the Builder -->
     <script>
-        // Menu System
+        // --- 1. Menu System ---
         function toggleMenu(id) {
             const el = document.getElementById(id);
             if(el) {
                 const isFlex = el.style.display === 'flex';
                 // Close all
                 document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
-                // Toggle target
+                // Toggle target if it wasn't already open
                 if(!isFlex) el.style.display = 'flex';
             }
         }
@@ -132,13 +146,15 @@
         document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
         document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
         
-        // Select Button -> Open Menu
-        document.getElementById('btn-select').addEventListener('mousedown', () => {
-             // Only open if we aren't playing or if user wants menu
-             toggleMenu('main-menu');
-        });
+        // Select Button -> Open Main Menu
+        // (Note: The builder will attach the input logic, this just handles UI)
+        const selectBtn = document.getElementById('btn-select');
+        if(selectBtn) {
+            selectBtn.addEventListener('mousedown', () => toggleMenu('main-menu'));
+            selectBtn.addEventListener('touchstart', (e) => { e.preventDefault(); toggleMenu('main-menu'); });
+        }
 
-        // Theme System
+        // --- 2. Theme System ---
         function applyTheme(themeName) {
             const root = document.documentElement;
             let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
@@ -146,6 +162,8 @@
             else if (themeName === 'glacier') { mainColor = '#a5f3fc'; darkColor = '#0891b2'; bgColor = '#164e63'; }
             else if (themeName === 'black') { mainColor = '#27272a'; darkColor = '#18181b'; bgColor = '#09090b'; }
             else if (themeName === 'nannboy') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; btnColor = '#800000'; dpadColor = '#800000'; }
+            else if (themeName === 'red') { mainColor = '#E83942'; darkColor = '#b91c1c'; bgColor = '#7f1d1d'; }
+            
             root.style.setProperty('--console-main', mainColor); root.style.setProperty('--console-dark', darkColor);
             root.style.setProperty('--bg-color', bgColor); root.style.setProperty('--btn-color', btnColor);
             root.style.setProperty('--dpad-color', dpadColor);
@@ -154,7 +172,7 @@
             opt.addEventListener('click', () => applyTheme(opt.getAttribute('data-theme')));
         });
         
-        // Responsive Scaling
+        // --- 3. Responsive Scaling ---
         function scaleConsole() { 
             const wrapper = document.getElementById('console-wrapper'); 
             const gbcBody = document.getElementById('gbc-body'); 
@@ -164,6 +182,7 @@
             gbcBody.style.height = `${window.innerHeight / scale}px`; 
         }
         window.addEventListener('resize', scaleConsole);
+        // Initial call
         scaleConsole();
     </script>
 </body>
