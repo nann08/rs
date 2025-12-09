@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Nann Boy">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#7f1d1d">
     <title>Nann Emulator</title>
+    
     <!-- REQUIRED: JSZip for Unzipping Roms -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
@@ -24,17 +25,23 @@
         .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
-        .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
+        
+        /* IMPORTANT: Canvas and Iframe Styling */
         iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; object-fit: contain; }
+        
         .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
         #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
         .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
+        
         .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
         .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
         .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
+        
+        /* Hide Inputs */
         #file-input-html, #file-input-rom, #file-input-zip-web { display: none; } 
+        
         .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
         .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
         .speaker-grille { position: absolute; bottom: 40px; right: 25px; display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10; }
@@ -59,26 +66,9 @@
         .btn-pill { width: 70px; height: 18px; background-color: #4b5563; border-radius: 12px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 2px rgba(0,0,0,0.8), 2px 3px 4px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.05s, box-shadow 0.05s; transform: rotate(-25deg); }
         .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
         .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
-        
-        #install-prompt { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; align-items: center; text-align: center; border: 2px solid #3b82f6; animation: slideUp 0.5s ease-out; }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .install-icon { font-size: 24px; margin-bottom: 10px; }
-        .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
-        .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
-        #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
-        #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
-        
-        #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
-
-    <div id="install-prompt">
-        <div id="close-install">✕</div>
-        <div class="install-icon">📲</div>
-        <div class="font-bold text-lg mb-2">Install App</div>
-        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4" width="20" height="20"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
-    </div>
 
     <div id="console-wrapper">
         <div class="gbc-body" id="gbc-body">
@@ -88,15 +78,14 @@
                     <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30;">
                         <span id="loading-text">Initializing...</span>
                     </div>
-                    <div id="debug-console"></div>
                     <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
                     
                     <iframe id="game-iframe" src="about:blank" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-write" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts" referrerpolicy="no-referrer"></iframe>
                     <canvas id="rom-canvas"></canvas>
+                    
                     <div id="main-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
                         <div class="menu-btn" id="btn-menu-load-game">LOAD GAME</div>
-                        <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
                         <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
                         <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
                     </div>
@@ -109,26 +98,18 @@
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
                     </div>
                     
+                    <!-- INPUTS (The Builder will hijack these) -->
                     <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
                     <input type="file" id="file-input-html" accept=".html,text/html" style="display:none">
                     <input type="file" id="file-input-zip-web" accept=".zip" style="display:none">
 
-                    <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
                     <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-[140px] overflow-y-auto px-4">
                         <div class="theme-option" data-theme="nannboy"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;"><div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div></div><span class="font-bold text-gray-700">Nann Boy</span></div>
                         <div class="theme-option" data-theme="red"><div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div><span class="font-bold text-gray-700">Original Red</span></div>
                         <div class="theme-option" data-theme="purple"><div class="theme-preview" style="background: linear-gradient(145deg, #7c3aed, #4c1d95);"></div><span class="font-bold text-gray-700">Atomic Purple</span></div>
                         <div class="theme-option" data-theme="glacier"><div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div><span class="font-bold text-gray-700">Glacier Blue</span></div>
-                        <div class="theme-option" data-theme="pink"><div class="theme-preview" style="background: linear-gradient(145deg, #f472b6, #db2777);"></div><span class="font-bold text-gray-700">Berry Pink</span></div>
-                        <div class="theme-option" data-theme="green"><div class="theme-preview" style="background: linear-gradient(145deg, #84cc16, #4d7c0f);"></div><span class="font-bold text-gray-700">Leaf Green</span></div>
-                        <div class="theme-option" data-theme="orange"><div class="theme-preview" style="background: linear-gradient(145deg, #f97316, #c2410c);"></div><span class="font-bold text-gray-700">June Orange</span></div>
-                        <div class="theme-option" data-theme="white"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div><span class="font-bold text-gray-700">Polar White</span></div>
                         <div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div>
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
-                    <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-40 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
-                    <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    
-                    <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
             <div class="nann-brand">NANN BOY</div>
@@ -142,544 +123,65 @@
     </div>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        function debugLog(msg, type='info') {
-            const consoleEl = document.getElementById('debug-console');
-            if (consoleEl) {
-                consoleEl.style.display = 'block';
-                const entry = document.createElement('div');
-                entry.textContent = `> ${msg}`;
-                entry.className = `debug-${type}`;
-                consoleEl.appendChild(entry);
-                consoleEl.scrollTop = consoleEl.scrollHeight;
+        // Basic UI Logic Only (Menus, Themes)
+        // The Engine Logic is handled by the Builder
+        function toggleMenu(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                const isFlex = el.style.display === 'flex';
+                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
+                if(!isFlex) el.style.display = 'flex';
             }
-            console.log(`[Emulator] ${msg}`);
         }
-
-        const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
-        const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
-        const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = inCanvasEnvironment ? __initial_auth_token : null;
-
-        let auth;
-        let userId = null;
-        let gameMode = 'html'; 
-        let currentRomName = 'unknown_game'; 
-        let emulatorInitialized = false;
-
-        let keyMap = {
-            'Up': { key: 'ArrowUp' },
-            'Down': { key: 'ArrowDown' },
-            'Left': { key: 'ArrowLeft' },
-            'Right': { key: 'ArrowRight' }, 
-            'A': { key: 'x' },  
-            'B': { key: 'z' },  
-            'Start': { key: 'Enter' },
-            'Select': { key: 'Backspace' },
+        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
+        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
+        document.getElementById('btn-close-main-menu').onclick = () => document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
+        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
+        document.getElementById('btn-select').addEventListener('mousedown', () => toggleMenu('main-menu'));
+        
+        // HTML Upload (Preserved)
+        document.getElementById('btn-load-html-file').onclick = () => document.getElementById('file-input-html').click();
+        
+        document.getElementById('file-input-html').onchange = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const iframe = document.getElementById('game-iframe');
+                const blob = new Blob([ev.target.result], {type:'text/html'});
+                iframe.src = URL.createObjectURL(blob);
+                iframe.style.display = 'block';
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('rom-canvas').style.display = 'none';
+                toggleMenu('main-menu'); // Close menu
+                document.getElementById('power-led').classList.add('on');
+            };
+            reader.readAsText(file);
         };
-        
-        const keyMapStorageKey = `emulator-keymap-${appId}`;
-        const themeStorageKey = `emulator-theme-${appId}`;
-        
-        let currentMenu = null; 
-        let activeBindingLabel = null;
-        let virtualKeyStates = {};
-        let isAuthReady = false;
-
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-        function playHapticSound() {
-            if (!audioCtx) return;
-            const t = audioCtx.currentTime;
-            
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(600, t);
-            osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
-            
-            gain.gain.setValueAtTime(0.15, t);
-            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
-            
-            osc.start(t);
-            osc.stop(t + 0.03);
-
-            const osc2 = audioCtx.createOscillator();
-            const gain2 = audioCtx.createGain();
-            osc2.connect(gain2);
-            gain2.connect(audioCtx.destination);
-            
-            osc2.type = 'sine'; 
-            osc2.frequency.setValueAtTime(150, t);
-            osc2.frequency.exponentialRampToValueAtTime(100, t + 0.1); // Slight drop
-            
-            gain2.gain.setValueAtTime(0.1, t);
-            gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-            
-            osc2.start(t);
-            osc2.stop(t + 0.1);
-        }
 
         function applyTheme(themeName) {
             const root = document.documentElement;
-            let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
+            let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d';
             if (themeName === 'purple') { mainColor = '#7c3aed'; darkColor = '#4c1d95'; bgColor = '#4c1d95'; }
             else if (themeName === 'glacier') { mainColor = '#a5f3fc'; darkColor = '#0891b2'; bgColor = '#164e63'; }
-            else if (themeName === 'pink') { mainColor = '#f472b6'; darkColor = '#db2777'; bgColor = '#831843'; }
-            else if (themeName === 'green') { mainColor = '#84cc16'; darkColor = '#4d7c0f'; bgColor = '#14532d'; }
-            else if (themeName === 'orange') { mainColor = '#f97316'; darkColor = '#c2410c'; bgColor = '#7c2d12'; }
-            else if (themeName === 'white') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; }
             else if (themeName === 'black') { mainColor = '#27272a'; darkColor = '#18181b'; bgColor = '#09090b'; }
-            else if (themeName === 'nannboy') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; btnColor = '#800000'; dpadColor = '#800000'; }
+            else if (themeName === 'nannboy') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; }
             root.style.setProperty('--console-main', mainColor); root.style.setProperty('--console-dark', darkColor);
-            root.style.setProperty('--bg-color', bgColor); root.style.setProperty('--btn-color', btnColor);
-            root.style.setProperty('--dpad-color', dpadColor);
-            localStorage.setItem(themeStorageKey, themeName);
+            root.style.setProperty('--bg-color', bgColor);
         }
-        function loadTheme() { const savedTheme = localStorage.getItem(themeStorageKey); if (savedTheme) applyTheme(savedTheme); }
-
-        async function initFirebase() {
-            loadTheme();
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
-                loadingOverlay.style.display = 'none'; isAuthReady = true; loadKeyMap(); return;
-            }
-            try {
-                const app = initializeApp(firebaseConfig); auth = getAuth(app);
-                if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken); else await signInAnonymously(auth);
-                onAuthStateChanged(auth, (user) => { userId = user ? user.uid : null; isAuthReady = true; loadKeyMap(); loadingOverlay.style.display = 'none'; });
-            } catch (error) { console.error("Auth Error:", error); loadingOverlay.innerHTML = "Offline Mode"; setTimeout(() => loadingOverlay.style.display = 'none', 1000); }
-        }
-
-        function loadKeyMap() { const storedMap = localStorage.getItem(keyMapStorageKey); if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } } renderBindings(); }
-        function saveKeyMap() { localStorage.setItem(keyMapStorageKey, JSON.stringify(keyMap)); renderBindings(); }
-        function renderBindings() {
-            const bindingsList = document.getElementById('bindings-list');
-            if (bindingsList) {
-                bindingsList.innerHTML = Object.keys(keyMap).map(label => {
-                    const mappedKey = keyMap[label]; const displayKey = mappedKey ? (mappedKey.key === ' ' ? 'SPACE' : mappedKey.key.toUpperCase()) : 'N/A';
-                    return `<div class="binding-row"><span class="font-semibold">${label}:</span><span class="binding-key binding-target" data-label="${label}" id="binding-key-${label}">${displayKey}</span></div>`;
-                }).join('');
-                bindingsList.querySelectorAll('.binding-target').forEach(span => { span.addEventListener('click', () => startKeyBinding(span.getAttribute('data-label'))); });
-            }
-        }
-
-        function handleGlobalKey(e) {
-            if (currentMenu !== null) { if (e.key === "Escape") { if (currentMenu === 'keyselect') hideKeySelection(); else closeAllMenus(); } return; }
-        }
+        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
         
-        function updateDpadVisuals(label, isDown) {
-            if (!['Up', 'Down', 'Left', 'Right'].includes(label)) return;
-            const dpadArmH = document.querySelector('.dpad-h'); const dpadArmV = document.querySelector('.dpad-v');
-            if (isDown) { if (label === 'Left' || label === 'Right') dpadArmH?.classList.add('pressed-arm'); if (label === 'Up' || label === 'Down') dpadArmV?.classList.add('pressed-arm'); }
-            else { const isHorizontalHeld = virtualKeyStates['Left'] || virtualKeyStates['Right']; const isVerticalHeld = virtualKeyStates['Up'] || virtualKeyStates['Down']; if (!isHorizontalHeld) dpadArmH?.classList.remove('pressed-arm'); if (!isVerticalHeld) dpadArmV?.classList.remove('pressed-arm'); }
+        function scaleConsole() { 
+            const wrapper = document.getElementById('console-wrapper'); 
+            const gbcBody = document.getElementById('gbc-body'); 
+            if (!wrapper || !gbcBody) return; 
+            const scale = Math.min(1, window.innerWidth / 440); 
+            wrapper.style.transform = `scale(${scale})`; 
+            gbcBody.style.height = `${window.innerHeight / scale}px`; 
         }
-        function handleVisualPress(element, isDown) { if (element) { if (isDown) element.classList.add('pressed'); else element.classList.remove('pressed'); } }
-        
-        // --- INPUT HANDLING ---
-        function sendInput(label, isDown) { 
-            const mapping = keyMap[label];
-            if (!mapping) return;
-
-            const eventType = isDown ? 'keydown' : 'keyup';
-            const keyCode = mapping.keyCode || 0; 
-
-            // 1. HTML MODE (Iframe)
-            if (gameMode === 'html') {
-                const iframe = document.getElementById('game-iframe');
-                if (iframe && iframe.contentWindow) {
-                    const eventData = {
-                        type: eventType,
-                        key: mapping.key,
-                        code: mapping.code || `Key${mapping.key.toUpperCase()}`,
-                        keyCode: keyCode,
-                        which: keyCode,
-                        bubbles: true
-                    };
-                    
-                    iframe.contentWindow.postMessage(eventData, '*');
-
-                    if (label === 'Start' && isDown) {
-                        iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*');
-                    }
-                }
-                return;
-            }
-
-            // 2. ROM MODE (mGBA / Window Event)
-             const event = new KeyboardEvent(eventType, {
-                key: mapping.key,
-                code: mapping.code || `Key${mapping.key.toUpperCase()}`,
-                keyCode: keyCode,
-                bubbles: true
-            });
-            window.dispatchEvent(event);
-        }
-
-        function handleVirtualPress(label, isDown, shouldSendMessage = true) { 
-            const currentState = virtualKeyStates[label] || false; 
-            if (isDown !== currentState) { 
-                virtualKeyStates[label] = isDown; 
-                if (shouldSendMessage) sendInput(label, isDown); 
-            } 
-        }
-
-        function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
-        function showKeySelection(label) {
-            currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
-            document.getElementById('binding-label-display').textContent = label;
-            const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
-            // Added keyCodes for better compatibility
-            const keys = [
-                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
-                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
-                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
-                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
-                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
-                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
-                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
-            ];
-            keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); hideKeySelection(); }); keypad.appendChild(btn); });
-        }
-        function hideKeySelection() { document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding'); document.getElementById('key-selection-modal').style.display = 'none'; activeBindingLabel = null; currentMenu = 'keymap'; }
-        
-        function openMenu(menuId) { 
-            // Hide all menus first
-            document.querySelectorAll('.menu-ui').forEach(el => { 
-                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
-                    el.style.display = 'none'; 
-                }
-            }); 
-            
-            const menu = document.getElementById(menuId); 
-            if (menu) { 
-                menu.style.display = 'flex'; 
-                currentMenu = menuId; 
-                if (menuId === 'key-binding-menu') renderBindings(); 
-            } 
-        }
-
-        function closeAllMenus() { 
-            document.querySelectorAll('.menu-ui').forEach(el => { 
-                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
-                    el.style.display = 'none'; 
-                }
-            }); 
-            currentMenu = null; 
-        }
-        function toggleMenu(menuId) { if (currentMenu === menuId) closeAllMenus(); else openMenu(menuId); }
-        
-        // --- MENU LOGIC FOR HTML VS ROM ---
-        document.getElementById('btn-menu-load-game').addEventListener('click', () => {
-             openMenu('load-game-menu');
-        });
-
-        document.getElementById('btn-back-load-menu').addEventListener('click', () => {
-             openMenu('main-menu');
-        });
-
-        // The builder script will REPLACE this button's clone to handle ROMs.
-        document.getElementById('btn-load-rom-action').addEventListener('click', () => {
-             document.getElementById('file-input-rom').click();
-        });
-
-        document.getElementById('btn-load-html-file').addEventListener('click', () => {
-             document.getElementById('file-input-html').click();
-        });
-
-        // Use the ZIP input for "WEB FOLDER" (technically web zip) since folder upload is flaky on mobile
-        document.getElementById('btn-load-zip-web').addEventListener('click', () => {
-             document.getElementById('file-input-zip-web').click();
-        });
-        
-        document.getElementById('btn-menu-controls').addEventListener('click', () => {
-             openMenu('key-binding-menu');
-        });
-        
-        document.getElementById('btn-menu-style').addEventListener('click', () => {
-             openMenu('styles-menu');
-        });
-
-        document.getElementById('btn-close-main-menu').addEventListener('click', () => {
-             closeAllMenus();
-        });
-        
-        // Attach sound to menu buttons
-        function setupMenuSounds() {
-            const clickables = document.querySelectorAll('.menu-btn, .upload-label, button');
-            clickables.forEach(btn => {
-                btn.addEventListener('click', () => {
-                   initAudio();
-                   playHapticSound(); 
-                });
-            });
-        }
-
-
-        // --- WEB ZIP UPLOAD HANDLER ---
-        function handleWebZipUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const fileStatus = document.getElementById('file-status'); 
-            
-            closeAllMenus();
-            
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if(loadingOverlay) {
-                loadingOverlay.style.display = 'flex';
-                loadingOverlay.innerHTML = `<span id="loading-text">Unzipping Game...</span>`;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                JSZip.loadAsync(e.target.result).then(async function(zip) {
-                    const fileMap = {};
-                    let indexHtmlPath = null;
-                    const promises = [];
-                    
-                    zip.forEach((relativePath, zipEntry) => {
-                        if (!zipEntry.dir) {
-                             const promise = zipEntry.async("blob").then(blob => {
-                                 const blobUrl = URL.createObjectURL(blob);
-                                 fileMap[relativePath] = blobUrl;
-                                 const parts = relativePath.split('/');
-                                 const fileName = parts[parts.length - 1];
-                                 if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
-                                 if (fileName.toLowerCase() === 'index.html') {
-                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
-                                         indexHtmlPath = relativePath;
-                                     }
-                                 }
-                             });
-                             promises.push(promise);
-                        }
-                    });
-
-                    await Promise.all(promises);
-
-                    if (!indexHtmlPath) {
-                        alert("Error: No index.html found in ZIP.");
-                        loadingOverlay.style.display = 'none';
-                        return;
-                    }
-                    
-                    const indexBlobUrl = fileMap[indexHtmlPath];
-                    const indexRes = await fetch(indexBlobUrl);
-                    let htmlContent = await indexRes.text();
-
-                    const monkeyPatchScript = `
-                    <script>
-                        (function() {
-                            const assets = ${JSON.stringify(fileMap)};
-                            console.log("Assets loaded from ZIP:", Object.keys(assets).length);
-                            
-                            function resolve(path) {
-                                if(!path || typeof path !== 'string') return path;
-                                let clean = path.replace(/^\\.\\//, '').replace(/^\\//, '');
-                                if(assets[clean]) return assets[clean];
-                                for(let key in assets) {
-                                    if(key.endsWith(clean)) return assets[key];
-                                }
-                                return path;
-                            }
-
-                            const originalFetch = window.fetch;
-                            window.fetch = function(input, init) {
-                                if(typeof input === 'string') input = resolve(input);
-                                return originalFetch(input, init);
-                            };
-
-                            const originalImage = window.Image;
-                            window.Image = function(w, h) {
-                                const img = new originalImage(w, h);
-                                let srcVal = '';
-                                Object.defineProperty(img, 'src', {
-                                    get: () => srcVal,
-                                    set: (v) => { srcVal = v; img.setAttribute('src', resolve(v)); }
-                                });
-                                return img;
-                            };
-
-                            const originalAudio = window.Audio;
-                            window.Audio = function(src) {
-                                if(src) src = resolve(src);
-                                return new originalAudio(src);
-                            };
-
-                            const observer = new MutationObserver(mutations => {
-                                mutations.forEach(mutation => {
-                                    if (mutation.type === 'childList') {
-                                        mutation.addedNodes.forEach(node => {
-                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
-                                               rewriteSrc(node);
-                                            }
-                                            if(node.querySelectorAll) {
-                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
-                                            }
-                                        });
-                                    } else if (mutation.type === 'attributes') {
-                                        rewriteSrc(mutation.target);
-                                    }
-                                });
-                            });
-                            
-                            function rewriteSrc(node) {
-                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
-                                const val = node.getAttribute(attr);
-                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
-                                    const resolved = resolve(val);
-                                    if(resolved !== val) node.setAttribute(attr, resolved);
-                                }
-                            }
-
-                            observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'href'] });
-                            
-                            window.addEventListener('DOMContentLoaded', () => {
-                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
-                            });
-
-                            try {
-                                const originalSetItem = window.localStorage.setItem;
-                                const originalGetItem = window.localStorage.getItem;
-                                const GAME_ID = "nann_boy_save_";
-
-                                window.localStorage.setItem = function(key, value) {
-                                    originalSetItem.call(window.localStorage, key, value);
-                                    window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
-                                };
-                                
-                                window.parent.postMessage({ type: 'LOAD_REQUEST', prefix: GAME_ID }, '*');
-                                
-                                window.addEventListener('message', (e) => {
-                                    if(e.data.type === 'LOAD_DATA') {
-                                        const cleanKey = e.data.key.replace(GAME_ID, '');
-                                        originalSetItem.call(window.localStorage, cleanKey, e.data.value);
-                                        console.log("Restored save:", cleanKey);
-                                    }
-                                });
-
-                            } catch(e) { console.warn("Storage patch failed", e); }
-
-                            window.addEventListener('keydown', (e) => {
-                                if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            });
-
-                        })();
-                    <\/script>
-                    <style>
-                        html, body { 
-                            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
-                            display: flex; align-items: center; justify-content: center; background: #000;
-                        }
-                        canvas { 
-                            max-width: 100%; max-height: 100%; 
-                            object-fit: contain; 
-                        }
-                    </style>
-                    `;
-                    
-                    htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
-                    
-                    const finalBlob = new Blob([htmlContent], { type: 'text/html' });
-                    const finalUrl = URL.createObjectURL(finalBlob);
-                    
-                    const iframe = document.getElementById('game-iframe');
-                    const romCanvas = document.getElementById('rom-canvas');
-                    const startScreen = document.getElementById('start-screen');
-                    const powerLed = document.getElementById('power-led');
-
-                    iframe.onload = () => {
-                            iframe.onload = null;
-                            gameMode = 'html';
-                            iframe.style.display = 'block';
-                            romCanvas.style.display = 'none';
-                            startScreen.style.display = 'none';
-                            iframe.contentWindow.focus();
-                            powerLed.classList.add('on');
-                            loadingOverlay.style.display = 'none';
-                    };
-                    iframe.src = finalUrl;
-
-                }).catch(err => {
-                    console.error(err);
-                    alert("Failed to unzip game: " + err.message);
-                    loadingOverlay.style.display = 'none';
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function handleHtmlUpload(event) {
-            const file = event.target.files[0]; 
-            if (!file) return;
-             const fileStatus = document.getElementById('file-status');
-             const iframe = document.getElementById('game-iframe');
-             const romCanvas = document.getElementById('rom-canvas');
-             const powerLed = document.getElementById('power-led');
-             const startScreen = document.getElementById('start-screen');
-            powerLed.classList.remove('on'); 
-
-            if (file.type !== 'text/html' && !file.name.endsWith('.html')) { return; }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                 let htmlContent = e.target.result;
-                const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
-                const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
-                htmlContent = fitStyle + htmlContent + bridgeScript;
-                try { const blob = new Blob([htmlContent], { type: 'text/html' }); const blobUrl = URL.createObjectURL(blob); iframe.onload = () => { URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null; gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.display = 'none'; startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on'); }; iframe.src = blobUrl; } catch (error) { }
-            };
-            reader.readAsText(file);
-        }
-
-        function setupControlListeners() {
-            const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill'); const TAP_THRESHOLD_MS = 300; 
-            const handleStart = (e) => {
-                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
-                if (currentMenu !== null && label !== 'Start' && label !== 'Select') return;
-                initAudio(); playHapticSound(); if (navigator.vibrate) navigator.vibrate(15);
-                control.pressTime = Date.now(); control.isTap = true;
-                handleVisualPress(control, true); updateDpadVisuals(label, true); handleVirtualPress(label, true, true); 
-            };
-            const handleEnd = (e) => {
-                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
-                handleVirtualPress(label, false, true); handleVisualPress(control, false); updateDpadVisuals(label, false);
-                if (['Select', 'Start'].includes(label) && control.isTap) { const duration = Date.now() - (control.pressTime || 0); if (duration < TAP_THRESHOLD_MS) { if (label === 'Select') toggleMenu('main-menu'); else if (label === 'Start') toggleMenu('start-menu'); } } control.isTap = false;
-            };
-            gameControls.forEach(control => { control.addEventListener('touchstart', handleStart, { passive: false }); control.addEventListener('mousedown', handleStart); control.addEventListener('touchend', handleEnd); control.addEventListener('mouseup', handleEnd); control.addEventListener('mouseleave', handleEnd); });
-            document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu')); document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
-            document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
-            // Folder Upload (via ZIP)
-            document.getElementById('file-input-zip-web')?.addEventListener('change', handleWebZipUpload); 
-            
-            // This listener will be REPLACED by the injected builder script
-            // document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
-
-            document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection); document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
-            document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
-            document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu')); document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
-            document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
-            document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
-            window.addEventListener('keydown', handleGlobalKey); window.addEventListener('keyup', handleGlobalKey);
-            
-            // Initial call to attach sounds
-            setupMenuSounds();
-        }
-        function checkStandalone() { const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; if (isIOS && !isStandalone) setTimeout(() => { document.getElementById('install-prompt').style.display = 'flex'; }, 3000); }
-        function scaleConsole() { const wrapper = document.getElementById('console-wrapper'); const gbcBody = document.getElementById('gbc-body'); if (!wrapper || !gbcBody) return; const designWidth = 440; const windowWidth = window.innerWidth; const windowHeight = window.innerHeight; const scale = Math.min(1, windowWidth / designWidth); wrapper.style.transform = `scale(${scale})`; const requiredHeight = windowHeight / scale; gbcBody.style.height = `${requiredHeight}px`; }
-        function appMain() { initFirebase(); setupControlListeners(); scaleConsole(); window.addEventListener('resize', scaleConsole); if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleConsole); checkStandalone(); }
-        if (document.readyState === 'loading') { window.addEventListener('DOMContentLoaded', appMain); } else { appMain(); }
+        window.addEventListener('resize', scaleConsole);
+        scaleConsole();
     </script>
 </body>
 </html>
