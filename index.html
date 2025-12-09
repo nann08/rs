@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Nann Boy">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#7f1d1d">
     <title>Nann Emulator</title>
     
-    <!-- JSZip for Unzipping Roms -->
+    <!-- LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase Compat (Works locally without modules) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -76,6 +76,8 @@
         .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
         
         #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
+        
+        #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -88,15 +90,14 @@
                     <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30; display: none;">
                         <svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span id="loading-text">Loading...</span>
+                        <div id="error-log" class="text-red-500 text-xs mt-2 font-mono"></div>
                     </div>
                     
                     <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
                     
-                    <!-- ENGINE AREA -->
                     <canvas id="rom-canvas"></canvas>
                     <iframe id="game-iframe"></iframe>
                     
-                    <!-- MENUS (Preserved Original) -->
                     <div id="main-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
                         <div class="menu-btn" id="btn-menu-load-game">LOAD GAME</div>
@@ -127,7 +128,6 @@
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-40 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
-                    
                     <div id="toast-notification"></div>
                 </div>
             </div>
@@ -141,11 +141,8 @@
         </div>
     </div>
     
-    <!-- ORIGINAL SCRIPT LOGIC (With WasmBoy Removed, mGBA hooks added) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
+    <!-- STANDARD SCRIPT (NO TYPE=MODULE) -->
+    <script>
         // APP VARS
         const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
         const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
@@ -155,26 +152,14 @@
         let auth;
         let userId = null;
         let gameMode = 'html'; 
-        let currentRomName = 'unknown_game'; 
-        
-        // --- KEY MAPPING (Preserved) ---
-        let keyMap = {
-            'Up': { key: 'ArrowUp' },
-            'Down': { key: 'ArrowDown' },
-            'Left': { key: 'ArrowLeft' },
-            'Right': { key: 'ArrowRight' }, 
-            'A': { key: 'x' },  
-            'B': { key: 'z' },  
-            'Start': { key: 'Enter' },
-            'Select': { key: 'Backspace' },
-        };
+        let keyMap = { 'Up':{key:'ArrowUp'}, 'Down':{key:'ArrowDown'}, 'Left':{key:'ArrowLeft'}, 'Right':{key:'ArrowRight'}, 'A':{key:'x'}, 'B':{key:'z'}, 'Start':{key:'Enter'}, 'Select':{key:'Backspace'} };
         const keyMapStorageKey = `emulator-keymap-${appId}`;
         const themeStorageKey = `emulator-theme-${appId}`;
         let currentMenu = null; 
         let activeBindingLabel = null;
         let virtualKeyStates = {};
 
-        // --- AUDIO / THEME / FIREBASE (Standard) ---
+        // --- AUDIO / THEME / FIREBASE ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -187,13 +172,9 @@
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(600, t);
-            osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
-            gain.gain.setValueAtTime(0.15, t);
-            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
-            osc.start(t);
-            osc.stop(t + 0.03);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, t); osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
+            gain.gain.setValueAtTime(0.15, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
+            osc.start(t); osc.stop(t + 0.03);
         }
 
         function applyTheme(themeName) {
@@ -210,25 +191,27 @@
         }
         function loadTheme() { const savedTheme = localStorage.getItem(themeStorageKey); if (savedTheme) applyTheme(savedTheme); }
 
-        async function initFirebase() {
+        function initFirebase() {
             loadTheme();
             const loadingOverlay = document.getElementById('loading-overlay');
+            // COMPAT MODE FIREBASE INIT
             if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
                 if(loadingOverlay) loadingOverlay.style.display = 'none'; 
                 loadKeyMap(); return;
             }
             try {
-                const app = initializeApp(firebaseConfig); auth = getAuth(app);
-                if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken); else await signInAnonymously(auth);
-                onAuthStateChanged(auth, (user) => { 
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                if (initialAuthToken) auth.signInWithCustomToken(initialAuthToken); else auth.signInAnonymously();
+                auth.onAuthStateChanged((user) => { 
                     userId = user ? user.uid : null; 
                     loadKeyMap(); 
                     if(loadingOverlay) loadingOverlay.style.display = 'none'; 
                 });
-            } catch (error) { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
+            } catch (error) { console.error("Firebase Init Error", error); if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
 
-        // --- KEY MAP LOGIC (Preserved) ---
+        // --- KEY MAP LOGIC ---
         function loadKeyMap() { const storedMap = localStorage.getItem(keyMapStorageKey); if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } } renderBindings(); }
         function saveKeyMap() { localStorage.setItem(keyMapStorageKey, JSON.stringify(keyMap)); renderBindings(); }
         function renderBindings() {
@@ -246,11 +229,9 @@
         function sendInput(label, isDown) { 
             const mapping = keyMap[label];
             if (!mapping) return;
-
             const eventType = isDown ? 'keydown' : 'keyup';
             const keyCode = mapping.keyCode || 0; 
 
-            // 1. HTML MODE
             if (gameMode === 'html') {
                 const iframe = document.getElementById('game-iframe');
                 if (iframe && iframe.contentWindow) {
@@ -259,17 +240,8 @@
                 }
                 return;
             }
-
-            // 2. ROM MODE (mGBA)
-            // Dispatch standard events to window (mGBA listens here)
-            // We use the 'keyCode' from your map or default
-            const event = new KeyboardEvent(eventType, {
-                key: mapping.key,
-                code: mapping.code,
-                keyCode: keyCode,
-                which: keyCode,
-                bubbles: true
-            });
+            // ROM MODE (mGBA)
+            const event = new KeyboardEvent(eventType, { key: mapping.key, code: mapping.code, keyCode: keyCode, which: keyCode, bubbles: true });
             window.dispatchEvent(event);
         }
 
@@ -306,7 +278,7 @@
         document.getElementById('btn-close-key-map').onclick = () => openMenu('main-menu');
         document.getElementById('btn-cancel-key-select').onclick = () => { document.getElementById('key-selection-modal').style.display = 'none'; currentMenu = 'keymap'; };
 
-        // --- CONTROL LISTENERS (Touch/Click) ---
+        // --- CONTROL LISTENERS ---
         function setupControlListeners() {
             const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill'); 
             const handleStart = (e) => {
@@ -314,22 +286,17 @@
                 if (currentMenu !== null && label !== 'Start' && label !== 'Select') return;
                 initAudio(); playHapticSound(); 
                 if (navigator.vibrate) navigator.vibrate(15);
-                
                 control.classList.add('pressed');
                 if(label === 'Left'||label==='Right') document.querySelector('.dpad-h').classList.add('pressed-arm');
                 if(label === 'Up'||label==='Down') document.querySelector('.dpad-v').classList.add('pressed-arm');
-                
                 handleVirtualPress(label, true); 
             };
             const handleEnd = (e) => {
                 e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
-                
                 control.classList.remove('pressed');
                 document.querySelector('.dpad-h').classList.remove('pressed-arm');
                 document.querySelector('.dpad-v').classList.remove('pressed-arm');
-                
                 handleVirtualPress(label, false);
-                
                 if (label === 'Select' && !control.hasLongPress) toggleMenu('main-menu'); 
                 if (label === 'Start' && !control.hasLongPress) toggleMenu('start-menu');
             };
@@ -343,8 +310,7 @@
             document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
         }
 
-        // --- ROM LOADING (UPDATED FOR mGBA + ZIP) ---
-        // This handles the FILE INPUT and calls the Engine
+        // --- ROM LOADING LOGIC ---
         document.getElementById('file-input-rom').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -353,31 +319,29 @@
             closeAllMenus();
             const loadingOverlay = document.getElementById('loading-overlay');
             const loadingText = document.getElementById('loading-text');
+            const errorLog = document.getElementById('error-log');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                if(loadingText) loadingText.innerText = "Processing...";
+                loadingText.innerText = "Processing...";
+                errorLog.innerText = "";
             }
 
-            // CRITICAL: Yield to UI to let spinner render
+            // Yield to browser to let loading screen appear
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
                 let romData = null;
                 let romName = file.name;
 
-                // ZIP Logic (Moved here from Builder)
+                // ZIP Logic
                 if (file.name.toLowerCase().endsWith('.zip')) {
                     if(loadingText) loadingText.innerText = "Unzipping...";
                     await new Promise(r => setTimeout(r, 50));
 
                     const zipBuffer = await file.arrayBuffer();
                     const zip = await JSZip.loadAsync(zipBuffer);
-                    
-                    // Find ROM
                     const romFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gb|gbc|gba)$/i));
-                    
-                    if(!romFile) throw new Error("No ROM found in ZIP");
-                    
+                    if(!romFile) throw new Error("No .gb/.gbc/.gba found inside ZIP");
                     romName = romFile.name;
                     romData = await romFile.async("uint8array");
                 } else {
@@ -392,44 +356,25 @@
                 if (window.startMgbaGame) {
                     gameMode = 'rom';
                     const success = await window.startMgbaGame(romData, romName);
-                    if(!success) throw new Error("Engine reported failure");
+                    if(!success) throw new Error("Engine crashed during startup");
                     
-                    // Cleanup UI
                     if(loadingOverlay) loadingOverlay.style.display = 'none';
                     document.getElementById('start-screen').style.display = 'none';
                     document.getElementById('rom-canvas').style.display = 'block';
                     document.getElementById('game-iframe').style.display = 'none';
                     document.getElementById('power-led').classList.add('on');
                 } else {
-                    throw new Error("Engine not loaded yet");
+                    throw new Error("Engine not loaded! Check mgba.js");
                 }
 
             } catch (err) {
                 console.error(err);
-                alert("Failed: " + err.message);
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
+                if(loadingText) loadingText.innerText = "Error!";
+                if(errorLog) errorLog.innerText = err.message;
             }
         });
 
-        // --- KEY BINDING UI (Preserved) ---
-        function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
-        function showKeySelection(label) {
-            currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
-            document.getElementById('binding-label-display').textContent = label;
-            const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
-            const keys = [
-                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
-                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
-                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
-                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
-                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
-                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
-                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
-            ];
-            keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); currentMenu = 'keymap'; document.getElementById('key-selection-modal').style.display = 'none'; }); keypad.appendChild(btn); });
-        }
-
-        // --- BOOTSTRAP ---
+        // --- BOOT ---
         function appMain() { 
             initFirebase(); 
             setupControlListeners(); 
