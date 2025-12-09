@@ -8,8 +8,23 @@
     <meta name="apple-mobile-web-app-title" content="Nann Boy">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#7f1d1d">
-    <title>Nann Emulator (mGBA)</title>
+    <title>Nann Emulator</title>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- WASMBOY REMOVED so mGBA can be injected -->
+
+    <script>
+        (function() {
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
+            const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
+            if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+                const manifest = { "name": "Nann Boy", "short_name": "NannBoy", "start_url": ".", "display": "standalone", "background_color": "#7f1d1d", "theme_color": "#7f1d1d", "orientation": "portrait", "icons": [{ "src": `data:image/png;base64,${ICON_BASE64}`, "sizes": "192x192", "type": "image/png" }] };
+                const linkManifest = document.createElement('link'); linkManifest.rel = 'manifest'; linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`; document.head.appendChild(linkManifest);
+            }
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -23,13 +38,29 @@
         .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
         .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
+        /* SCREEN FIT FIX: Removed hard aspect ratio, allow content to fit */
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
-        /* CANVAS STYLING FOR mGBA */
-        canvas#rom-canvas { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; display: none; }
+        /* UPDATED: Iframe Supercharged with Scaling */
+        iframe, canvas#rom-canvas { 
+            width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; 
+            /* FORCE FIT: This ensures the inner game scales down to fit the screen */
+            object-fit: contain; 
+        }
         
-        .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
+        .menu-ui { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: white; 
+            padding: 10px 12px;
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            z-index: 100; 
+            overflow-y: auto; 
+        }
+        
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
         
         .menu-ui::-webkit-scrollbar { width: 4px; }
@@ -40,10 +71,36 @@
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
         .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
         
-        .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        /* Compact Menu Buttons */
+        .menu-btn { 
+            width: 90%; 
+            padding: 6px 0; 
+            margin: 3px 0;  
+            background-color: #f3f4f6; 
+            border: 2px solid #d1d5db; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            color: #374151; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            flex-shrink: 0; 
+        }
         .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
         .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
         .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
+        #file-input-html, #file-input-rom, #file-input-zip-web { display: none; } 
+        
+        .upload-label { 
+            display: flex; align-items: center; justify-content: center; width: 100%; 
+            padding: 8px; 
+            background-color: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 6px; 
+            transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); flex-shrink: 0;
+        }
+        .upload-label.rom-label { background-color: #2563eb; }
+        .upload-label.folder-label { background-color: #16a34a; }
+        .upload-label:hover { opacity: 0.9; }
         
         .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
         .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
@@ -53,12 +110,13 @@
         .dpad-cross { width: 100%; height: 100%; position: relative; }
         .dpad-arm { background-color: var(--dpad-color); position: absolute; border-radius: 6px; box-shadow: 2px 4px 6px rgba(0,0,0,0.4); transition: transform 0.05s; }
         .dpad-arm::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8); pointer-events: none; }
-        .dpad-arm.pressed { transform: translateY(2px) !important; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        .dpad-arm.pressed-arm { transform: translateY(2px) !important; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
         .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
         .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
         .dpad-center { position: absolute; width: 40px; height: 40px; background-color: var(--dpad-color); top: 45px; left: 45px; z-index: 15; border-radius: 4px; background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%); }
         .dpad-center::after { content: ''; position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%); box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1); }
         .dpad-btn { position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer; }
+        .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
         .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
         .action-buttons { position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg); }
         .btn-round { width: 60px; height: 60px; background-color: var(--btn-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; transition: transform 0.05s, box-shadow 0.05s; box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4); color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900; }
@@ -69,49 +127,88 @@
         .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
         .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
         
+        #install-prompt { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; align-items: center; text-align: center; border: 2px solid #3b82f6; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .install-icon { font-size: 24px; margin-bottom: 10px; }
+        .install-text { color: #1f2937; font-size: 14px; margin-bottom: 15px; }
+        /* FIXED: Share Icon size forced */
+        .share-icon-img { width: 20px !important; height: 20px !important; vertical-align: middle; display: inline-block; margin: 0 5px; }
+        #close-install { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #9ca3af; cursor: pointer; }
+        #toast-notification { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #1f2937; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 300; }
+        
+        /* Debug Console */
+        #debug-console { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 10px; padding: 5px; overflow-y: scroll; z-index: 2000; display: none; pointer-events: none; }
+        .debug-error { color: #ff5555; font-weight: bold; }
+        .debug-warn { color: #ffaa00; }
+        .debug-info { color: #88ccff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+    <div id="install-prompt">
+        <div id="close-install">✕</div>
+        <div class="install-icon">📲</div>
+        <div class="font-bold text-lg mb-2">Install App</div>
+        <div class="install-text">To install Nann Boy on iOS:<br>1. Tap <strong>Share</strong> <svg class="share-icon-img" viewBox="0 0 50 50" fill="none" stroke="#007AFF" stroke-width="4" width="20" height="20"><path d="M25 5L25 35 M15 15L25 5L35 15 M10 25V40H40V25"/></svg><br>2. Tap <strong>"Add to Home Screen"</strong></div>
+    </div>
 
     <div id="console-wrapper">
         <div class="gbc-body" id="gbc-body">
             <div class="gbc-screen-lens">
                 <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
                 <div class="lcd-screen" id="lcd-screen">
-                    <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30; display: none;">
-                        <span id="loading-text">Ready</span>
+                    <div id="loading-overlay" class="text-white text-center absolute flex flex-col items-center justify-center" style="z-index: 30;">
+                        <svg class="animate-spin h-6 w-6 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span id="loading-text">Initializing...</span>
                     </div>
-                    
+                    <div id="debug-console"></div>
                     <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
                     
-                    <!-- THE CANVAS FOR mGBA -->
+                    <!-- UPDATED IFRAME -->
+                    <iframe id="game-iframe" src="about:blank" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-write" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts" referrerpolicy="no-referrer"></iframe>
+                    
                     <canvas id="rom-canvas"></canvas>
-
                     <div id="main-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
+                        <!-- BUTTONS FOR LOADING -->
                         <div class="menu-btn" id="btn-menu-load-game">LOAD GAME</div>
+                        <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
                         <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
                         <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
                     </div>
 
+                    <!-- REVISED LOAD GAME SUB-MENU -->
                     <div id="load-game-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
-                        <!-- This ID matches the Python Builder -->
                         <div class="menu-btn" id="btn-load-rom-action">ROM FILE</div>
+                        <div class="menu-btn" id="btn-load-html-file">HTML FILE</div>
+                        <!-- Swapped to ZIP input to support mobile -->
+                        <div class="menu-btn" id="btn-load-zip-web">WEB ZIP</div>
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
                     </div>
                     
-                    <!-- Hidden Inputs (ID matches Builder) -->
-                    <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
+                    <!-- Hidden Inputs -->
+                    <input type="file" id="file-input-rom" accept=".gb,.gbc,.zip" style="display:none">
+                    <input type="file" id="file-input-html" accept=".html,text/html" style="display:none">
+                    <!-- WEB ZIP INPUT -->
+                    <input type="file" id="file-input-zip-web" accept=".zip" style="display:none">
 
+                    <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
                     <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-[140px] overflow-y-auto px-4">
                         <div class="theme-option" data-theme="nannboy"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af); position: relative;"><div style="position: absolute; width: 8px; height: 8px; background: #800000; border-radius: 50%; bottom: 2px; right: 2px;"></div></div><span class="font-bold text-gray-700">Nann Boy</span></div>
                         <div class="theme-option" data-theme="red"><div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div><span class="font-bold text-gray-700">Original Red</span></div>
                         <div class="theme-option" data-theme="purple"><div class="theme-preview" style="background: linear-gradient(145deg, #7c3aed, #4c1d95);"></div><span class="font-bold text-gray-700">Atomic Purple</span></div>
                         <div class="theme-option" data-theme="glacier"><div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div><span class="font-bold text-gray-700">Glacier Blue</span></div>
+                        <div class="theme-option" data-theme="pink"><div class="theme-preview" style="background: linear-gradient(145deg, #f472b6, #db2777);"></div><span class="font-bold text-gray-700">Berry Pink</span></div>
+                        <div class="theme-option" data-theme="green"><div class="theme-preview" style="background: linear-gradient(145deg, #84cc16, #4d7c0f);"></div><span class="font-bold text-gray-700">Leaf Green</span></div>
+                        <div class="theme-option" data-theme="orange"><div class="theme-preview" style="background: linear-gradient(145deg, #f97316, #c2410c);"></div><span class="font-bold text-gray-700">June Orange</span></div>
+                        <div class="theme-option" data-theme="white"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div><span class="font-bold text-gray-700">Polar White</span></div>
                         <div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div>
                     </div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
+                    <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-40 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
+                    <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
                     
+                    <div id="toast-notification">GAME SAVED</div>
                 </div>
             </div>
             <div class="nann-brand">NANN BOY</div>
@@ -124,66 +221,612 @@
         </div>
     </div>
     
-    <!-- PURE UI LOGIC (Menus, Themes, Resizing) -->
-    <!-- The Engine Logic is injected by the Builder -->
-    <script>
-        // --- 1. Menu System ---
-        function toggleMenu(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                const isFlex = el.style.display === 'flex';
-                // Close all
-                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
-                // Toggle target if it wasn't already open
-                if(!isFlex) el.style.display = 'flex';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // DEBUG SYSTEM
+        function debugLog(msg, type='info') {
+            const consoleEl = document.getElementById('debug-console');
+            if (consoleEl) {
+                consoleEl.style.display = 'block';
+                const entry = document.createElement('div');
+                entry.textContent = `> ${msg}`;
+                entry.className = `debug-${type}`;
+                consoleEl.appendChild(entry);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
             }
-        }
-        
-        // Basic Listeners
-        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
-        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
-        document.getElementById('btn-close-main-menu').onclick = () => document.getElementById('main-menu').style.display = 'none';
-        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
-        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
-        
-        // Select Button -> Open Main Menu
-        // (Note: The builder will attach the input logic, this just handles UI)
-        const selectBtn = document.getElementById('btn-select');
-        if(selectBtn) {
-            selectBtn.addEventListener('mousedown', () => toggleMenu('main-menu'));
-            selectBtn.addEventListener('touchstart', (e) => { e.preventDefault(); toggleMenu('main-menu'); });
+            console.log(`[Emulator] ${msg}`);
         }
 
-        // --- 2. Theme System ---
+        const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
+        const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
+        const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = inCanvasEnvironment ? __initial_auth_token : null;
+
+        let auth;
+        let userId = null;
+        let gameMode = 'html'; 
+        let currentRomName = 'unknown_game'; 
+        let emulatorInitialized = false;
+
+        let keyMap = {
+            'Up': { key: 'ArrowUp' },
+            'Down': { key: 'ArrowDown' },
+            'Left': { key: 'ArrowLeft' },
+            'Right': { key: 'ArrowRight' }, 
+            'A': { key: 'x' },  
+            'B': { key: 'z' },  
+            'Start': { key: 'Enter' },
+            'Select': { key: 'Backspace' },
+        };
+        
+        const keyMapStorageKey = `emulator-keymap-${appId}`;
+        const themeStorageKey = `emulator-theme-${appId}`;
+        
+        let currentMenu = null; 
+        let activeBindingLabel = null;
+        let virtualKeyStates = {};
+        let isAuthReady = false;
+
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playHapticSound() {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            
+            // "Click" - Mechanical Switch Snap
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            // Triangle wave for a slightly softer but sharp click
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(600, t);
+            // Fast frequency drop (pitch decay)
+            osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
+            
+            // Fast volume envelope
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
+            
+            osc.start(t);
+            osc.stop(t + 0.03);
+
+            // "Thock" - The Bottom Out sound
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            // Sine for the thud/body of the sound
+            osc2.type = 'sine'; 
+            osc2.frequency.setValueAtTime(150, t);
+            osc2.frequency.exponentialRampToValueAtTime(100, t + 0.1); // Slight drop
+            
+            gain2.gain.setValueAtTime(0.1, t);
+            gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+            
+            osc2.start(t);
+            osc2.stop(t + 0.1);
+        }
+
         function applyTheme(themeName) {
             const root = document.documentElement;
             let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
             if (themeName === 'purple') { mainColor = '#7c3aed'; darkColor = '#4c1d95'; bgColor = '#4c1d95'; }
             else if (themeName === 'glacier') { mainColor = '#a5f3fc'; darkColor = '#0891b2'; bgColor = '#164e63'; }
+            else if (themeName === 'pink') { mainColor = '#f472b6'; darkColor = '#db2777'; bgColor = '#831843'; }
+            else if (themeName === 'green') { mainColor = '#84cc16'; darkColor = '#4d7c0f'; bgColor = '#14532d'; }
+            else if (themeName === 'orange') { mainColor = '#f97316'; darkColor = '#c2410c'; bgColor = '#7c2d12'; }
+            else if (themeName === 'white') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; }
             else if (themeName === 'black') { mainColor = '#27272a'; darkColor = '#18181b'; bgColor = '#09090b'; }
             else if (themeName === 'nannboy') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; btnColor = '#800000'; dpadColor = '#800000'; }
-            else if (themeName === 'red') { mainColor = '#E83942'; darkColor = '#b91c1c'; bgColor = '#7f1d1d'; }
-            
             root.style.setProperty('--console-main', mainColor); root.style.setProperty('--console-dark', darkColor);
             root.style.setProperty('--bg-color', bgColor); root.style.setProperty('--btn-color', btnColor);
             root.style.setProperty('--dpad-color', dpadColor);
+            localStorage.setItem(themeStorageKey, themeName);
         }
-        document.querySelectorAll('.theme-option').forEach(opt => {
-            opt.addEventListener('click', () => applyTheme(opt.getAttribute('data-theme')));
+        function loadTheme() { const savedTheme = localStorage.getItem(themeStorageKey); if (savedTheme) applyTheme(savedTheme); }
+
+        async function initFirebase() {
+            loadTheme();
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                loadingOverlay.style.display = 'none'; isAuthReady = true; loadKeyMap(); return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig); auth = getAuth(app);
+                if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken); else await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => { userId = user ? user.uid : null; isAuthReady = true; loadKeyMap(); loadingOverlay.style.display = 'none'; });
+            } catch (error) { console.error("Auth Error:", error); loadingOverlay.innerHTML = "Offline Mode"; setTimeout(() => loadingOverlay.style.display = 'none', 1000); }
+        }
+
+        function loadKeyMap() { const storedMap = localStorage.getItem(keyMapStorageKey); if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } } renderBindings(); }
+        function saveKeyMap() { localStorage.setItem(keyMapStorageKey, JSON.stringify(keyMap)); renderBindings(); }
+        function renderBindings() {
+            const bindingsList = document.getElementById('bindings-list');
+            if (bindingsList) {
+                bindingsList.innerHTML = Object.keys(keyMap).map(label => {
+                    const mappedKey = keyMap[label]; const displayKey = mappedKey ? (mappedKey.key === ' ' ? 'SPACE' : mappedKey.key.toUpperCase()) : 'N/A';
+                    return `<div class="binding-row"><span class="font-semibold">${label}:</span><span class="binding-key binding-target" data-label="${label}" id="binding-key-${label}">${displayKey}</span></div>`;
+                }).join('');
+                bindingsList.querySelectorAll('.binding-target').forEach(span => { span.addEventListener('click', () => startKeyBinding(span.getAttribute('data-label'))); });
+            }
+        }
+
+        function handleGlobalKey(e) {
+            if (currentMenu !== null) { if (e.key === "Escape") { if (currentMenu === 'keyselect') hideKeySelection(); else closeAllMenus(); } return; }
+            // WasmBoy listens to keys automatically, but we might want to capture for UI or preventDefault
+            // For now, let WasmBoy handle it natively or dispatch custom if needed
+        }
+        
+        function updateDpadVisuals(label, isDown) {
+            if (!['Up', 'Down', 'Left', 'Right'].includes(label)) return;
+            const dpadArmH = document.querySelector('.dpad-h'); const dpadArmV = document.querySelector('.dpad-v');
+            if (isDown) { if (label === 'Left' || label === 'Right') dpadArmH?.classList.add('pressed-arm'); if (label === 'Up' || label === 'Down') dpadArmV?.classList.add('pressed-arm'); }
+            else { const isHorizontalHeld = virtualKeyStates['Left'] || virtualKeyStates['Right']; const isVerticalHeld = virtualKeyStates['Up'] || virtualKeyStates['Down']; if (!isHorizontalHeld) dpadArmH?.classList.remove('pressed-arm'); if (!isVerticalHeld) dpadArmV?.classList.remove('pressed-arm'); }
+        }
+        function handleVisualPress(element, isDown) { if (element) { if (isDown) element.classList.add('pressed'); else element.classList.remove('pressed'); } }
+        
+        // --- INPUT HANDLING ---
+        function sendInput(label, isDown) { 
+            const mapping = keyMap[label];
+            if (!mapping) return;
+
+            const eventType = isDown ? 'keydown' : 'keyup';
+            const keyCode = mapping.keyCode || 0; 
+
+            // 1. HTML MODE (Iframe)
+            if (gameMode === 'html') {
+                const iframe = document.getElementById('game-iframe');
+                if (iframe && iframe.contentWindow) {
+                    const eventData = {
+                        type: eventType,
+                        key: mapping.key,
+                        code: mapping.code || `Key${mapping.key.toUpperCase()}`,
+                        keyCode: keyCode,
+                        which: keyCode,
+                        bubbles: true
+                    };
+                    
+                    iframe.contentWindow.postMessage(eventData, '*');
+
+                    if (label === 'Start' && isDown) {
+                        iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*');
+                    }
+                }
+                return;
+            }
+
+            // 2. ROM MODE (mGBA / Window Event)
+            // The Builder script will also attach listeners, but mGBA listens to window events generally.
+            // Keeping this ensures inputs are dispatched even if the builder script fails to attach.
+             const event = new KeyboardEvent(eventType, {
+                key: mapping.key,
+                code: mapping.code || `Key${mapping.key.toUpperCase()}`,
+                keyCode: keyCode,
+                bubbles: true
+            });
+            window.dispatchEvent(event);
+        }
+
+        function handleVirtualPress(label, isDown, shouldSendMessage = true) { 
+            const currentState = virtualKeyStates[label] || false; 
+            if (isDown !== currentState) { 
+                virtualKeyStates[label] = isDown; 
+                if (shouldSendMessage) sendInput(label, isDown); 
+            } 
+        }
+
+        function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
+        function showKeySelection(label) {
+            currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
+            document.getElementById('binding-label-display').textContent = label;
+            const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
+            // Added keyCodes for better compatibility
+            const keys = [
+                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
+                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
+                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
+                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
+                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
+                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
+                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
+            ];
+            keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); hideKeySelection(); }); keypad.appendChild(btn); });
+        }
+        function hideKeySelection() { document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding'); document.getElementById('key-selection-modal').style.display = 'none'; activeBindingLabel = null; currentMenu = 'keymap'; }
+        
+        function openMenu(menuId) { 
+            // Hide all menus first
+            document.querySelectorAll('.menu-ui').forEach(el => { 
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
+                    el.style.display = 'none'; 
+                }
+            }); 
+            
+            const menu = document.getElementById(menuId); 
+            if (menu) { 
+                menu.style.display = 'flex'; 
+                currentMenu = menuId; 
+                if (menuId === 'key-binding-menu') renderBindings(); 
+            } 
+        }
+
+        function closeAllMenus() { 
+            document.querySelectorAll('.menu-ui').forEach(el => { 
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
+                    el.style.display = 'none'; 
+                }
+            }); 
+            currentMenu = null; 
+        }
+        function toggleMenu(menuId) { if (currentMenu === menuId) closeAllMenus(); else openMenu(menuId); }
+        
+        // --- MENU LOGIC FOR HTML VS ROM ---
+        document.getElementById('btn-menu-load-game').addEventListener('click', () => {
+             // Go to sub menu
+             openMenu('load-game-menu');
+        });
+
+        document.getElementById('btn-back-load-menu').addEventListener('click', () => {
+             openMenu('main-menu');
+        });
+
+        // The builder script will REPLACE this button's clone to handle ROMs.
+        // We leave it here so the HTML structure is intact.
+        document.getElementById('btn-load-rom-action').addEventListener('click', () => {
+             document.getElementById('file-input-rom').click();
+        });
+
+        document.getElementById('btn-load-html-file').addEventListener('click', () => {
+             document.getElementById('file-input-html').click();
+        });
+
+        // Use the ZIP input for "WEB FOLDER" (technically web zip) since folder upload is flaky on mobile
+        document.getElementById('btn-load-zip-web').addEventListener('click', () => {
+             document.getElementById('file-input-zip-web').click();
         });
         
-        // --- 3. Responsive Scaling ---
-        function scaleConsole() { 
-            const wrapper = document.getElementById('console-wrapper'); 
-            const gbcBody = document.getElementById('gbc-body'); 
-            if (!wrapper || !gbcBody) return; 
-            const scale = Math.min(1, window.innerWidth / 440); 
-            wrapper.style.transform = `scale(${scale})`; 
-            gbcBody.style.height = `${window.innerHeight / scale}px`; 
+        document.getElementById('btn-menu-controls').addEventListener('click', () => {
+             openMenu('key-binding-menu');
+        });
+        
+        document.getElementById('btn-menu-style').addEventListener('click', () => {
+             openMenu('styles-menu');
+        });
+
+        document.getElementById('btn-close-main-menu').addEventListener('click', () => {
+             closeAllMenus();
+        });
+        
+        // Attach sound to menu buttons
+        function setupMenuSounds() {
+            const clickables = document.querySelectorAll('.menu-btn, .upload-label, button');
+            clickables.forEach(btn => {
+                btn.addEventListener('click', () => {
+                   initAudio();
+                   playHapticSound(); 
+                });
+            });
         }
-        window.addEventListener('resize', scaleConsole);
-        // Initial call
-        scaleConsole();
+
+
+        // --- WEB ZIP UPLOAD HANDLER ---
+        function handleWebZipUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileStatus = document.getElementById('file-status'); // Might be hidden, but okay
+            
+            closeAllMenus();
+            
+            // Show loading...
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if(loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.innerHTML = `<span id="loading-text">Unzipping Game...</span>`;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                JSZip.loadAsync(e.target.result).then(async function(zip) {
+                    // 1. Map all files in ZIP to Blob URLs
+                    const fileMap = {};
+                    let indexHtmlPath = null;
+
+                    // We need to wait for all files to be read
+                    const promises = [];
+                    
+                    zip.forEach((relativePath, zipEntry) => {
+                        if (!zipEntry.dir) {
+                             const promise = zipEntry.async("blob").then(blob => {
+                                 const blobUrl = URL.createObjectURL(blob);
+                                 // Store by relative path (e.g. "game/index.html")
+                                 // Also store by filename just in case
+                                 fileMap[relativePath] = blobUrl;
+                                 
+                                 // Simple name mapping for flat lookups
+                                 const parts = relativePath.split('/');
+                                 const fileName = parts[parts.length - 1];
+                                 if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
+
+                                 // Smart detection for index.html (prioritize root, then dist/)
+                                 if (fileName.toLowerCase() === 'index.html') {
+                                     // Prefer dist/index.html if we see it (common in webpack games)
+                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
+                                         indexHtmlPath = relativePath;
+                                     }
+                                 }
+                             });
+                             promises.push(promise);
+                        }
+                    });
+
+                    await Promise.all(promises);
+
+                    if (!indexHtmlPath) {
+                        alert("Error: No index.html found in ZIP.");
+                        loadingOverlay.style.display = 'none';
+                        return;
+                    }
+                    
+                    // 2. Load the index.html content to inject our monkey patch
+                    const indexBlobUrl = fileMap[indexHtmlPath];
+                    const indexRes = await fetch(indexBlobUrl);
+                    let htmlContent = await indexRes.text();
+
+                    // 3. Inject Monkey Patch (The Smart Asset Patcher)
+                    // This is the new, robust logic
+                    const monkeyPatchScript = `
+                    <script>
+                        (function() {
+                            // Asset Map from ZIP
+                            const assets = ${JSON.stringify(fileMap)};
+                            console.log("Assets loaded from ZIP:", Object.keys(assets).length);
+                            
+                            // Helper: Find blob URL for a relative path
+                            function resolve(path) {
+                                if(!path || typeof path !== 'string') return path;
+                                // Clean path: ./assets/img.png -> assets/img.png
+                                let clean = path.replace(/^\\.\\//, '').replace(/^\\//, '');
+                                
+                                // 1. Direct Match
+                                if(assets[clean]) return assets[clean];
+                                
+                                // 2. Fuzzy Match (handle subfolders)
+                                // If game asks for "assets/image.png" but zip has "dist/assets/image.png"
+                                for(let key in assets) {
+                                    if(key.endsWith(clean)) return assets[key];
+                                }
+                                return path;
+                            }
+
+                            // --- PATCH 1: FETCH / XHR ---
+                            const originalFetch = window.fetch;
+                            window.fetch = function(input, init) {
+                                if(typeof input === 'string') input = resolve(input);
+                                return originalFetch(input, init);
+                            };
+
+                            // --- PATCH 2: IMAGES ---
+                            // Intercept "new Image().src = ..."
+                            const originalImage = window.Image;
+                            window.Image = function(w, h) {
+                                const img = new originalImage(w, h);
+                                // We define a setter for 'src' to intercept it
+                                let srcVal = '';
+                                Object.defineProperty(img, 'src', {
+                                    get: () => srcVal,
+                                    set: (v) => { srcVal = v; img.setAttribute('src', resolve(v)); }
+                                });
+                                return img;
+                            };
+
+                            // --- PATCH 3: AUDIO ---
+                            const originalAudio = window.Audio;
+                            window.Audio = function(src) {
+                                if(src) src = resolve(src);
+                                return new originalAudio(src);
+                            };
+
+                            // --- PATCH 4: DOM ELEMENTS ---
+                            // Rewrites <img src="..."> <link href="..."> in the static HTML
+                            // Use MutationObserver to catch dynamic additions
+                            const observer = new MutationObserver(mutations => {
+                                mutations.forEach(mutation => {
+                                    if (mutation.type === 'childList') {
+                                        mutation.addedNodes.forEach(node => {
+                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
+                                               rewriteSrc(node);
+                                            }
+                                            if(node.querySelectorAll) {
+                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
+                                            }
+                                        });
+                                    } else if (mutation.type === 'attributes') {
+                                        rewriteSrc(mutation.target);
+                                    }
+                                });
+                            });
+                            
+                            function rewriteSrc(node) {
+                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
+                                const val = node.getAttribute(attr);
+                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
+                                    const resolved = resolve(val);
+                                    if(resolved !== val) node.setAttribute(attr, resolved);
+                                }
+                            }
+
+                            observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'href'] });
+                            
+                            // Initial rewrite
+                            window.addEventListener('DOMContentLoaded', () => {
+                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
+                            });
+
+                            // --- PATCH 5: LOCAL STORAGE BRIDGE (SAVE STATES) ---
+                            // Intercept localStorage to save to parent window
+                            try {
+                                const originalSetItem = window.localStorage.setItem;
+                                const originalGetItem = window.localStorage.getItem;
+                                
+                                // Prefix for this game session to avoid collisions
+                                const GAME_ID = "nann_boy_save_";
+
+                                window.localStorage.setItem = function(key, value) {
+                                    // Save to iframe local storage (temporary)
+                                    originalSetItem.call(window.localStorage, key, value);
+                                    // Send to parent to persist
+                                    window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
+                                };
+                                
+                                // Request load on startup
+                                window.parent.postMessage({ type: 'LOAD_REQUEST', prefix: GAME_ID }, '*');
+                                
+                                window.addEventListener('message', (e) => {
+                                    if(e.data.type === 'LOAD_DATA') {
+                                        // Restore data
+                                        const cleanKey = e.data.key.replace(GAME_ID, '');
+                                        originalSetItem.call(window.localStorage, cleanKey, e.data.value);
+                                        console.log("Restored save:", cleanKey);
+                                    }
+                                });
+
+                            } catch(e) { console.warn("Storage patch failed", e); }
+
+                            // --- PATCH 6: INPUT HANDLING ---
+                            // Ensure the iframe captures keyboard events and doesn't let them bubble out weirdly
+                            window.addEventListener('keydown', (e) => {
+                                // Prevent scrolling with arrow keys
+                                if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            });
+
+                        })();
+                    <\/script>
+                    <style>
+                        /* FORCE FIT STYLE */
+                        html, body { 
+                            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
+                            display: flex; align-items: center; justify-content: center; background: #000;
+                        }
+                        canvas { 
+                            max-width: 100%; max-height: 100%; 
+                            object-fit: contain; /* Maintain Aspect Ratio */
+                        }
+                    </style>
+                    `;
+                    
+                    htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
+                    
+                    // 4. Launch in Iframe
+                    const finalBlob = new Blob([htmlContent], { type: 'text/html' });
+                    const finalUrl = URL.createObjectURL(finalBlob);
+                    
+                    const iframe = document.getElementById('game-iframe');
+                    const romCanvas = document.getElementById('rom-canvas');
+                    const startScreen = document.getElementById('start-screen');
+                    const powerLed = document.getElementById('power-led');
+
+                    iframe.onload = () => {
+                            // Don't revoke immediately as game might need it, but for memory we should eventually
+                            // URL.revokeObjectURL(finalUrl); 
+                            iframe.onload = null;
+                            gameMode = 'html';
+                            iframe.style.display = 'block';
+                            romCanvas.style.display = 'none';
+                            startScreen.style.display = 'none';
+                            iframe.contentWindow.focus();
+                            powerLed.classList.add('on');
+                            loadingOverlay.style.display = 'none';
+                    };
+                    iframe.src = finalUrl;
+
+                }).catch(err => {
+                    console.error(err);
+                    alert("Failed to unzip game: " + err.message);
+                    loadingOverlay.style.display = 'none';
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleHtmlUpload(event) {
+            const file = event.target.files[0]; 
+            if (!file) return;
+            // ... (Simple HTML logic) ...
+             const fileStatus = document.getElementById('file-status');
+             const iframe = document.getElementById('game-iframe');
+             const romCanvas = document.getElementById('rom-canvas');
+             const powerLed = document.getElementById('power-led');
+             const startScreen = document.getElementById('start-screen');
+            powerLed.classList.remove('on'); 
+
+            if (file.type !== 'text/html' && !file.name.endsWith('.html')) { return; }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                 let htmlContent = e.target.result;
+                const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
+                const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
+                htmlContent = fitStyle + htmlContent + bridgeScript;
+                try { const blob = new Blob([htmlContent], { type: 'text/html' }); const blobUrl = URL.createObjectURL(blob); iframe.onload = () => { URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null; gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.display = 'none'; startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on'); }; iframe.src = blobUrl; } catch (error) { }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- ROM HANDLER ---
+        // The builder script will overwrite this behavior!
+        // We leave the function skeleton but empty so it doesn't do anything before the injection.
+        function handleRomUpload(event) {
+            // Logic handled by injected script
+        }
+
+        function setupControlListeners() {
+            const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill'); const TAP_THRESHOLD_MS = 300; 
+            const handleStart = (e) => {
+                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
+                if (currentMenu !== null && label !== 'Start' && label !== 'Select') return;
+                initAudio(); playHapticSound(); if (navigator.vibrate) navigator.vibrate(15);
+                control.pressTime = Date.now(); control.isTap = true;
+                handleVisualPress(control, true); updateDpadVisuals(label, true); handleVirtualPress(label, true, true); 
+            };
+            const handleEnd = (e) => {
+                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
+                handleVirtualPress(label, false, true); handleVisualPress(control, false); updateDpadVisuals(label, false);
+                if (['Select', 'Start'].includes(label) && control.isTap) { const duration = Date.now() - (control.pressTime || 0); if (duration < TAP_THRESHOLD_MS) { if (label === 'Select') toggleMenu('main-menu'); else if (label === 'Start') toggleMenu('start-menu'); } } control.isTap = false;
+            };
+            gameControls.forEach(control => { control.addEventListener('touchstart', handleStart, { passive: false }); control.addEventListener('mousedown', handleStart); control.addEventListener('touchend', handleEnd); control.addEventListener('mouseup', handleEnd); control.addEventListener('mouseleave', handleEnd); });
+            document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu')); document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
+            document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
+            // Folder Upload (via ZIP)
+            document.getElementById('file-input-zip-web')?.addEventListener('change', handleWebZipUpload); 
+            
+            // This listener will be REPLACED by the injected builder script
+            // document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
+
+            document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection); document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
+            document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
+            document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu')); document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
+            document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
+            document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
+            window.addEventListener('keydown', handleGlobalKey); window.addEventListener('keyup', handleGlobalKey);
+            
+            // Initial call to attach sounds
+            setupMenuSounds();
+        }
+        function checkStandalone() { const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; if (isIOS && !isStandalone) setTimeout(() => { document.getElementById('install-prompt').style.display = 'flex'; }, 3000); }
+        function scaleConsole() { const wrapper = document.getElementById('console-wrapper'); const gbcBody = document.getElementById('gbc-body'); if (!wrapper || !gbcBody) return; const designWidth = 440; const windowWidth = window.innerWidth; const windowHeight = window.innerHeight; const scale = Math.min(1, windowWidth / designWidth); wrapper.style.transform = `scale(${scale})`; const requiredHeight = windowHeight / scale; gbcBody.style.height = `${requiredHeight}px`; }
+        function appMain() { initFirebase(); setupControlListeners(); scaleConsole(); window.addEventListener('resize', scaleConsole); if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleConsole); checkStandalone(); }
+        if (document.readyState === 'loading') { window.addEventListener('DOMContentLoaded', appMain); } else { appMain(); }
     </script>
 </body>
 </html>
