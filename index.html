@@ -17,7 +17,7 @@
 
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -398,11 +398,6 @@
                     };
                     
                     iframe.contentWindow.postMessage(eventData, '*');
-
-                    // If Start Button (Enter) is pressed down, trigger SAVE
-                    if (label === 'Start' && isDown) {
-                        iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*');
-                    }
                 }
                 return;
             }
@@ -559,8 +554,12 @@
                                  const fileName = parts[parts.length - 1];
                                  if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
 
+                                 // Smart detection for index.html (prioritize root, then dist/)
                                  if (fileName.toLowerCase() === 'index.html') {
-                                     indexHtmlPath = relativePath;
+                                     // Prefer dist/index.html if we see it (common in webpack games)
+                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
+                                         indexHtmlPath = relativePath;
+                                     }
                                  }
                              });
                              promises.push(promise);
@@ -580,39 +579,72 @@
                     const indexRes = await fetch(indexBlobUrl);
                     let htmlContent = await indexRes.text();
 
-                    // 3. Inject Monkey Patch
+                    // 3. Inject Monkey Patch (The Smart Asset Patcher)
+                    // This is the new, robust logic
                     const monkeyPatchScript = `
                     <script>
                         (function() {
+                            // Asset Map from ZIP
                             const assets = ${JSON.stringify(fileMap)};
                             console.log("Assets loaded from ZIP:", Object.keys(assets).length);
                             
-                            // 1. Patch Fetch / XHR
-                            const originalFetch = window.fetch;
-                            window.fetch = async function(input, init) {
-                                let url = input;
-                                if (typeof input === 'object' && input.url) url = input.url;
+                            // Helper: Find blob URL for a relative path
+                            function resolve(path) {
+                                if(!path || typeof path !== 'string') return path;
+                                // Clean path: ./assets/img.png -> assets/img.png
+                                let clean = path.replace(/^\\.\\//, '').replace(/^\\//, '');
                                 
-                                // Try to match the end of the URL to our asset map
-                                // e.g. input="styles.css", map has "folder/styles.css"
-                                for(const key in assets) {
-                                    if(url.endsWith(key) || url.includes(key)) {
-                                        return originalFetch(assets[key], init);
-                                    }
+                                // 1. Direct Match
+                                if(assets[clean]) return assets[clean];
+                                
+                                // 2. Fuzzy Match (handle subfolders)
+                                // If game asks for "assets/image.png" but zip has "dist/assets/image.png"
+                                for(let key in assets) {
+                                    if(key.endsWith(clean)) return assets[key];
                                 }
+                                return path;
+                            }
+
+                            // --- PATCH 1: FETCH / XHR ---
+                            const originalFetch = window.fetch;
+                            window.fetch = function(input, init) {
+                                if(typeof input === 'string') input = resolve(input);
                                 return originalFetch(input, init);
                             };
 
-                            // 2. Patch DOM Elements (img, script, link)
+                            // --- PATCH 2: IMAGES ---
+                            // Intercept "new Image().src = ..."
+                            const originalImage = window.Image;
+                            window.Image = function(w, h) {
+                                const img = new originalImage(w, h);
+                                // We define a setter for 'src' to intercept it
+                                let srcVal = '';
+                                Object.defineProperty(img, 'src', {
+                                    get: () => srcVal,
+                                    set: (v) => { srcVal = v; img.setAttribute('src', resolve(v)); }
+                                });
+                                return img;
+                            };
+
+                            // --- PATCH 3: AUDIO ---
+                            const originalAudio = window.Audio;
+                            window.Audio = function(src) {
+                                if(src) src = resolve(src);
+                                return new originalAudio(src);
+                            };
+
+                            // --- PATCH 4: DOM ELEMENTS ---
+                            // Rewrites <img src="..."> <link href="..."> in the static HTML
+                            // Use MutationObserver to catch dynamic additions
                             const observer = new MutationObserver(mutations => {
                                 mutations.forEach(mutation => {
                                     if (mutation.type === 'childList') {
                                         mutation.addedNodes.forEach(node => {
-                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK') {
+                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
                                                rewriteSrc(node);
                                             }
                                             if(node.querySelectorAll) {
-                                                node.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
                                             }
                                         });
                                     } else if (mutation.type === 'attributes') {
@@ -622,21 +654,11 @@
                             });
                             
                             function rewriteSrc(node) {
-                                const attr = node.tagName === 'LINK' ? 'href' : 'src';
+                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
                                 const val = node.getAttribute(attr);
-                                if(val) {
-                                    // Clean the val to match keys (remove ./ or leading /)
-                                    const cleanVal = val.replace(/^\\.\\/|^\\//, '');
-                                    
-                                    // Look for match
-                                    for(const key in assets) {
-                                        if(cleanVal.endsWith(key)) {
-                                            // Check if already replaced
-                                            if(val.startsWith('blob:')) return;
-                                            node.setAttribute(attr, assets[key]);
-                                            return;
-                                        }
-                                    }
+                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
+                                    const resolved = resolve(val);
+                                    if(resolved !== val) node.setAttribute(attr, resolved);
                                 }
                             }
 
@@ -644,27 +666,22 @@
                             
                             // Initial rewrite
                             window.addEventListener('DOMContentLoaded', () => {
-                                 document.querySelectorAll('img, script, link').forEach(rewriteSrc);
+                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
                             });
 
                             // --- PATCH 5: LOCAL STORAGE BRIDGE (SAVE STATES) ---
+                            // Intercept localStorage to save to parent window
                             try {
                                 const originalSetItem = window.localStorage.setItem;
+                                const originalGetItem = window.localStorage.getItem;
+                                
+                                // Prefix for this game session to avoid collisions
                                 const GAME_ID = "nann_boy_save_";
 
-                                // Function to sync ALL localStorage to parent
-                                function syncStorage() {
-                                    const data = {};
-                                    for (let i = 0; i < window.localStorage.length; i++) {
-                                        const key = window.localStorage.key(i);
-                                        data[key] = window.localStorage.getItem(key);
-                                    }
-                                    window.parent.postMessage({ type: 'SAVE_STATE_BATCH', prefix: GAME_ID, data: data }, '*');
-                                }
-
                                 window.localStorage.setItem = function(key, value) {
+                                    // Save to iframe local storage (temporary)
                                     originalSetItem.call(window.localStorage, key, value);
-                                    // Auto-sync on set
+                                    // Send to parent to persist
                                     window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
                                 };
                                 
@@ -673,17 +690,19 @@
                                 
                                 window.addEventListener('message', (e) => {
                                     if(e.data.type === 'LOAD_DATA') {
+                                        // Restore data
                                         const cleanKey = e.data.key.replace(GAME_ID, '');
                                         originalSetItem.call(window.localStorage, cleanKey, e.data.value);
-                                    } else if (e.data.type === 'FORCE_SAVE') {
-                                        syncStorage(); // Force a full sync
+                                        console.log("Restored save:", cleanKey);
                                     }
                                 });
 
                             } catch(e) { console.warn("Storage patch failed", e); }
 
                             // --- PATCH 6: INPUT HANDLING ---
+                            // Ensure the iframe captures keyboard events and doesn't let them bubble out weirdly
                             window.addEventListener('keydown', (e) => {
+                                // Prevent scrolling with arrow keys
                                 if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
                                     e.preventDefault();
                                 }
@@ -891,13 +910,6 @@
                     // Save to actual local storage
                     try {
                         localStorage.setItem(e.data.key, e.data.value);
-                    } catch(err) { console.error("Save failed", err); }
-                } else if (e.data.type === 'SAVE_STATE_BATCH') {
-                     // Save entire batch from Force Save
-                     try {
-                        for (const [key, value] of Object.entries(e.data.data)) {
-                             localStorage.setItem(e.data.prefix + key, value);
-                        }
                         // Show toast
                         const toast = document.getElementById('toast-notification');
                         if(toast) {
@@ -905,8 +917,7 @@
                             toast.style.opacity = 1;
                             setTimeout(() => toast.style.opacity = 0, 2000);
                         }
-                     } catch(err) { console.error("Batch save failed", err); }
-
+                    } catch(err) { console.error("Save failed", err); }
                 } else if (e.data.type === 'LOAD_REQUEST') {
                     // Search local storage for matching keys
                     const iframe = document.getElementById('game-frame');
