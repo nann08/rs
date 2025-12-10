@@ -10,25 +10,28 @@
     <meta name="theme-color" content="#7f1d1d">
     <title>Nann Emulator</title>
     
-    <!-- LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- ENGINE -->
+
+    <!-- CHANGED: REPLACED WASMBOY WITH LOCAL mGBA -->
     <script src="mgba.js"></script>
 
-    <!-- FIREBASE (Compat Mode) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
+    <script>
+        (function() {
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
+            const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
+            if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+                const manifest = { "name": "Nann Boy", "short_name": "NannBoy", "start_url": ".", "display": "standalone", "background_color": "#7f1d1d", "theme_color": "#7f1d1d", "orientation": "portrait", "icons": [{ "src": `data:image/png;base64,${ICON_BASE64}`, "sizes": "192x192", "type": "image/png" }] };
+                const linkManifest = document.createElement('link'); linkManifest.rel = 'manifest'; linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`; document.head.appendChild(linkManifest);
+            }
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overscroll-behavior: none; position: fixed; overflow: hidden; background-color: var(--bg-color); transition: background-color 0.3s ease; font-family: 'Inter', sans-serif; display: flex; align-items: flex-start; justify-content: center; }
-        
         #console-wrapper { transform-origin: top center; will-change: transform; display: flex; justify-content: center; transform: translate3d(0,0,0); }
         .gbc-body { --console-width: 440px; background: linear-gradient(145deg, var(--console-main) 0%, var(--console-dark) 100%); width: var(--console-width); border-radius: 20px 20px 60px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.3); position: relative; display: flex; flex-direction: column; align-items: center; padding-top: calc(30px + var(--safe-top)); padding-bottom: var(--safe-bottom); contain: content; transition: background 0.3s ease; }
         .gbc-screen-lens { background-color: #3f3f46; width: 380px; height: 310px; border-radius: 15px 15px 50px 15px; padding: 20px 30px; box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; z-index: 10; transform: translate3d(0,0,0); }
@@ -36,14 +39,31 @@
         .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
         .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
-        
+        /* SCREEN FIT FIX: Removed hard aspect ratio, allow content to fit */
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
-        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; object-fit: contain; }
+        /* UPDATED: Iframe Supercharged with Scaling */
+        iframe, canvas#rom-canvas { 
+            width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; 
+            /* FORCE FIT: This ensures the inner game scales down to fit the screen */
+            object-fit: contain; 
+        }
         
-        .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
+        .menu-ui { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: white; 
+            padding: 10px 12px;
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            z-index: 100; 
+            overflow-y: auto; 
+        }
+        
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
+        
         .menu-ui::-webkit-scrollbar { width: 4px; }
         .menu-ui::-webkit-scrollbar-track { background: #f1f1f1; }
         .menu-ui::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
@@ -52,13 +72,35 @@
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
         .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
         
-        .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        /* Compact Menu Buttons */
+        .menu-btn { 
+            width: 90%; 
+            padding: 6px 0; 
+            margin: 3px 0;  
+            background-color: #f3f4f6; 
+            border: 2px solid #d1d5db; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            color: #374151; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            flex-shrink: 0; 
+        }
         .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
         .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
         .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
         #file-input-html, #file-input-rom, #file-input-zip-web { display: none; } 
         
-        .upload-label { display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px; background-color: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 6px; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); flex-shrink: 0; }
+        .upload-label { 
+            display: flex; align-items: center; justify-content: center; width: 100%; 
+            padding: 8px; 
+            background-color: #dc2626; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-bottom: 6px; 
+            transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); flex-shrink: 0;
+        }
+        .upload-label.rom-label { background-color: #2563eb; }
+        .upload-label.folder-label { background-color: #16a34a; }
         .upload-label:hover { opacity: 0.9; }
         
         .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
@@ -124,7 +166,7 @@
                 <div class="lcd-screen" id="lcd-screen">
                     
                     <!-- LOADING OVERLAY -->
-                    <div id="loading-overlay">
+                    <div id="loading-overlay" style="display: none;">
                         <div class="text-sm font-bold tracking-widest">SYSTEM BOOT</div>
                         <div class="loader-bar-bg"><div id="loader-bar-fill"></div></div>
                         <div id="loading-text">Initializing...</div>
@@ -153,6 +195,7 @@
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
                         <div class="menu-btn" id="btn-load-rom-action">ROM FILE</div>
                         <div class="menu-btn" id="btn-load-html-file">HTML FILE</div>
+                        <!-- Swapped to ZIP input to support mobile -->
                         <div class="menu-btn" id="btn-load-zip-web">WEB ZIP</div>
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
                     </div>
@@ -160,6 +203,7 @@
                     <!-- Hidden Inputs -->
                     <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
                     <input type="file" id="file-input-html" accept=".html,text/html" style="display:none">
+                    <!-- WEB ZIP INPUT -->
                     <input type="file" id="file-input-zip-web" accept=".zip" style="display:none">
 
                     <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
@@ -190,8 +234,24 @@
         </div>
     </div>
     
-    <script>
-        // GLOBALS
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // DEBUG SYSTEM
+        function debugLog(msg, type='info') {
+            const consoleEl = document.getElementById('debug-console');
+            if (consoleEl) {
+                consoleEl.style.display = 'block';
+                const entry = document.createElement('div');
+                entry.textContent = `> ${msg}`;
+                entry.className = `debug-${type}`;
+                consoleEl.appendChild(entry);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+            console.log(`[Emulator] ${msg}`);
+        }
+
         const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
         const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
         const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
@@ -203,211 +263,692 @@
         let currentRomName = 'unknown_game'; 
         let emulatorInitialized = false;
 
-        let keyMap = { 'Up':{key:'ArrowUp'}, 'Down':{key:'ArrowDown'}, 'Left':{key:'ArrowLeft'}, 'Right':{key:'ArrowRight'}, 'A':{key:'x'}, 'B':{key:'z'}, 'Start':{key:'Enter'}, 'Select':{key:'Backspace'} };
+        let keyMap = {
+            'Up': { key: 'ArrowUp' },
+            'Down': { key: 'ArrowDown' },
+            'Left': { key: 'ArrowLeft' },
+            'Right': { key: 'ArrowRight' }, 
+            'A': { key: 'x' },  
+            'B': { key: 'z' },  
+            'Start': { key: 'Enter' },
+            'Select': { key: 'Backspace' },
+        };
+        
         const keyMapStorageKey = `emulator-keymap-${appId}`;
         const themeStorageKey = `emulator-theme-${appId}`;
+        
         let currentMenu = null; 
         let activeBindingLabel = null;
         let virtualKeyStates = {};
+        let isAuthReady = false;
 
-        // --- 1. ENGINE CONFIGURATION (mGBA) ---
-        var Module = {
-            canvas: document.getElementById('rom-canvas'),
-            noInitialRun: true,
-            locateFile: function(path) { return path; }, // Load local files
-            print: (t) => console.log(t),
-            printErr: (t) => console.error(t),
-            onRuntimeInitialized: function() {
-                console.log("✅ Engine Ready");
-                // Hide loading overlay if it was stuck on init
-                const overlay = document.getElementById('loading-overlay');
-                const txt = document.getElementById('loading-text');
-                if(txt && txt.innerText === "Initializing...") {
-                    overlay.style.display = 'none';
-                }
-            }
-        };
-
-        // --- 2. ROM UPLOAD HANDLER (The Fix) ---
-        document.getElementById('btn-load-rom-action').onclick = () => document.getElementById('file-input-rom').click();
-        
-        document.getElementById('file-input-rom').onchange = async (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-
-            // UI
-            document.querySelectorAll('.menu-ui').forEach(m => m.style.display='none');
-            const overlay = document.getElementById('loading-overlay');
-            const bar = document.getElementById('loader-bar-fill');
-            const txt = document.getElementById('loading-text');
-            overlay.style.display = 'flex';
-            txt.innerText = "Processing file...";
-            bar.style.width = "20%";
-
-            // Wait for UI render
-            await new Promise(r => setTimeout(r, 100));
-
-            try {
-                // Ensure Engine Loaded
-                if(typeof mGBA === 'undefined') throw new Error("Engine script not found. Ensure mgba.js is in folder.");
-
-                let romData = null;
-                let romName = file.name;
-
-                // ZIP Handling
-                if (file.name.toLowerCase().endsWith('.zip')) {
-                    txt.innerText = "Unzipping...";
-                    bar.style.width = "40%";
-                    const buf = await file.arrayBuffer();
-                    const zip = await JSZip.loadAsync(buf);
-                    const rom = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gb|gbc|gba)$/i));
-                    if(!rom) throw new Error("No ROM found in ZIP");
-                    romName = rom.name;
-                    romData = await rom.async("uint8array");
-                } else {
-                    const buf = await file.arrayBuffer();
-                    romData = new Uint8Array(buf);
-                }
-
-                txt.innerText = "Starting Engine...";
-                bar.style.width = "80%";
-
-                // Initialize
-                if(!window.Emulator) {
-                    // Modern Factory or Legacy Global
-                    if(typeof mGBA === 'function') {
-                        window.Emulator = await mGBA(Module);
-                    } else {
-                        window.Emulator = Module;
-                    }
-                }
-
-                // Run: FIXED COMMAND HERE
-                window.Emulator.FS.writeFile(romName, romData);
-                
-                // *** THE FIX: Use loadFile instead of cwrap for this build ***
-                if(window.Emulator.loadFile) {
-                    window.Emulator.loadFile(romName);
-                } else if (window.Emulator.callMain) {
-                    window.Emulator.callMain([romName]);
-                } else {
-                    // Fallback to cwrap if loadFile isn't there
-                    window.Emulator.cwrap('loadGame', 'number', ['string'])(romName);
-                }
-                
-                // Success
-                bar.style.width = "100%";
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    document.getElementById('start-screen').style.display = 'none';
-                    document.getElementById('rom-canvas').style.display = 'block';
-                    document.getElementById('power-led').classList.add('on');
-                }, 500);
-
-            } catch(err) {
-                console.error(err);
-                alert("Error: " + err.message);
-                overlay.style.display = 'none';
-            }
-        };
-
-        // --- 3. HTML UPLOAD HANDLER ---
-        document.getElementById('btn-load-html-file').onclick = () => document.getElementById('file-input-html').click();
-        document.getElementById('file-input-html').onchange = (e) => {
-            const f = e.target.files[0];
-            if(!f) return;
-            const url = URL.createObjectURL(f);
-            document.getElementById('game-iframe').src = url;
-            document.getElementById('game-iframe').style.display = 'block';
-            document.getElementById('rom-canvas').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none';
-            toggleMenu('main-menu');
-            document.getElementById('power-led').classList.add('on');
-        };
-
-        // --- 4. UI & LOGIC ---
-        function toggleMenu(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                const isFlex = el.style.display === 'flex';
-                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
-                if(!isFlex) el.style.display = 'flex';
-            }
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
-        function closeAllMenus() { 
-            document.querySelectorAll('.menu-ui').forEach(el => el.style.display = 'none'); 
-            currentMenu = null; 
-        }
-        
-        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
-        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
-        document.getElementById('btn-close-main-menu').onclick = closeAllMenus;
-        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
-        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
-        document.getElementById('btn-menu-controls').onclick = () => toggleMenu('key-binding-menu');
-        document.getElementById('btn-close-key-map').onclick = () => toggleMenu('main-menu');
-        document.getElementById('btn-select').addEventListener('mousedown', () => toggleMenu('main-menu'));
-        document.getElementById('btn-load-zip-web').onclick = () => document.getElementById('file-input-zip-web').click();
+        function playHapticSound() {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            
+            // "Click" - Mechanical Switch Snap
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            // Triangle wave for a slightly softer but sharp click
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(600, t);
+            // Fast frequency drop (pitch decay)
+            osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
+            
+            // Fast volume envelope
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
+            
+            osc.start(t);
+            osc.stop(t + 0.03);
 
-        // --- 5. INPUTS ---
-        function sendInput(label, isDown) {
-            const map = keyMap[label]; if(!map) return;
-            const code = map.keyCode || 0;
-            // HTML
-            if(gameMode === 'html') {
-                const fr = document.getElementById('game-iframe');
-                if(fr && fr.contentWindow) fr.contentWindow.postMessage({type:isDown?'keydown':'keyup', key:map.key, keyCode:code}, '*');
-                return;
-            }
-            // ROM
-            const event = new KeyboardEvent(isDown?'keydown':'keyup', {key:map.key, code:map.code, keyCode:code, which:code, bubbles:true});
-            window.dispatchEvent(event);
+            // "Thock" - The Bottom Out sound
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            // Sine for the thud/body of the sound
+            osc2.type = 'sine'; 
+            osc2.frequency.setValueAtTime(150, t);
+            osc2.frequency.exponentialRampToValueAtTime(100, t + 0.1); // Slight drop
+            
+            gain2.gain.setValueAtTime(0.1, t);
+            gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+            
+            osc2.start(t);
+            osc2.stop(t + 0.1);
         }
-        document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill').forEach(btn => {
-            const label = btn.getAttribute('data-label');
-            const handler = (e, down) => {
-                if(e.cancelable) e.preventDefault();
-                down ? btn.classList.add('pressed') : btn.classList.remove('pressed');
-                if(label === 'Left'||label==='Right') document.querySelector('.dpad-h').classList.toggle('pressed-arm', down);
-                if(label === 'Up'||label==='Down') document.querySelector('.dpad-v').classList.toggle('pressed-arm', down);
-                sendInput(label, down);
-            };
-            btn.addEventListener('mousedown', (e)=>handler(e,true)); btn.addEventListener('mouseup', (e)=>handler(e,false));
-            btn.addEventListener('touchstart', (e)=>handler(e,true)); btn.addEventListener('touchend', (e)=>handler(e,false));
-        });
 
-        // Theme & Resize
         function applyTheme(themeName) {
             const root = document.documentElement;
-            let m='#E83942', d='#b91c1c', b='#7f1d1d';
-            if(themeName==='purple'){m='#7c3aed';d='#4c1d95';b='#4c1d95';}
-            else if(themeName==='glacier'){m='#a5f3fc';d='#0891b2';b='#164e63';}
-            else if(themeName==='black'){m='#27272a';d='#18181b';b='#09090b';}
-            else if(themeName==='nannboy'){m='#f3f4f6';d='#9ca3af';b='#374151';}
-            root.style.setProperty('--console-main', m); root.style.setProperty('--console-dark', d); root.style.setProperty('--bg-color', b);
+            let mainColor = '#E83942'; let darkColor = '#b91c1c'; let bgColor = '#7f1d1d'; let btnColor = '#1c1c1c'; let dpadColor = '#1c1c1c';
+            if (themeName === 'purple') { mainColor = '#7c3aed'; darkColor = '#4c1d95'; bgColor = '#4c1d95'; }
+            else if (themeName === 'glacier') { mainColor = '#a5f3fc'; darkColor = '#0891b2'; bgColor = '#164e63'; }
+            else if (themeName === 'pink') { mainColor = '#f472b6'; darkColor = '#db2777'; bgColor = '#831843'; }
+            else if (themeName === 'green') { mainColor = '#84cc16'; darkColor = '#4d7c0f'; bgColor = '#14532d'; }
+            else if (themeName === 'orange') { mainColor = '#f97316'; darkColor = '#c2410c'; bgColor = '#7c2d12'; }
+            else if (themeName === 'white') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; }
+            else if (themeName === 'black') { mainColor = '#27272a'; darkColor = '#18181b'; bgColor = '#09090b'; }
+            else if (themeName === 'nannboy') { mainColor = '#f3f4f6'; darkColor = '#9ca3af'; bgColor = '#374151'; btnColor = '#800000'; dpadColor = '#800000'; }
+            root.style.setProperty('--console-main', mainColor); root.style.setProperty('--console-dark', darkColor);
+            root.style.setProperty('--bg-color', bgColor); root.style.setProperty('--btn-color', btnColor);
+            root.style.setProperty('--dpad-color', dpadColor);
             localStorage.setItem(themeStorageKey, themeName);
         }
-        const savedTheme = localStorage.getItem(themeStorageKey); if(savedTheme) applyTheme(savedTheme);
-        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
+        function loadTheme() { const savedTheme = localStorage.getItem(themeStorageKey); if (savedTheme) applyTheme(savedTheme); }
 
-        // Firebase (Minimal)
-        function initFirebase() {
-            if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) return;
+        async function initFirebase() {
+            loadTheme();
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
+                isAuthReady = true; loadKeyMap(); return;
+            }
             try {
-                firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                if (initialAuthToken) auth.signInWithCustomToken(initialAuthToken); else auth.signInAnonymously();
-            } catch (e) { console.error(e); }
+                const app = initializeApp(firebaseConfig); auth = getAuth(app);
+                if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken); else await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => { userId = user ? user.uid : null; isAuthReady = true; loadKeyMap(); if(loadingOverlay) loadingOverlay.style.display = 'none'; });
+            } catch (error) { console.error("Auth Error:", error); if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
 
-        function scale() { 
-            const w = document.getElementById('console-wrapper');
-            const s = Math.min(1, window.innerWidth / 440);
-            w.style.transform = `scale(${s})`;
-            document.getElementById('gbc-body').style.height = `${window.innerHeight/s}px`;
+        function loadKeyMap() { const storedMap = localStorage.getItem(keyMapStorageKey); if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } } renderBindings(); }
+        function saveKeyMap() { localStorage.setItem(keyMapStorageKey, JSON.stringify(keyMap)); renderBindings(); }
+        function renderBindings() {
+            const bindingsList = document.getElementById('bindings-list');
+            if (bindingsList) {
+                bindingsList.innerHTML = Object.keys(keyMap).map(label => {
+                    const mappedKey = keyMap[label]; const displayKey = mappedKey ? (mappedKey.key === ' ' ? 'SPACE' : mappedKey.key.toUpperCase()) : 'N/A';
+                    return `<div class="binding-row"><span class="font-semibold">${label}:</span><span class="binding-key binding-target" data-label="${label}" id="binding-key-${label}">${displayKey}</span></div>`;
+                }).join('');
+                bindingsList.querySelectorAll('.binding-target').forEach(span => { span.addEventListener('click', () => startKeyBinding(span.getAttribute('data-label'))); });
+            }
         }
-        window.onresize = scale; scale();
-        initFirebase();
+
+        function handleGlobalKey(e) {
+            if (currentMenu !== null) { if (e.key === "Escape") { if (currentMenu === 'keyselect') hideKeySelection(); else closeAllMenus(); } return; }
+            // mGBA listens globally, so we don't block here unless menu is open
+        }
+        
+        function updateDpadVisuals(label, isDown) {
+            if (!['Up', 'Down', 'Left', 'Right'].includes(label)) return;
+            const dpadArmH = document.querySelector('.dpad-h'); const dpadArmV = document.querySelector('.dpad-v');
+            if (isDown) { if (label === 'Left' || label === 'Right') dpadArmH?.classList.add('pressed-arm'); if (label === 'Up' || label === 'Down') dpadArmV?.classList.add('pressed-arm'); }
+            else { const isHorizontalHeld = virtualKeyStates['Left'] || virtualKeyStates['Right']; const isVerticalHeld = virtualKeyStates['Up'] || virtualKeyStates['Down']; if (!isHorizontalHeld) dpadArmH?.classList.remove('pressed-arm'); if (!isVerticalHeld) dpadArmV?.classList.remove('pressed-arm'); }
+        }
+        function handleVisualPress(element, isDown) { if (element) { if (isDown) element.classList.add('pressed'); else element.classList.remove('pressed'); } }
+        
+        // --- INPUT HANDLING ---
+        function sendInput(label, isDown) { 
+            const mapping = keyMap[label];
+            if (!mapping) return;
+
+            const eventType = isDown ? 'keydown' : 'keyup';
+            const keyCode = mapping.keyCode || 0; 
+
+            // 1. HTML MODE (Iframe)
+            if (gameMode === 'html') {
+                const iframe = document.getElementById('game-iframe');
+                if (iframe && iframe.contentWindow) {
+                    const eventData = {
+                        type: eventType,
+                        key: mapping.key,
+                        code: mapping.code || `Key${mapping.key.toUpperCase()}`,
+                        keyCode: keyCode,
+                        which: keyCode,
+                        bubbles: true
+                    };
+                    
+                    iframe.contentWindow.postMessage(eventData, '*');
+
+                    if (label === 'Start' && isDown) {
+                        iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*');
+                    }
+                }
+                return;
+            }
+
+            // 2. ROM MODE (mGBA / Window Event)
+             const event = new KeyboardEvent(eventType, {
+                key: mapping.key,
+                code: mapping.code || `Key${mapping.key.toUpperCase()}`,
+                keyCode: keyCode,
+                bubbles: true
+            });
+            window.dispatchEvent(event);
+        }
+
+        function handleVirtualPress(label, isDown, shouldSendMessage = true) { 
+            const currentState = virtualKeyStates[label] || false; 
+            if (isDown !== currentState) { 
+                virtualKeyStates[label] = isDown; 
+                if (shouldSendMessage) sendInput(label, isDown); 
+            } 
+        }
+
+        function startKeyBinding(label) { activeBindingLabel = label; document.getElementById(`binding-key-${label}`).classList.add('active-binding'); showKeySelection(label); }
+        function showKeySelection(label) {
+            currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
+            document.getElementById('binding-label-display').textContent = label;
+            const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
+            // Added keyCodes for better compatibility
+            const keys = [
+                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
+                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
+                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
+                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
+                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
+                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
+                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
+            ];
+            keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); hideKeySelection(); }); keypad.appendChild(btn); });
+        }
+        function hideKeySelection() { document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding'); document.getElementById('key-selection-modal').style.display = 'none'; activeBindingLabel = null; currentMenu = 'keymap'; }
+        
+        function openMenu(menuId) { 
+            // Hide all menus first
+            document.querySelectorAll('.menu-ui').forEach(el => { 
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
+                    el.style.display = 'none'; 
+                }
+            }); 
+            
+            const menu = document.getElementById(menuId); 
+            if (menu) { 
+                menu.style.display = 'flex'; 
+                currentMenu = menuId; 
+                if (menuId === 'key-binding-menu') renderBindings(); 
+            } 
+        }
+
+        function closeAllMenus() { 
+            document.querySelectorAll('.menu-ui').forEach(el => { 
+                if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
+                    el.style.display = 'none'; 
+                }
+            }); 
+            currentMenu = null; 
+        }
+        function toggleMenu(menuId) { if (currentMenu === menuId) closeAllMenus(); else openMenu(menuId); }
+        
+        // --- MENU LOGIC FOR HTML VS ROM ---
+        document.getElementById('btn-menu-load-game').addEventListener('click', () => {
+             // Go to sub menu
+             openMenu('load-game-menu');
+        });
+
+        document.getElementById('btn-back-load-menu').addEventListener('click', () => {
+             openMenu('main-menu');
+        });
+
+        // REPLACED: mGBA UPLOAD LOGIC
+        document.getElementById('btn-load-rom-action').addEventListener('click', () => {
+             document.getElementById('file-input-rom').click();
+        });
+
+        document.getElementById('btn-load-html-file').addEventListener('click', () => {
+             document.getElementById('file-input-html').click();
+        });
+
+        // Use the ZIP input for "WEB FOLDER" (technically web zip) since folder upload is flaky on mobile
+        document.getElementById('btn-load-zip-web').addEventListener('click', () => {
+             document.getElementById('file-input-zip-web').click();
+        });
+        
+        document.getElementById('btn-menu-controls').addEventListener('click', () => {
+             openMenu('key-binding-menu');
+        });
+        
+        document.getElementById('btn-menu-style').addEventListener('click', () => {
+             openMenu('styles-menu');
+        });
+
+        document.getElementById('btn-close-main-menu').addEventListener('click', () => {
+             closeAllMenus();
+        });
+        
+        // Attach sound to menu buttons
+        function setupMenuSounds() {
+            const clickables = document.querySelectorAll('.menu-btn, .upload-label, button');
+            clickables.forEach(btn => {
+                btn.addEventListener('click', () => {
+                   initAudio();
+                   playHapticSound(); 
+                });
+            });
+        }
+
+
+        // --- WEB ZIP UPLOAD HANDLER ---
+        function handleWebZipUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileStatus = document.getElementById('file-status'); // Might be hidden, but okay
+            
+            closeAllMenus();
+            
+            // Show loading...
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if(loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.innerHTML = `<span id="loading-text">Unzipping Game...</span>`;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                JSZip.loadAsync(e.target.result).then(async function(zip) {
+                    // 1. Map all files in ZIP to Blob URLs
+                    const fileMap = {};
+                    let indexHtmlPath = null;
+
+                    // We need to wait for all files to be read
+                    const promises = [];
+                    
+                    zip.forEach((relativePath, zipEntry) => {
+                        if (!zipEntry.dir) {
+                             const promise = zipEntry.async("blob").then(blob => {
+                                 const blobUrl = URL.createObjectURL(blob);
+                                 // Store by relative path (e.g. "game/index.html")
+                                 // Also store by filename just in case
+                                 fileMap[relativePath] = blobUrl;
+                                 
+                                 // Simple name mapping for flat lookups
+                                 const parts = relativePath.split('/');
+                                 const fileName = parts[parts.length - 1];
+                                 if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
+
+                                 // Smart detection for index.html (prioritize root, then dist/)
+                                 if (fileName.toLowerCase() === 'index.html') {
+                                     // Prefer dist/index.html if we see it (common in webpack games)
+                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
+                                         indexHtmlPath = relativePath;
+                                     }
+                                 }
+                             });
+                             promises.push(promise);
+                        }
+                    });
+
+                    await Promise.all(promises);
+
+                    if (!indexHtmlPath) {
+                        alert("Error: No index.html found in ZIP.");
+                        loadingOverlay.style.display = 'none';
+                        return;
+                    }
+                    
+                    // 2. Load the index.html content to inject our monkey patch
+                    const indexBlobUrl = fileMap[indexHtmlPath];
+                    const indexRes = await fetch(indexBlobUrl);
+                    let htmlContent = await indexRes.text();
+
+                    // 3. Inject Monkey Patch (The Smart Asset Patcher)
+                    // This is the new, robust logic
+                    const monkeyPatchScript = `
+                    <script>
+                        (function() {
+                            // Asset Map from ZIP
+                            const assets = ${JSON.stringify(fileMap)};
+                            console.log("Assets loaded from ZIP:", Object.keys(assets).length);
+                            
+                            // Helper: Find blob URL for a relative path
+                            function resolve(path) {
+                                if(!path || typeof path !== 'string') return path;
+                                // Clean path: ./assets/img.png -> assets/img.png
+                                let clean = path.replace(/^\\.\\//, '').replace(/^\\//, '');
+                                
+                                // 1. Direct Match
+                                if(assets[clean]) return assets[clean];
+                                
+                                // 2. Fuzzy Match (handle subfolders)
+                                // If game asks for "assets/image.png" but zip has "dist/assets/image.png"
+                                for(let key in assets) {
+                                    if(key.endsWith(clean)) return assets[key];
+                                }
+                                return path;
+                            }
+
+                            // --- PATCH 1: FETCH / XHR ---
+                            const originalFetch = window.fetch;
+                            window.fetch = function(input, init) {
+                                if(typeof input === 'string') input = resolve(input);
+                                return originalFetch(input, init);
+                            };
+
+                            // --- PATCH 2: IMAGES ---
+                            // Intercept "new Image().src = ..."
+                            const originalImage = window.Image;
+                            window.Image = function(w, h) {
+                                const img = new originalImage(w, h);
+                                // We define a setter for 'src' to intercept it
+                                let srcVal = '';
+                                Object.defineProperty(img, 'src', {
+                                    get: () => srcVal,
+                                    set: (v) => { srcVal = v; img.setAttribute('src', resolve(v)); }
+                                });
+                                return img;
+                            };
+
+                            // --- PATCH 3: AUDIO ---
+                            const originalAudio = window.Audio;
+                            window.Audio = function(src) {
+                                if(src) src = resolve(src);
+                                return new originalAudio(src);
+                            };
+
+                            // --- PATCH 4: DOM ELEMENTS ---
+                            // Rewrites <img src="..."> <link href="..."> in the static HTML
+                            // Use MutationObserver to catch dynamic additions
+                            const observer = new MutationObserver(mutations => {
+                                mutations.forEach(mutation => {
+                                    if (mutation.type === 'childList') {
+                                        mutation.addedNodes.forEach(node => {
+                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
+                                               rewriteSrc(node);
+                                            }
+                                            if(node.querySelectorAll) {
+                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
+                                            }
+                                        });
+                                    } else if (mutation.type === 'attributes') {
+                                        rewriteSrc(mutation.target);
+                                    }
+                                });
+                            });
+                            
+                            function rewriteSrc(node) {
+                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
+                                const val = node.getAttribute(attr);
+                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
+                                    const resolved = resolve(val);
+                                    if(resolved !== val) node.setAttribute(attr, resolved);
+                                }
+                            }
+
+                            observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'href'] });
+                            
+                            // Initial rewrite
+                            window.addEventListener('DOMContentLoaded', () => {
+                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
+                            });
+
+                            // --- PATCH 5: LOCAL STORAGE BRIDGE (SAVE STATES) ---
+                            // Intercept localStorage to save to parent window
+                            try {
+                                const originalSetItem = window.localStorage.setItem;
+                                const originalGetItem = window.localStorage.getItem;
+                                
+                                // Prefix for this game session to avoid collisions
+                                const GAME_ID = "nann_boy_save_";
+
+                                window.localStorage.setItem = function(key, value) {
+                                    // Save to iframe local storage (temporary)
+                                    originalSetItem.call(window.localStorage, key, value);
+                                    // Send to parent to persist
+                                    window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
+                                };
+                                
+                                // Request load on startup
+                                window.parent.postMessage({ type: 'LOAD_REQUEST', prefix: GAME_ID }, '*');
+                                
+                                window.addEventListener('message', (e) => {
+                                    if(e.data.type === 'LOAD_DATA') {
+                                        // Restore data
+                                        const cleanKey = e.data.key.replace(GAME_ID, '');
+                                        originalSetItem.call(window.localStorage, cleanKey, e.data.value);
+                                        console.log("Restored save:", cleanKey);
+                                    }
+                                });
+
+                            } catch(e) { console.warn("Storage patch failed", e); }
+
+                            // --- PATCH 6: INPUT HANDLING ---
+                            // Ensure the iframe captures keyboard events and doesn't let them bubble out weirdly
+                            window.addEventListener('keydown', (e) => {
+                                // Prevent scrolling with arrow keys
+                                if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            });
+
+                        })();
+                    <\/script>
+                    <style>
+                        /* FORCE FIT STYLE */
+                        html, body { 
+                            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
+                            display: flex; align-items: center; justify-content: center; background: #000;
+                        }
+                        canvas { 
+                            max-width: 100%; max-height: 100%; 
+                            object-fit: contain; /* Maintain Aspect Ratio */
+                        }
+                    </style>
+                    `;
+                    
+                    htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
+                    
+                    // 4. Launch in Iframe
+                    const finalBlob = new Blob([htmlContent], { type: 'text/html' });
+                    const finalUrl = URL.createObjectURL(finalBlob);
+                    
+                    const iframe = document.getElementById('game-iframe');
+                    const romCanvas = document.getElementById('rom-canvas');
+                    const startScreen = document.getElementById('start-screen');
+                    const powerLed = document.getElementById('power-led');
+
+                    iframe.onload = () => {
+                            // Don't revoke immediately as game might need it, but for memory we should eventually
+                            // URL.revokeObjectURL(finalUrl); 
+                            iframe.onload = null;
+                            gameMode = 'html';
+                            iframe.style.display = 'block';
+                            romCanvas.style.display = 'none';
+                            startScreen.style.display = 'none';
+                            iframe.contentWindow.focus();
+                            powerLed.classList.add('on');
+                            loadingOverlay.style.display = 'none';
+                    };
+                    iframe.src = finalUrl;
+
+                }).catch(err => {
+                    console.error(err);
+                    alert("Failed to unzip game: " + err.message);
+                    loadingOverlay.style.display = 'none';
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleHtmlUpload(event) {
+            const file = event.target.files[0]; 
+            if (!file) return;
+            // ... (Simple HTML logic) ...
+             const fileStatus = document.getElementById('file-status');
+             const iframe = document.getElementById('game-iframe');
+             const romCanvas = document.getElementById('rom-canvas');
+             const powerLed = document.getElementById('power-led');
+             const startScreen = document.getElementById('start-screen');
+            powerLed.classList.remove('on'); 
+
+            if (file.type !== 'text/html' && !file.name.endsWith('.html')) { return; }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                 let htmlContent = e.target.result;
+                const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
+                const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
+                htmlContent = fitStyle + htmlContent + bridgeScript;
+                try { const blob = new Blob([htmlContent], { type: 'text/html' }); const blobUrl = URL.createObjectURL(blob); iframe.onload = () => { URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null; gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.display = 'none'; startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on'); }; iframe.src = blobUrl; } catch (error) { }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- 1. CONFIG: Module Setup ---
+        var Module = {
+            canvas: document.getElementById('rom-canvas'),
+            noInitialRun: true, // Crucial: Prevents auto-run crash
+            print: function(text) { console.log(text); },
+            printErr: function(text) { console.error(text); }
+        };
+
+        // --- 2. ROM UPLOAD HANDLER ---
+        document.getElementById('file-input-rom').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const powerLed = document.getElementById('power-led');
+            powerLed.classList.remove('on');
+            if (!file) return;
+
+            closeAllMenus();
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if(loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.innerHTML = `<span id="loading-text">Loading ROM...</span>`;
+            }
+
+            const isZip = file.name.toLowerCase().endsWith('.zip');
+
+            if (isZip) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const zip = await JSZip.loadAsync(e.target.result);
+                        const romFile = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gba|gbc|gb)$/i));
+                        
+                        if (!romFile) throw new Error("No ROM file (.gba, .gbc) found in ZIP");
+                        
+                        const romData = await romFile.async("uint8array");
+                        launchMgba(romData, romFile.name);
+                    } catch (err) {
+                        alert("Error: " + err.message);
+                        if(loadingOverlay) loadingOverlay.style.display = 'none';
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const romData = new Uint8Array(e.target.result);
+                    launchMgba(romData, file.name);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        // --- 3. LAUNCHER FUNCTION ---
+        function launchMgba(romData, romName) {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
+            // Check for mGBA availability
+            if (typeof mGBA === 'undefined' && typeof Module.loadFile === 'undefined') {
+                alert("Engine not loaded. Check mgba.js");
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+                return;
+            }
+
+            try {
+                // If using the factory pattern (modern mGBA)
+                if (typeof mGBA === 'function') {
+                    // Only initialize if not already done
+                    if (!window.Emulator) {
+                        mGBA(Module).then(instance => {
+                            window.Emulator = instance;
+                            runGame(instance, romData, romName);
+                        });
+                    } else {
+                        runGame(window.Emulator, romData, romName);
+                    }
+                } else {
+                    // Fallback for direct Module usage
+                    runGame(Module, romData, romName);
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Launch Error: " + e.message);
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function runGame(instance, romData, romName) {
+            const romCanvas = document.getElementById('rom-canvas');
+            const startScreen = document.getElementById('start-screen');
+            const gameIframe = document.getElementById('game-iframe');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const powerLed = document.getElementById('power-led');
+            
+            try {
+                // Write file to virtual filesystem
+                instance.FS.writeFile(romName, romData);
+                
+                // EXECUTE GAME: Prioritize loadFile as per debug info
+                if (instance.loadFile) {
+                    instance.loadFile(romName);
+                } else if (instance.callMain) {
+                    instance.callMain([romName]);
+                } else {
+                    // Last resort fallback
+                    instance.cwrap('loadGame', 'number', ['string'])(romName);
+                }
+                
+                // Update UI state
+                gameMode = 'rom';
+                startScreen.style.display = 'none';
+                gameIframe.style.display = 'none';
+                romCanvas.style.display = 'block';
+                powerLed.classList.add('on');
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+                
+            } catch(e) {
+                alert("Emulation Error: " + e.message);
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function setupControlListeners() {
+            const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill'); const TAP_THRESHOLD_MS = 300; 
+            const handleStart = (e) => {
+                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
+                if (currentMenu !== null && label !== 'Start' && label !== 'Select') return;
+                initAudio(); playHapticSound(); if (navigator.vibrate) navigator.vibrate(15);
+                control.pressTime = Date.now(); control.isTap = true;
+                handleVisualPress(control, true); updateDpadVisuals(label, true); handleVirtualPress(label, true, true); 
+            };
+            const handleEnd = (e) => {
+                e.preventDefault(); const control = e.currentTarget; const label = control.getAttribute('data-label');
+                handleVirtualPress(label, false, true); handleVisualPress(control, false); updateDpadVisuals(label, false);
+                if (['Select', 'Start'].includes(label) && control.isTap) { const duration = Date.now() - (control.pressTime || 0); if (duration < TAP_THRESHOLD_MS) { if (label === 'Select') toggleMenu('main-menu'); else if (label === 'Start') toggleMenu('start-menu'); } } control.isTap = false;
+            };
+            gameControls.forEach(control => { control.addEventListener('touchstart', handleStart, { passive: false }); control.addEventListener('mousedown', handleStart); control.addEventListener('touchend', handleEnd); control.addEventListener('mouseup', handleEnd); control.addEventListener('mouseleave', handleEnd); });
+            document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu')); document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
+            document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
+            // Folder Upload (via ZIP)
+            document.getElementById('file-input-zip-web')?.addEventListener('change', handleWebZipUpload); 
+            
+            // Note: file-input-rom is handled by the dedicated event listener above
+            
+            document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection); document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
+            document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
+            document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu')); document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
+            document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
+            document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
+            window.addEventListener('keydown', handleGlobalKey); window.addEventListener('keyup', handleGlobalKey);
+            
+            // Initial call to attach sounds
+            setupMenuSounds();
+        }
+        function checkStandalone() { const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; if (isIOS && !isStandalone) setTimeout(() => { document.getElementById('install-prompt').style.display = 'flex'; }, 3000); }
+        function scaleConsole() { const wrapper = document.getElementById('console-wrapper'); const gbcBody = document.getElementById('gbc-body'); if (!wrapper || !gbcBody) return; const designWidth = 440; const windowWidth = window.innerWidth; const windowHeight = window.innerHeight; const scale = Math.min(1, windowWidth / designWidth); wrapper.style.transform = `scale(${scale})`; const requiredHeight = windowHeight / scale; gbcBody.style.height = `${requiredHeight}px`; }
+        function appMain() { initFirebase(); setupControlListeners(); scaleConsole(); window.addEventListener('resize', scaleConsole); if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleConsole); checkStandalone(); }
+        if (document.readyState === 'loading') { window.addEventListener('DOMContentLoaded', appMain); } else { appMain(); }
     </script>
 </body>
 </html>
