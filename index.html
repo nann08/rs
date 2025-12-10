@@ -1,130 +1,340 @@
-import base64
-import os
-import sys
-
-# CONFIG
-BUILD_DIR = "build"
-OUTPUT_FILENAME = "NannBoy_mGBA.html"
-
-print("--- Nann Boy Builder (Lazy Loader) ---")
-
-def find_file(name):
-    if os.path.exists(name): return name
-    if os.path.exists(os.path.join(BUILD_DIR, name)): return os.path.join(BUILD_DIR, name)
-    return None
-
-html_path = find_file("index.html")
-js_path = find_file("mgba.js")
-wasm_path = find_file("mgba.wasm")
-
-if not (html_path and js_path and wasm_path):
-    print("❌ ERROR: Files missing. Check 'build' folder.")
-    sys.exit(1)
-
-# READ
-print("Reading resources...")
-with open(html_path, "r", encoding="utf-8") as f: original_html = f.read()
-with open(js_path, "r", encoding="utf-8") as f: js_content = f.read()
-with open(wasm_path, "rb") as f: wasm_bytes = f.read()
-
-# Encode WASM
-print("Encoding Engine...")
-wasm_b64 = base64.b64encode(wasm_bytes).decode("utf-8")
-
-# LAZY LOADER SCRIPT
-# This puts the JS code in a string variable, not a script tag.
-# It only executes when initMgbaEngine() is called.
-injection_script = f"""
-<script>
-    /**
-     * Nann Boy Lazy Loader
-     * Delays parsing of the engine until needed to prevent freezing.
-     */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Nann Boy">
+    <meta name="theme-color" content="#7f1d1d">
+    <title>Nann Emulator</title>
     
-    // 1. STORE ENGINE AS TEXT (Fast)
-    const MGBA_JS_SOURCE = `{js_content.replace('`', '\\`').replace('$', '\\$')}`;
-    const WASM_DATA = "{wasm_b64}";
-
-    // 2. HELPER: ASYNC WASM DECODE
-    // Uses fetch() on data URI which is non-blocking in modern browsers
-    async function getWasmBinary() {{
-        const res = await fetch("data:application/wasm;base64," + WASM_DATA);
-        const buf = await res.arrayBuffer();
-        return new Uint8Array(buf);
-    }}
-
-    // 3. LAZY INIT FUNCTION
-    window.engineReady = false;
+    <!-- LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    window.initMgbaEngine = async function() {{
-        if(window.engineReady) return;
-        
-        console.log("Decoding WASM...");
-        const binary = await getWasmBinary();
-        
-        console.log("Injecting Engine...");
-        
-        // Define Module config BEFORE loading script
-        window.Module = {{
-            canvas: document.getElementById('rom-canvas'),
-            wasmBinary: binary,
-            noInitialRun: true,
-            print: (t) => console.log(t),
-            printErr: (t) => console.error(t),
-            onRuntimeInitialized: () => {{
-                console.log("✅ Engine Init Complete");
-                window.engineReady = true;
-            }}
-        }};
+    <!-- FIREBASE (Compat Mode for Local Use) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-        // Inject JS from Blob (Prevents Main Thread Block)
-        const blob = new Blob([MGBA_JS_SOURCE], {{type: 'text/javascript'}});
-        const url = URL.createObjectURL(blob);
-        const script = document.createElement('script');
-        script.src = url;
-        document.body.appendChild(script);
-
-        // Wait for it to load
-        return new Promise(resolve => {{
-            script.onload = () => {{
-                // Wait for RuntimeInitialized
-                const check = setInterval(() => {{
-                    if(window.engineReady) {{
-                        clearInterval(check);
-                        URL.revokeObjectURL(url);
-                        resolve();
-                    }}
-                }}, 100);
-            }};
-        }});
-    }};
-
-    // 4. START GAME
-    window.startMgbaGame = async function(romData, romName) {{
-        if(!window.engineReady) await window.initMgbaEngine();
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
+        :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overscroll-behavior: none; position: fixed; overflow: hidden; background-color: var(--bg-color); transition: background-color 0.3s ease; font-family: 'Inter', sans-serif; display: flex; align-items: flex-start; justify-content: center; }
         
-        try {{
-            window.Module.FS.writeFile(romName, romData);
+        #console-wrapper { transform-origin: top center; will-change: transform; display: flex; justify-content: center; transform: translate3d(0,0,0); }
+        .gbc-body { --console-width: 440px; background: linear-gradient(145deg, var(--console-main) 0%, var(--console-dark) 100%); width: var(--console-width); border-radius: 20px 20px 60px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.3); position: relative; display: flex; flex-direction: column; align-items: center; padding-top: calc(30px + var(--safe-top)); padding-bottom: var(--safe-bottom); contain: content; transition: background 0.3s ease; }
+        .gbc-screen-lens { background-color: #3f3f46; width: 380px; height: 310px; border-radius: 15px 15px 50px 15px; padding: 20px 30px; box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; z-index: 10; transform: translate3d(0,0,0); }
+        .lens-branding { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
+        .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
+        @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
+        
+        .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
+        .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
+        
+        /* Canvas & Iframe */
+        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; object-fit: contain; }
+        
+        /* UI Elements */
+        .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
+        .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
+        .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
+        .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
+        .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
+        
+        /* Loading Bar */
+        #loading-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .loader-bar-bg { width: 70%; height: 4px; background: #333; margin-top: 10px; border-radius: 2px; }
+        #loader-bar-fill { width: 0%; height: 100%; background: #0f0; border-radius: 2px; transition: width 0.1s; }
+        #loading-text { font-family: monospace; font-size: 10px; margin-top: 5px; color: #888; }
+
+        /* Controls */
+        .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
+        .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
+        .speaker-grille { position: absolute; bottom: 40px; right: 25px; display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10; }
+        .vent-slot { width: 8px; height: 60px; background-color: rgba(0,0,0,0.25); border-radius: 4px; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 1px 1px 0 rgba(255,255,255,0.15); }
+        
+        .dpad { position: absolute; top: 40px; left: 40px; width: 130px; height: 130px; }
+        .dpad-cross { width: 100%; height: 100%; position: relative; }
+        .dpad-arm { background-color: var(--dpad-color); position: absolute; border-radius: 6px; box-shadow: 2px 4px 6px rgba(0,0,0,0.4); transition: transform 0.05s; }
+        .dpad-arm::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .dpad-arm.pressed-arm { transform: translateY(2px) !important; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
+        .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
+        .dpad-center { position: absolute; width: 40px; height: 40px; background-color: var(--dpad-color); top: 45px; left: 45px; z-index: 15; border-radius: 4px; background: radial-gradient(circle at center, var(--dpad-color) 60%, var(--dpad-color) 100%); }
+        .dpad-center::after { content: ''; position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, var(--dpad-color) 70%); box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1); }
+        .dpad-btn { position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer; }
+        .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
+        .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
+        
+        .action-buttons { position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg); }
+        .btn-round { width: 60px; height: 60px; background-color: var(--btn-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; transition: transform 0.05s, box-shadow 0.05s; box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4); color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900; }
+        .btn-round.pressed { transform: translateY(3px) !important; box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.4); }
+        .btn-b { bottom: 0; left: 0; } .btn-a { top: 0; right: 0; }
+        .meta-buttons { position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; }
+        .btn-pill { width: 70px; height: 18px; background-color: #4b5563; border-radius: 12px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 2px rgba(0,0,0,0.8), 2px 3px 4px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.05s, box-shadow 0.05s; transform: rotate(-25deg); }
+        .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
+        .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
+        
+        .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+        .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
+        
+        #file-input-html, #file-input-rom, #file-input-zip-web { display: none; } 
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="console-wrapper">
+        <div class="gbc-body" id="gbc-body">
+            <div class="gbc-screen-lens">
+                <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
+                <div class="lcd-screen" id="lcd-screen">
+                    
+                    <!-- PROGRESSIVE LOADING OVERLAY -->
+                    <div id="loading-overlay">
+                        <div class="font-bold mb-2 text-sm tracking-wider">SYSTEM BOOT</div>
+                        <div class="loader-bar-bg">
+                            <div id="loader-bar-fill"></div>
+                        </div>
+                        <div id="loading-text">Initializing...</div>
+                    </div>
+
+                    <div id="start-screen"><div class="nann-pill"><div class="nann-logo-text">NANN BOY</div></div></div>
+                    
+                    <iframe id="game-iframe"></iframe>
+                    <canvas id="rom-canvas"></canvas>
+                    
+                    <div id="main-menu" class="menu-ui">
+                        <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
+                        <div class="menu-btn" id="btn-menu-load-game">LOAD GAME</div>
+                        <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
+                        <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
+                        <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
+                    </div>
+
+                    <div id="load-game-menu" class="menu-ui">
+                        <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
+                        <div class="menu-btn" id="btn-load-rom-action">ROM FILE (.gba/.zip)</div>
+                        <div class="menu-btn" id="btn-load-html-file">HTML FILE</div>
+                        <div class="menu-btn" id="btn-load-zip-web">WEB ZIP</div>
+                        <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
+                    </div>
+                    
+                    <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
+                    <input type="file" id="file-input-html" accept=".html,text/html" style="display:none">
+                    <input type="file" id="file-input-zip-web" accept=".zip" style="display:none">
+
+                    <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
+                    
+                    <!-- Styles Menu & Key Bindings (UI Structure Only) -->
+                    <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-[140px] overflow-y-auto px-4"><div class="theme-option" data-theme="nannboy"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div><span class="font-bold text-gray-700">Nann Boy</span></div><div class="theme-option" data-theme="red"><div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div><span class="font-bold text-gray-700">Original Red</span></div><div class="theme-option" data-theme="purple"><div class="theme-preview" style="background: linear-gradient(145deg, #7c3aed, #4c1d95);"></div><span class="font-bold text-gray-700">Atomic Purple</span></div><div class="theme-option" data-theme="glacier"><div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div><span class="font-bold text-gray-700">Glacier Blue</span></div><div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div></div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
+                    <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-40 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
+                    <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
+                    <div id="toast-notification"></div>
+                </div>
+            </div>
+            <div class="nann-brand">NANN BOY</div>
+            <div class="controls-area">
+                <div class="speaker-grille"><div class="vent-slot"></div><div class="vent-slot"></div><div class="vent-slot"></div><div class="vent-slot"></div><div class="vent-slot"></div><div class="vent-slot"></div></div>
+                <div class="dpad"><div class="dpad-cross"><div class="dpad-arm dpad-h"></div><div class="dpad-arm dpad-v"></div><div class="dpad-center"></div><div class="dpad-btn dpad-up" data-label="Up"></div><div class="dpad-btn dpad-down" data-label="Down"></div><div class="dpad-btn dpad-left" data-label="Left"></div><div class="dpad-btn dpad-right" data-label="Right"></div></div></div>
+                <div class="action-buttons"><div class="btn-round btn-b" id="btn-b" data-label="B">B</div><div class="btn-round btn-a" id="btn-a" data-label="A">A</div></div>
+                <div class="meta-buttons"><div class="flex flex-col items-center"><div class="btn-pill" id="btn-select" data-label="Select"></div><div class="meta-label">SELECT</div></div><div class="flex flex-col items-center"><div class="btn-pill" id="btn-start" data-label="Start"></div><div class="meta-label">START</div></div></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- STANDARD SCRIPT (NO MODULES) -->
+    <script>
+        // --- 1. GLOBALS & SETTINGS ---
+        const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
+        const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
+        const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
+        
+        let gameMode = 'html'; 
+        let keyMap = { 'Up':{key:'ArrowUp'}, 'Down':{key:'ArrowDown'}, 'Left':{key:'ArrowLeft'}, 'Right':{key:'ArrowRight'}, 'A':{key:'x'}, 'B':{key:'z'}, 'Start':{key:'Enter'}, 'Select':{key:'Backspace'} };
+        const keyMapStorageKey = `emulator-keymap-${appId}`;
+        const themeStorageKey = `emulator-theme-${appId}`;
+        let currentMenu = null; 
+        
+        // --- 2. AUDIO & THEME ---
+        function initAudio() { const ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); }
+        
+        function applyTheme(themeName) {
+            const root = document.documentElement;
+            let m='#E83942', d='#b91c1c', b='#7f1d1d';
+            if(themeName==='purple'){m='#7c3aed';d='#4c1d95';b='#4c1d95';}
+            else if(themeName==='glacier'){m='#a5f3fc';d='#0891b2';b='#164e63';}
+            else if(themeName==='black'){m='#27272a';d='#18181b';b='#09090b';}
+            else if(themeName==='nannboy'){m='#f3f4f6';d='#9ca3af';b='#374151';}
+            root.style.setProperty('--console-main', m); root.style.setProperty('--console-dark', d); root.style.setProperty('--bg-color', b);
+            localStorage.setItem(themeStorageKey, themeName);
+        }
+        const savedTheme = localStorage.getItem(themeStorageKey); if(savedTheme) applyTheme(savedTheme);
+
+        // --- 3. UI LOGIC (MENUS) ---
+        function toggleMenu(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                const isFlex = el.style.display === 'flex';
+                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
+                if(!isFlex) el.style.display = 'flex';
+            }
+        }
+        
+        // --- 4. INPUT HANDLING (Virtual + Keyboard) ---
+        function sendInput(label, isDown) {
+            const map = keyMap[label];
+            if(!map) return;
+            const code = map.keyCode || 0;
             
-            // Try different entry points depending on version
-            if(window.Module.callMain) {{
-                window.Module.callMain([romName]);
-            }} else {{
-                window.Module.cwrap('loadGame', 'number', ['string'])(romName);
-            }}
-            return true;
-        }} catch(e) {{
-            console.error(e);
-            return false;
-        }}
-    }};
-</script>
-"""
+            // HTML Mode
+            if(gameMode === 'html') {
+                const f = document.getElementById('game-iframe');
+                if(f && f.contentWindow) f.contentWindow.postMessage({type: isDown?'keydown':'keyup', key:map.key, keyCode:code}, '*');
+                return;
+            }
+            
+            // ROM Mode (mGBA)
+            window.dispatchEvent(new KeyboardEvent(isDown?'keydown':'keyup', {key:map.key, code:map.code, keyCode:code, which:code, bubbles:true}));
+        }
 
-# WRITE
-final_html = original_html.replace("</body>", f"{injection_script}</body>") if "</body>" in original_html else original_html + injection_script
+        // Bind UI
+        document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill').forEach(btn => {
+            const label = btn.getAttribute('data-label');
+            const handler = (e, down) => {
+                if(e.cancelable) e.preventDefault();
+                down ? btn.classList.add('pressed') : btn.classList.remove('pressed');
+                sendInput(label, down);
+                // Menu triggers
+                if(!down && label==='Select') toggleMenu('main-menu');
+                if(!down && label==='Start') toggleMenu('start-menu');
+            };
+            btn.addEventListener('mousedown', (e)=>handler(e,true)); btn.addEventListener('mouseup', (e)=>handler(e,false));
+            btn.addEventListener('touchstart', (e)=>handler(e,true)); btn.addEventListener('touchend', (e)=>handler(e,false));
+        });
 
-with open(OUTPUT_FILENAME, "w", encoding="utf-8") as f:
-    f.write(final_html)
+        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
+        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
+        document.getElementById('btn-close-main-menu').onclick = () => toggleMenu('main-menu'); // actually closes because toggle
+        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
+        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
+        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
 
-print(f"SUCCESS! Open {OUTPUT_FILENAME}")
+        // --- 5. ROM UPLOAD HANDLER ---
+        // This connects the UI to the Engine (injected by builder)
+        document.getElementById('btn-load-rom-action').onclick = () => document.getElementById('file-input-rom').click();
+        
+        document.getElementById('file-input-rom').onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            // Show Loading UI
+            document.querySelectorAll('.menu-ui').forEach(m => m.style.display='none');
+            const overlay = document.getElementById('loading-overlay');
+            const bar = document.getElementById('loader-bar-fill');
+            const txt = document.getElementById('loading-text');
+            
+            overlay.style.display = 'flex';
+            txt.innerText = "Reading File...";
+            bar.style.width = "10%";
+
+            // Yield to render
+            await new Promise(r => setTimeout(r, 50));
+
+            try {
+                let romData = null;
+                let romName = file.name;
+
+                if(file.name.endsWith('.zip')) {
+                    txt.innerText = "Unzipping...";
+                    bar.style.width = "30%";
+                    await new Promise(r => setTimeout(r, 50));
+                    
+                    const buf = await file.arrayBuffer();
+                    const zip = await JSZip.loadAsync(buf);
+                    const rom = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gba|gbc|gb)$/i));
+                    
+                    if(!rom) throw new Error("No ROM found in ZIP");
+                    romName = rom.name;
+                    romData = await rom.async("uint8array");
+                } else {
+                    const buf = await file.arrayBuffer();
+                    romData = new Uint8Array(buf);
+                }
+
+                txt.innerText = "Booting Engine...";
+                bar.style.width = "60%";
+                await new Promise(r => setTimeout(r, 50));
+
+                if(window.startMgbaGame) {
+                    gameMode = 'rom';
+                    const ok = await window.startMgbaGame(romData, romName);
+                    if(ok) {
+                        bar.style.width = "100%";
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            document.getElementById('start-screen').style.display = 'none';
+                            document.getElementById('rom-canvas').style.display = 'block';
+                            document.getElementById('power-led').classList.add('on');
+                        }, 200);
+                    } else {
+                        throw new Error("Engine Launch Failed");
+                    }
+                } else {
+                    // Engine not ready yet? Wait a sec
+                    txt.innerText = "Waiting for Engine...";
+                    let checks = 0;
+                    const checkInterval = setInterval(async () => {
+                        checks++;
+                        if(window.startMgbaGame) {
+                            clearInterval(checkInterval);
+                            const ok = await window.startMgbaGame(romData, romName);
+                            if(ok) {
+                                overlay.style.display='none';
+                                document.getElementById('start-screen').style.display = 'none';
+                                document.getElementById('rom-canvas').style.display = 'block';
+                                document.getElementById('power-led').classList.add('on');
+                            }
+                        }
+                        if(checks > 50) { clearInterval(checkInterval); alert("Engine Timeout"); overlay.style.display='none'; }
+                    }, 200);
+                }
+
+            } catch(err) {
+                console.error(err);
+                alert("Error: " + err.message);
+                overlay.style.display = 'none';
+            }
+        };
+
+        // --- 6. HTML GAME UPLOAD ---
+        document.getElementById('btn-load-html-file').onclick = () => document.getElementById('file-input-html').click();
+        document.getElementById('file-input-html').onchange = (e) => {
+            const f = e.target.files[0];
+            if(!f) return;
+            const url = URL.createObjectURL(f);
+            const fr = document.getElementById('game-iframe');
+            fr.src = url;
+            fr.style.display = 'block';
+            document.getElementById('rom-canvas').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none';
+            toggleMenu('main-menu');
+            document.getElementById('power-led').classList.add('on');
+        };
+
+        // Responsive
+        function scale() { 
+            const w = document.getElementById('console-wrapper');
+            const s = Math.min(1, window.innerWidth / 440);
+            w.style.transform = `scale(${s})`;
+            document.getElementById('gbc-body').style.height = `${window.innerHeight/s}px`;
+        }
+        window.onresize = scale; scale();
+    </script>
+</body>
+</html>
