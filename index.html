@@ -11,11 +11,17 @@
     <!-- LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- ENGINE SCRIPT (Loads from file) -->
+    <!-- ENGINE: Loads mgba.js from the same folder (Repo Structure) -->
     <script src="mgba.js"></script>
 
+    <!-- FIREBASE (Compat Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
@@ -37,6 +43,9 @@
         .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
         .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .menu-btn:active { background-color: #e5e7eb; transform: scale(0.98); }
+        .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+        .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
         
         #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; text-align: center; color: #000000; background-color: var(--screen-color); }
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
@@ -51,7 +60,6 @@
         .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
         .speaker-grille { position: absolute; bottom: 40px; right: 25px; display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10; }
         .vent-slot { width: 8px; height: 60px; background-color: rgba(0,0,0,0.25); border-radius: 4px; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 1px 1px 0 rgba(255,255,255,0.15); }
-        
         .dpad { position: absolute; top: 40px; left: 40px; width: 130px; height: 130px; }
         .dpad-cross { width: 100%; height: 100%; position: relative; }
         .dpad-arm { background-color: var(--dpad-color); position: absolute; border-radius: 6px; box-shadow: 2px 4px 6px rgba(0,0,0,0.4); transition: transform 0.05s; }
@@ -64,7 +72,6 @@
         .dpad-btn { position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer; }
         .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
         .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } .dpad-left { top: 37px; left: -5px; } .dpad-right { top: 37px; right: -5px; }
-        
         .action-buttons { position: absolute; top: 40px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg); }
         .btn-round { width: 60px; height: 60px; background-color: var(--btn-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; transition: transform 0.05s, box-shadow 0.05s; box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4); color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900; }
         .btn-round.pressed { transform: translateY(3px) !important; box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.4); }
@@ -74,10 +81,7 @@
         .btn-pill.pressed { transform: rotate(-25deg) translateY(2px); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(0,0,0,0.3); }
         .meta-label { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 900; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0 rgba(255,255,255,0.2); margin-top: 10px; transform: rotate(-25deg); text-align: center; }
         
-        .theme-option { display: flex; align-items: center; width: 100%; padding: 8px; margin: 4px 0; border: 1px solid #eee; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
-        .theme-preview { width: 24px; height: 24px; border-radius: 50%; margin-right: 15px; border: 2px solid rgba(0,0,0,0.1); }
-        
-        #file-input-html, #file-input-rom, #file-input-zip-web { display: none; } 
+        #file-input-html, #file-input-rom, #file-input-zip-web { display: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -87,8 +91,9 @@
             <div class="gbc-screen-lens">
                 <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
                 <div class="lcd-screen" id="lcd-screen">
+                    <!-- LOADING OVERLAY -->
                     <div id="loading-overlay">
-                        <div class="font-bold mb-2 text-sm tracking-wider">SYSTEM BOOT</div>
+                        <div class="text-sm font-bold tracking-widest">SYSTEM BOOT</div>
                         <div class="loader-bar-bg"><div id="loader-bar-fill"></div></div>
                         <div id="loading-text">Initializing...</div>
                     </div>
@@ -108,7 +113,7 @@
 
                     <div id="load-game-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
-                        <div class="menu-btn" id="btn-load-rom-action">ROM FILE (.gba/.zip)</div>
+                        <div class="menu-btn" id="btn-load-rom-action">ROM FILE</div>
                         <div class="menu-btn" id="btn-load-html-file">HTML FILE</div>
                         <div class="menu-btn" id="btn-load-zip-web">WEB ZIP</div>
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
@@ -137,23 +142,29 @@
     </div>
     
     <script>
-        // --- CONFIG ---
+        // --- CONFIG & GLOBALS ---
+        const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
+        const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
+        const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
+        
         let gameMode = 'html'; 
         let keyMap = { 'Up':{key:'ArrowUp'}, 'Down':{key:'ArrowDown'}, 'Left':{key:'ArrowLeft'}, 'Right':{key:'ArrowRight'}, 'A':{key:'x'}, 'B':{key:'z'}, 'Start':{key:'Enter'}, 'Select':{key:'Backspace'} };
+        const keyMapStorageKey = `emulator-keymap-${appId}`;
+        const themeStorageKey = `emulator-theme-${appId}`;
         
         // --- 1. ENGINE CONFIGURATION (For mGBA) ---
+        // This is called by mgba.js when it loads
         var Module = {
             canvas: document.getElementById('rom-canvas'),
-            noInitialRun: true, // Prevents auto-run freeze
+            noInitialRun: true, // Wait for file
             locateFile: function(path) {
-                // If on Vercel/GitHub, this finds mgba.wasm in the same folder
-                return path; 
+                return path; // Expects files in root folder (GitHub/Vercel)
             },
-            print: (text) => console.log(text),
-            printErr: (text) => console.error(text)
+            print: (t) => console.log(t),
+            printErr: (t) => console.error(t)
         };
 
-        // --- 2. ROM LOADING HANDLER ---
+        // --- 2. ROM UPLOAD HANDLER ---
         document.getElementById('btn-load-rom-action').onclick = () => document.getElementById('file-input-rom').click();
         
         document.getElementById('file-input-rom').onchange = async (e) => {
@@ -171,6 +182,9 @@
             bar.style.width = "20%";
 
             try {
+                // Ensure mGBA is loaded
+                if(typeof mGBA === 'undefined') throw new Error("Engine script (mgba.js) not found.");
+
                 let romData = null;
                 let romName = file.name;
 
@@ -193,17 +207,20 @@
                 txt.innerText = "Starting Engine...";
                 bar.style.width = "80%";
 
-                // WAIT FOR ENGINE (If it was loading async)
-                if(!window.mGBA && !window.Module) throw new Error("Engine not loaded. Check mgba.js");
-                
-                // Initialize if not already
+                // Initialize Engine if needed
                 if(!window.Emulator) {
                     window.Emulator = await mGBA(Module); 
                 }
 
                 // Write and Run
                 window.Emulator.FS.writeFile(romName, romData);
-                window.Emulator.cwrap('loadGame', 'number', ['string'])(romName);
+                
+                // Try different entry points for compatibility
+                try {
+                    window.Emulator.callMain([romName]);
+                } catch(e) {
+                    window.Emulator.cwrap('loadGame', 'number', ['string'])(romName);
+                }
                 
                 // Success
                 bar.style.width = "100%";
@@ -266,8 +283,9 @@
             else if(themeName==='black'){m='#27272a';d='#18181b';b='#09090b';}
             else if(themeName==='nannboy'){m='#f3f4f6';d='#9ca3af';b='#374151';}
             root.style.setProperty('--console-main', m); root.style.setProperty('--console-dark', d); root.style.setProperty('--bg-color', b);
+            localStorage.setItem(themeStorageKey, themeName);
         }
-        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
+        const savedTheme = localStorage.getItem(themeStorageKey); if(savedTheme) applyTheme(savedTheme);
 
         function scale() { 
             const w = document.getElementById('console-wrapper');
