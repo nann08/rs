@@ -11,14 +11,11 @@
     <!-- LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FIREBASE (Compat Mode for Local Use) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
+    <!-- ENGINE SCRIPT (Loads from file) -->
+    <script src="mgba.js"></script>
+
     <style>
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
         :root { --screen-color: #ffffff; --screen-shadow: #0f380f; --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px); --console-main: #E83942; --console-dark: #b91c1c; --bg-color: #7f1d1d; --btn-color: #1c1c1c; --dpad-color: #1c1c1c; }
@@ -35,10 +32,8 @@
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
-        /* Canvas & Iframe */
         iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; object-fit: contain; }
         
-        /* UI Elements */
         .menu-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; padding: 10px 12px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 100; overflow-y: auto; }
         .menu-ui h2 { margin-top: 0; margin-bottom: 8px; }
         .menu-btn { width: 90%; padding: 6px 0; margin: 3px 0; background-color: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; font-weight: bold; font-size: 13px; color: #374151; text-align: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
@@ -47,13 +42,11 @@
         .nann-pill { border: 3px solid #000000; border-radius: 50px; padding: 4px 24px; display: inline-block; margin-bottom: 20px; background: transparent; }
         .nann-logo-text { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 28px; color: #000000; letter-spacing: 1px; line-height: 1; }
         
-        /* Loading Bar */
         #loading-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .loader-bar-bg { width: 70%; height: 4px; background: #333; margin-top: 10px; border-radius: 2px; }
         #loader-bar-fill { width: 0%; height: 100%; background: #0f0; border-radius: 2px; transition: width 0.1s; }
         #loading-text { font-family: monospace; font-size: 10px; margin-top: 5px; color: #888; }
 
-        /* Controls */
         .nann-brand { font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; color: rgba(0,0,0,0.6); font-size: 28px; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 0px rgba(0, 0, 0, 0.2); }
         .controls-area { width: 100%; flex-grow: 1; position: relative; transform: translate3d(0,0,0); }
         .speaker-grille { position: absolute; bottom: 40px; right: 25px; display: flex; gap: 8px; transform: rotate(-25deg); z-index: 10; }
@@ -94,13 +87,9 @@
             <div class="gbc-screen-lens">
                 <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
                 <div class="lcd-screen" id="lcd-screen">
-                    
-                    <!-- PROGRESSIVE LOADING OVERLAY -->
                     <div id="loading-overlay">
                         <div class="font-bold mb-2 text-sm tracking-wider">SYSTEM BOOT</div>
-                        <div class="loader-bar-bg">
-                            <div id="loader-bar-fill"></div>
-                        </div>
+                        <div class="loader-bar-bg"><div id="loader-bar-fill"></div></div>
                         <div id="loading-text">Initializing...</div>
                     </div>
 
@@ -131,7 +120,6 @@
 
                     <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
                     
-                    <!-- Styles Menu & Key Bindings (UI Structure Only) -->
                     <div id="styles-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">STYLES</h2><div class="w-full max-h-[140px] overflow-y-auto px-4"><div class="theme-option" data-theme="nannboy"><div class="theme-preview" style="background: linear-gradient(145deg, #f3f4f6, #9ca3af);"></div><span class="font-bold text-gray-700">Nann Boy</span></div><div class="theme-option" data-theme="red"><div class="theme-preview" style="background: linear-gradient(145deg, #E83942, #b91c1c);"></div><span class="font-bold text-gray-700">Original Red</span></div><div class="theme-option" data-theme="purple"><div class="theme-preview" style="background: linear-gradient(145deg, #7c3aed, #4c1d95);"></div><span class="font-bold text-gray-700">Atomic Purple</span></div><div class="theme-option" data-theme="glacier"><div class="theme-preview" style="background: linear-gradient(145deg, #a5f3fc, #0891b2);"></div><span class="font-bold text-gray-700">Glacier Blue</span></div><div class="theme-option" data-theme="black"><div class="theme-preview" style="background: linear-gradient(145deg, #27272a, #000000);"></div><span class="font-bold text-gray-700">Midnight Black</span></div></div><button id="btn-back-styles" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back</button></div>
                     <div id="key-binding-menu" class="menu-ui"><h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2><div id="bindings-list" class="max-h-40 overflow-y-auto w-full flex flex-col items-center"></div><button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button></div>
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;"><h2 class="text-xl font-bold mb-4 text-gray-800">Map <span id="binding-label-display" class="text-red-600"></span></h2><div id="virtual-keypad" class="grid grid-cols-5 gap-2 p-2 max-w-sm overflow-y-auto" style="max-height: 70%;"></div><button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button></div>
@@ -148,85 +136,24 @@
         </div>
     </div>
     
-    <!-- STANDARD SCRIPT (NO MODULES) -->
     <script>
-        // --- 1. GLOBALS & SETTINGS ---
-        const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
-        const appId = inCanvasEnvironment ? __app_id : 'default-app-id';
-        const firebaseConfig = inCanvasEnvironment ? JSON.parse(__firebase_config) : null;
-        
+        // --- CONFIG ---
         let gameMode = 'html'; 
         let keyMap = { 'Up':{key:'ArrowUp'}, 'Down':{key:'ArrowDown'}, 'Left':{key:'ArrowLeft'}, 'Right':{key:'ArrowRight'}, 'A':{key:'x'}, 'B':{key:'z'}, 'Start':{key:'Enter'}, 'Select':{key:'Backspace'} };
-        const keyMapStorageKey = `emulator-keymap-${appId}`;
-        const themeStorageKey = `emulator-theme-${appId}`;
-        let currentMenu = null; 
         
-        // --- 2. AUDIO & THEME ---
-        function initAudio() { const ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); }
-        
-        function applyTheme(themeName) {
-            const root = document.documentElement;
-            let m='#E83942', d='#b91c1c', b='#7f1d1d';
-            if(themeName==='purple'){m='#7c3aed';d='#4c1d95';b='#4c1d95';}
-            else if(themeName==='glacier'){m='#a5f3fc';d='#0891b2';b='#164e63';}
-            else if(themeName==='black'){m='#27272a';d='#18181b';b='#09090b';}
-            else if(themeName==='nannboy'){m='#f3f4f6';d='#9ca3af';b='#374151';}
-            root.style.setProperty('--console-main', m); root.style.setProperty('--console-dark', d); root.style.setProperty('--bg-color', b);
-            localStorage.setItem(themeStorageKey, themeName);
-        }
-        const savedTheme = localStorage.getItem(themeStorageKey); if(savedTheme) applyTheme(savedTheme);
+        // --- 1. ENGINE CONFIGURATION (For mGBA) ---
+        var Module = {
+            canvas: document.getElementById('rom-canvas'),
+            noInitialRun: true, // Prevents auto-run freeze
+            locateFile: function(path) {
+                // If on Vercel/GitHub, this finds mgba.wasm in the same folder
+                return path; 
+            },
+            print: (text) => console.log(text),
+            printErr: (text) => console.error(text)
+        };
 
-        // --- 3. UI LOGIC (MENUS) ---
-        function toggleMenu(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                const isFlex = el.style.display === 'flex';
-                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
-                if(!isFlex) el.style.display = 'flex';
-            }
-        }
-        
-        // --- 4. INPUT HANDLING (Virtual + Keyboard) ---
-        function sendInput(label, isDown) {
-            const map = keyMap[label];
-            if(!map) return;
-            const code = map.keyCode || 0;
-            
-            // HTML Mode
-            if(gameMode === 'html') {
-                const f = document.getElementById('game-iframe');
-                if(f && f.contentWindow) f.contentWindow.postMessage({type: isDown?'keydown':'keyup', key:map.key, keyCode:code}, '*');
-                return;
-            }
-            
-            // ROM Mode (mGBA)
-            window.dispatchEvent(new KeyboardEvent(isDown?'keydown':'keyup', {key:map.key, code:map.code, keyCode:code, which:code, bubbles:true}));
-        }
-
-        // Bind UI
-        document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill').forEach(btn => {
-            const label = btn.getAttribute('data-label');
-            const handler = (e, down) => {
-                if(e.cancelable) e.preventDefault();
-                down ? btn.classList.add('pressed') : btn.classList.remove('pressed');
-                sendInput(label, down);
-                // Menu triggers
-                if(!down && label==='Select') toggleMenu('main-menu');
-                if(!down && label==='Start') toggleMenu('start-menu');
-            };
-            btn.addEventListener('mousedown', (e)=>handler(e,true)); btn.addEventListener('mouseup', (e)=>handler(e,false));
-            btn.addEventListener('touchstart', (e)=>handler(e,true)); btn.addEventListener('touchend', (e)=>handler(e,false));
-        });
-
-        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
-        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
-        document.getElementById('btn-close-main-menu').onclick = () => toggleMenu('main-menu'); // actually closes because toggle
-        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
-        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
-        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
-
-        // --- 5. ROM UPLOAD HANDLER ---
-        // This connects the UI to the Engine (injected by builder)
+        // --- 2. ROM LOADING HANDLER ---
         document.getElementById('btn-load-rom-action').onclick = () => document.getElementById('file-input-rom').click();
         
         document.getElementById('file-input-rom').onchange = async (e) => {
@@ -240,24 +167,20 @@
             const txt = document.getElementById('loading-text');
             
             overlay.style.display = 'flex';
-            txt.innerText = "Reading File...";
-            bar.style.width = "10%";
-
-            // Yield to render
-            await new Promise(r => setTimeout(r, 50));
+            txt.innerText = "Processing file...";
+            bar.style.width = "20%";
 
             try {
                 let romData = null;
                 let romName = file.name;
 
-                if(file.name.endsWith('.zip')) {
+                // ZIP Logic
+                if (file.name.toLowerCase().endsWith('.zip')) {
                     txt.innerText = "Unzipping...";
-                    bar.style.width = "30%";
-                    await new Promise(r => setTimeout(r, 50));
-                    
+                    bar.style.width = "40%";
                     const buf = await file.arrayBuffer();
                     const zip = await JSZip.loadAsync(buf);
-                    const rom = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gba|gbc|gb)$/i));
+                    const rom = Object.values(zip.files).find(f => !f.dir && f.name.match(/\.(gb|gbc|gba)$/i));
                     
                     if(!rom) throw new Error("No ROM found in ZIP");
                     romName = rom.name;
@@ -267,43 +190,29 @@
                     romData = new Uint8Array(buf);
                 }
 
-                txt.innerText = "Booting Engine...";
-                bar.style.width = "60%";
-                await new Promise(r => setTimeout(r, 50));
+                txt.innerText = "Starting Engine...";
+                bar.style.width = "80%";
 
-                if(window.startMgbaGame) {
-                    gameMode = 'rom';
-                    const ok = await window.startMgbaGame(romData, romName);
-                    if(ok) {
-                        bar.style.width = "100%";
-                        setTimeout(() => {
-                            overlay.style.display = 'none';
-                            document.getElementById('start-screen').style.display = 'none';
-                            document.getElementById('rom-canvas').style.display = 'block';
-                            document.getElementById('power-led').classList.add('on');
-                        }, 200);
-                    } else {
-                        throw new Error("Engine Launch Failed");
-                    }
-                } else {
-                    // Engine not ready yet? Wait a sec
-                    txt.innerText = "Waiting for Engine...";
-                    let checks = 0;
-                    const checkInterval = setInterval(async () => {
-                        checks++;
-                        if(window.startMgbaGame) {
-                            clearInterval(checkInterval);
-                            const ok = await window.startMgbaGame(romData, romName);
-                            if(ok) {
-                                overlay.style.display='none';
-                                document.getElementById('start-screen').style.display = 'none';
-                                document.getElementById('rom-canvas').style.display = 'block';
-                                document.getElementById('power-led').classList.add('on');
-                            }
-                        }
-                        if(checks > 50) { clearInterval(checkInterval); alert("Engine Timeout"); overlay.style.display='none'; }
-                    }, 200);
+                // WAIT FOR ENGINE (If it was loading async)
+                if(!window.mGBA && !window.Module) throw new Error("Engine not loaded. Check mgba.js");
+                
+                // Initialize if not already
+                if(!window.Emulator) {
+                    window.Emulator = await mGBA(Module); 
                 }
+
+                // Write and Run
+                window.Emulator.FS.writeFile(romName, romData);
+                window.Emulator.cwrap('loadGame', 'number', ['string'])(romName);
+                
+                // Success
+                bar.style.width = "100%";
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.getElementById('start-screen').style.display = 'none';
+                    document.getElementById('rom-canvas').style.display = 'block';
+                    document.getElementById('power-led').classList.add('on');
+                }, 500);
 
             } catch(err) {
                 console.error(err);
@@ -312,22 +221,54 @@
             }
         };
 
-        // --- 6. HTML GAME UPLOAD ---
-        document.getElementById('btn-load-html-file').onclick = () => document.getElementById('file-input-html').click();
-        document.getElementById('file-input-html').onchange = (e) => {
-            const f = e.target.files[0];
-            if(!f) return;
-            const url = URL.createObjectURL(f);
-            const fr = document.getElementById('game-iframe');
-            fr.src = url;
-            fr.style.display = 'block';
-            document.getElementById('rom-canvas').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none';
-            toggleMenu('main-menu');
-            document.getElementById('power-led').classList.add('on');
-        };
+        // --- 3. UI LOGIC (Menus, Themes, Inputs) ---
+        function toggleMenu(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                const isFlex = el.style.display === 'flex';
+                document.querySelectorAll('.menu-ui').forEach(m => m.style.display = 'none');
+                if(!isFlex) el.style.display = 'flex';
+            }
+        }
+        
+        // Listeners
+        document.getElementById('btn-menu-load-game').onclick = () => toggleMenu('load-game-menu');
+        document.getElementById('btn-back-load-menu').onclick = () => toggleMenu('main-menu');
+        document.getElementById('btn-close-main-menu').onclick = () => toggleMenu('main-menu'); 
+        document.getElementById('btn-menu-style').onclick = () => toggleMenu('styles-menu');
+        document.getElementById('btn-back-styles').onclick = () => toggleMenu('main-menu');
+        document.getElementById('btn-select').addEventListener('mousedown', () => toggleMenu('main-menu'));
+        
+        // Input Handling
+        function sendInput(label, isDown) {
+            const map = keyMap[label]; if(!map) return;
+            const code = map.keyCode || 0;
+            const event = new KeyboardEvent(isDown?'keydown':'keyup', {key:map.key, code:map.code, keyCode:code, which:code, bubbles:true});
+            window.dispatchEvent(event);
+        }
+        document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill').forEach(btn => {
+            const label = btn.getAttribute('data-label');
+            const handler = (e, down) => {
+                if(e.cancelable) e.preventDefault();
+                down ? btn.classList.add('pressed') : btn.classList.remove('pressed');
+                sendInput(label, down);
+            };
+            btn.addEventListener('mousedown', (e)=>handler(e,true)); btn.addEventListener('mouseup', (e)=>handler(e,false));
+            btn.addEventListener('touchstart', (e)=>handler(e,true)); btn.addEventListener('touchend', (e)=>handler(e,false));
+        });
 
-        // Responsive
+        // Theme & Resize
+        function applyTheme(themeName) {
+            const root = document.documentElement;
+            let m='#E83942', d='#b91c1c', b='#7f1d1d';
+            if(themeName==='purple'){m='#7c3aed';d='#4c1d95';b='#4c1d95';}
+            else if(themeName==='glacier'){m='#a5f3fc';d='#0891b2';b='#164e63';}
+            else if(themeName==='black'){m='#27272a';d='#18181b';b='#09090b';}
+            else if(themeName==='nannboy'){m='#f3f4f6';d='#9ca3af';b='#374151';}
+            root.style.setProperty('--console-main', m); root.style.setProperty('--console-dark', d); root.style.setProperty('--bg-color', b);
+        }
+        document.querySelectorAll('.theme-option').forEach(o => o.onclick = () => applyTheme(o.getAttribute('data-theme')));
+
         function scale() { 
             const w = document.getElementById('console-wrapper');
             const s = Math.min(1, window.innerWidth / 440);
