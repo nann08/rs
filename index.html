@@ -12,12 +12,12 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    <!-- CHANGED: REPLACED WASMBOY WITH LOCAL mGBA -->
-    <script src="mgba.js" onerror="window.mgbaScriptFailed = true;"></script>
+    <!-- CHANGED: Removed WasmBoy, Added your local mGBA script -->
+    <script src="mgba.js"></script>
 
     <script>
         (function() {
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const linkIcon = document.createElement('link'); linkIcon.rel = 'apple-touch-icon'; linkIcon.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkIcon);
             const linkFav32 = document.createElement('link'); linkFav32.rel = 'icon'; linkFav32.type = 'image/png'; linkFav32.sizes = '32x32'; linkFav32.href = `data:image/png;base64,${ICON_BASE64}`; document.head.appendChild(linkFav32);
             if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
@@ -39,19 +39,10 @@
         .power-led { width: 10px; height: 10px; background-color: #1c1c1c; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7); transition: background-color 0.2s; }
         .power-led.on { background-color: #ff0000; box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7); animation: led-glow 1.5s infinite alternate ease-in-out; }
         @keyframes led-glow { 0% { box-shadow: 0 0 5px #990000; opacity: 0.8; } 50% { box-shadow: 0 0 10px #ff0000; opacity: 1; } 100% { box-shadow: 0 0 5px #990000; opacity: 0.8; } }
-        /* SCREEN FIT FIX: Removed hard aspect ratio, allow content to fit */
         .lcd-screen { background-color: var(--screen-color); width: 320px; height: 240px; box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; transform: translate3d(0,0,0); backface-visibility: hidden; contain: paint; }
         .lcd-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(to right, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 200; }
         
-        /* UPDATED: Iframe Supercharged with Scaling */
-        iframe, canvas#rom-canvas { 
-            width: 100%; height: 100%; border: none; background-color: #000; 
-            /* VISIBILITY HIDDEN instead of display:none for better init compat */
-            visibility: hidden; position: absolute; top: 0; left: 0;
-            image-rendering: pixelated; 
-            /* FORCE FIT: This ensures the inner game scales down to fit the screen */
-            object-fit: contain; 
-        }
+        iframe, canvas#rom-canvas { width: 100%; height: 100%; border: none; background-color: #000; display: none; image-rendering: pixelated; object-fit: contain; }
         
         .menu-ui { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -145,12 +136,9 @@
         .debug-error { color: #ff5555; font-weight: bold; }
         .debug-warn { color: #ffaa00; }
         .debug-info { color: #88ccff; }
-        .debug-success { color: #00ff00; font-weight: bold; }
         
         /* Loading Overlay */
         #loading-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .loader-bar-bg { width: 70%; height: 4px; background: #333; margin-top: 10px; border-radius: 2px; }
-        #loader-bar-fill { width: 0%; height: 100%; background: #0f0; border-radius: 2px; transition: width 0.1s; }
         #loading-text { font-family: monospace; font-size: 10px; margin-top: 5px; color: #888; }
     </style>
 </head>
@@ -169,11 +157,8 @@
                 <div class="lens-branding"><div class="power-led" id="power-led"></div><div class="text-xs text-zinc-400 font-bold tracking-wider">BATTERY</div></div>
                 <div class="lcd-screen" id="lcd-screen">
                     
-                    <!-- LOADING OVERLAY -->
-                    <div id="loading-overlay">
-                        <div class="text-sm font-bold tracking-widest">SYSTEM DIAGNOSTIC</div>
-                        <div class="loader-bar-bg"><div id="loader-bar-fill"></div></div>
-                        <div id="loading-text">Checking file integrity...</div>
+                    <div id="loading-overlay" style="display:none;">
+                        <span id="loading-text">Loading...</span>
                     </div>
 
                     <div id="debug-console"></div>
@@ -181,26 +166,32 @@
                     
                     <iframe id="game-iframe" src="about:blank" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-write" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts" referrerpolicy="no-referrer"></iframe>
                     
+                    <!-- mGBA CANVAS -->
                     <canvas id="rom-canvas"></canvas>
 
                     <div id="main-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
+                        <!-- BUTTONS FOR LOADING -->
                         <div class="menu-btn" id="btn-menu-load-game">LOAD GAME</div>
                         <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
                         <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
                         <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
                     </div>
 
+                    <!-- REVISED LOAD GAME SUB-MENU -->
                     <div id="load-game-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">SELECT TYPE</h2>
                         <div class="menu-btn" id="btn-load-rom-action">ROM FILE</div>
                         <div class="menu-btn" id="btn-load-html-file">HTML FILE</div>
+                        <!-- Swapped to ZIP input to support mobile -->
                         <div class="menu-btn" id="btn-load-zip-web">WEB ZIP</div>
                         <button id="btn-back-load-menu" class="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Back</button>
                     </div>
                     
+                    <!-- Hidden Inputs -->
                     <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip" style="display:none">
                     <input type="file" id="file-input-html" accept=".html,text/html" style="display:none">
+                    <!-- WEB ZIP INPUT -->
                     <input type="file" id="file-input-zip-web" accept=".zip" style="display:none">
 
                     <div id="start-menu" class="menu-ui"><h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2><div class="text-xs text-center text-gray-500 mb-2">Use in-game saves.</div><button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button></div>
@@ -235,6 +226,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // DEBUG SYSTEM
         function debugLog(msg, type='info') {
             const consoleEl = document.getElementById('debug-console');
             if (consoleEl) {
@@ -246,54 +238,6 @@
                 consoleEl.scrollTop = consoleEl.scrollHeight;
             }
             console.log(`[Emulator] ${msg}`);
-        }
-        
-        window.onerror = function(message, source, lineno, colno, error) {
-            debugLog(`ERR: ${message} at ${source}:${lineno}`, 'error');
-            return false; 
-        };
-
-        // --- SELF DIAGNOSTIC TOOL ---
-        async function runSystemDiagnostics() {
-            debugLog("--- STARTING SYSTEM CHECK ---");
-            const loader = document.getElementById('loading-overlay');
-            const loaderText = document.getElementById('loading-text');
-            const loaderFill = document.getElementById('loader-bar-fill');
-            
-            // Step 1: Check mgba.js
-            if(loaderFill) loaderFill.style.width = '30%';
-            if (window.mgbaScriptFailed) {
-                 debugLog("FAIL: 'mgba.js' failed to load. Is it in the same folder?", 'error');
-                 if(loaderText) loaderText.textContent = "FATAL: mgba.js missing";
-                 return;
-            } else {
-                 debugLog("PASS: 'mgba.js' script tag detected.", 'success');
-            }
-
-            // Step 2: Check WASM accessibility
-            if(loaderFill) loaderFill.style.width = '60%';
-            try {
-                const response = await fetch('mgba.wasm', { method: 'HEAD' });
-                if (response.ok) {
-                    debugLog("PASS: 'mgba.wasm' found (HTTP 200).", 'success');
-                } else {
-                    debugLog(`FAIL: 'mgba.wasm' returned HTTP ${response.status}.`, 'error');
-                }
-            } catch (e) {
-                debugLog("FAIL: Could not fetch 'mgba.wasm'. Are you running on a local server?", 'error');
-                debugLog("NOTE: Browsers block 'file://' loading. Use a local server.", 'warn');
-            }
-
-            // Step 3: Check Environment
-            if(loaderFill) loaderFill.style.width = '100%';
-            if (typeof mGBA === 'undefined' && typeof Module === 'undefined') {
-                debugLog("WARN: mGBA engine not detected in global scope yet.", 'warn');
-            } else {
-                debugLog("PASS: Emulator engine ready.", 'success');
-                // Hide overlay if successful
-                setTimeout(() => { if(loader) loader.style.display = 'none'; }, 1000);
-            }
-            debugLog("--- CHECK COMPLETE ---");
         }
 
         const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
@@ -335,29 +279,35 @@
             if (!audioCtx) return;
             const t = audioCtx.currentTime;
             
+            // "Click" - Mechanical Switch Snap
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
+            // Triangle wave for a slightly softer but sharp click
             osc.type = 'triangle'; 
             osc.frequency.setValueAtTime(600, t);
+            // Fast frequency drop (pitch decay)
             osc.frequency.exponentialRampToValueAtTime(300, t + 0.03);
             
+            // Fast volume envelope
             gain.gain.setValueAtTime(0.15, t);
             gain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
             
             osc.start(t);
             osc.stop(t + 0.03);
 
+            // "Thock" - The Bottom Out sound
             const osc2 = audioCtx.createOscillator();
             const gain2 = audioCtx.createGain();
             osc2.connect(gain2);
             gain2.connect(audioCtx.destination);
             
+            // Sine for the thud/body of the sound
             osc2.type = 'sine'; 
             osc2.frequency.setValueAtTime(150, t);
-            osc2.frequency.exponentialRampToValueAtTime(100, t + 0.1); 
+            osc2.frequency.exponentialRampToValueAtTime(100, t + 0.1); // Slight drop
             
             gain2.gain.setValueAtTime(0.1, t);
             gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
@@ -386,19 +336,15 @@
 
         async function initFirebase() {
             loadTheme();
+            const loadingOverlay = document.getElementById('loading-overlay');
             if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
-                isAuthReady = true; loadKeyMap(); 
-                runSystemDiagnostics(); 
-                return;
+                if(loadingOverlay) loadingOverlay.style.display = 'none'; isAuthReady = true; loadKeyMap(); return;
             }
             try {
                 const app = initializeApp(firebaseConfig); auth = getAuth(app);
                 if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken); else await signInAnonymously(auth);
-                onAuthStateChanged(auth, (user) => { 
-                    userId = user ? user.uid : null; isAuthReady = true; loadKeyMap(); 
-                    runSystemDiagnostics();
-                });
-            } catch (error) { console.error("Auth Error:", error); runSystemDiagnostics(); }
+                onAuthStateChanged(auth, (user) => { userId = user ? user.uid : null; isAuthReady = true; loadKeyMap(); if(loadingOverlay) loadingOverlay.style.display = 'none'; });
+            } catch (error) { console.error("Auth Error:", error); if(loadingOverlay) loadingOverlay.innerHTML = "Offline Mode"; setTimeout(() => loadingOverlay.style.display = 'none', 1000); }
         }
 
         function loadKeyMap() { const storedMap = localStorage.getItem(keyMapStorageKey); if (storedMap) { try { keyMap = JSON.parse(storedMap); } catch (e) { } } renderBindings(); }
@@ -426,40 +372,22 @@
         }
         function handleVisualPress(element, isDown) { if (element) { if (isDown) element.classList.add('pressed'); else element.classList.remove('pressed'); } }
         
+        // --- INPUT HANDLING ---
         function sendInput(label, isDown) { 
             const mapping = keyMap[label];
             if (!mapping) return;
-
             const eventType = isDown ? 'keydown' : 'keyup';
             const keyCode = mapping.keyCode || 0; 
-
             if (gameMode === 'html') {
                 const iframe = document.getElementById('game-iframe');
                 if (iframe && iframe.contentWindow) {
-                    const eventData = {
-                        type: eventType,
-                        key: mapping.key,
-                        code: mapping.code || `Key${mapping.key.toUpperCase()}`,
-                        keyCode: keyCode,
-                        which: keyCode,
-                        bubbles: true
-                    };
-                    
+                    const eventData = { type: eventType, key: mapping.key, code: mapping.code || `Key${mapping.key.toUpperCase()}`, keyCode: keyCode, which: keyCode, bubbles: true };
                     iframe.contentWindow.postMessage(eventData, '*');
-
-                    if (label === 'Start' && isDown) {
-                        iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*');
-                    }
+                    if (label === 'Start' && isDown) { iframe.contentWindow.postMessage({ type: 'FORCE_SAVE' }, '*'); }
                 }
                 return;
             }
-
-             const event = new KeyboardEvent(eventType, {
-                key: mapping.key,
-                code: mapping.code || `Key${mapping.key.toUpperCase()}`,
-                keyCode: keyCode,
-                bubbles: true
-            });
+             const event = new KeyboardEvent(eventType, { key: mapping.key, code: mapping.code || `Key${mapping.key.toUpperCase()}`, keyCode: keyCode, bubbles: true });
             window.dispatchEvent(event);
         }
 
@@ -476,20 +404,13 @@
             currentMenu = 'keyselect'; document.getElementById('key-selection-modal').style.display = 'flex';
             document.getElementById('binding-label-display').textContent = label;
             const keypad = document.getElementById('virtual-keypad'); keypad.innerHTML = '';
-            const keys = [
-                {k:'1',c:'Digit1',d:'1', kc:49},{k:'2',c:'Digit2',d:'2', kc:50},{k:'3',c:'Digit3',d:'3', kc:51},{k:'4',c:'Digit4',d:'4', kc:52},{k:'5',c:'Digit5',d:'5', kc:53},
-                {k:'q',c:'KeyQ',d:'Q', kc:81},{k:'w',c:'KeyW',d:'W', kc:87},{k:'e',c:'KeyE',d:'E', kc:69},{k:'r',c:'KeyR',d:'R', kc:82},
-                {k:'a',c:'KeyA',d:'A', kc:65},{k:'s',c:'KeyS',d:'S', kc:83},{k:'d',c:'KeyD',d:'D', kc:68},{k:'f',c:'KeyF',d:'F', kc:70},
-                {k:'z',c:'KeyZ',d:'Z', kc:90},{k:'x',c:'KeyX',d:'X', kc:88},{k:'c',c:'KeyC',d:'C', kc:67},{k:'v',c:'KeyV',d:'V', kc:86},
-                {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},
-                {k:'ArrowUp',c:'ArrowUp',d:'↑', kc:38},{k:'ArrowDown',c:'ArrowDown',d:'↓', kc:40},
-                {k:'ArrowLeft',c:'ArrowLeft',d:'←', kc:37},{k:'ArrowRight',c:'ArrowRight',d:'→', kc:39}
-            ];
+            const keys = [{k:'1',c:'Digit1',d:'1'},{k:'2',c:'Digit2',d:'2'},{k:'3',c:'Digit3',d:'3'},{k:'4',c:'Digit4',d:'4'},{k:'5',c:'Digit5',d:'5'},{k:'q',c:'KeyQ',d:'Q'},{k:'w',c:'KeyW',d:'W'},{k:'e',c:'KeyE',d:'E'},{k:'r',c:'KeyR',d:'R'},{k:'a',c:'KeyA',d:'A'},{k:'s',c:'KeyS',d:'S'},{k:'d',c:'KeyD',d:'D'},{k:'f',c:'KeyF',d:'F'},{k:'z',c:'KeyZ',d:'Z'},{k:'x',c:'KeyX',d:'X'},{k:'c',c:'KeyC',d:'C'},{k:'v',c:'KeyV',d:'V'},{k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},{k:'ArrowUp',c:'ArrowUp',d:'↑'},{k:'ArrowDown',c:'ArrowDown',d:'↓'},{k:'ArrowLeft',c:'ArrowLeft',d:'←'},{k:'ArrowRight',c:'ArrowRight',d:'→'}];
             keys.forEach(vKey => { const btn = document.createElement('div'); btn.className = 'virtual-key-btn'; btn.textContent = vKey.display || vKey.d; btn.addEventListener('click', () => { keyMap[label] = { key: vKey.k, code: vKey.c, keyCode: vKey.kc || (vKey.k.length===1 ? vKey.k.toUpperCase().charCodeAt(0) : 0) }; saveKeyMap(); hideKeySelection(); }); keypad.appendChild(btn); });
         }
         function hideKeySelection() { document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding'); document.getElementById('key-selection-modal').style.display = 'none'; activeBindingLabel = null; currentMenu = 'keymap'; }
         
         function openMenu(menuId) { 
+            // Hide all menus first
             document.querySelectorAll('.menu-ui').forEach(el => { 
                 if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
                     el.style.display = 'none'; 
@@ -514,15 +435,42 @@
         }
         function toggleMenu(menuId) { if (currentMenu === menuId) closeAllMenus(); else openMenu(menuId); }
         
-        document.getElementById('btn-menu-load-game').addEventListener('click', () => { openMenu('load-game-menu'); });
-        document.getElementById('btn-back-load-menu').addEventListener('click', () => { openMenu('main-menu'); });
-        document.getElementById('btn-load-rom-action').addEventListener('click', () => { document.getElementById('file-input-rom').click(); });
-        document.getElementById('btn-load-html-file').addEventListener('click', () => { document.getElementById('file-input-html').click(); });
-        document.getElementById('btn-load-zip-web').addEventListener('click', () => { document.getElementById('file-input-zip-web').click(); });
-        document.getElementById('btn-menu-controls').addEventListener('click', () => { openMenu('key-binding-menu'); });
-        document.getElementById('btn-menu-style').addEventListener('click', () => { openMenu('styles-menu'); });
-        document.getElementById('btn-close-main-menu').addEventListener('click', () => { closeAllMenus(); });
+        // --- MENU LOGIC FOR HTML VS ROM ---
+        document.getElementById('btn-menu-load-game').addEventListener('click', () => {
+             // Go to sub menu
+             openMenu('load-game-menu');
+        });
+
+        document.getElementById('btn-back-load-menu').addEventListener('click', () => {
+             openMenu('main-menu');
+        });
+
+        document.getElementById('btn-load-rom-action').addEventListener('click', () => {
+             document.getElementById('file-input-rom').click();
+        });
+
+        document.getElementById('btn-load-html-file').addEventListener('click', () => {
+             document.getElementById('file-input-html').click();
+        });
+
+        // Use the ZIP input for "WEB FOLDER" (technically web zip) since folder upload is flaky on mobile
+        document.getElementById('btn-load-zip-web').addEventListener('click', () => {
+             document.getElementById('file-input-zip-web').click();
+        });
         
+        document.getElementById('btn-menu-controls').addEventListener('click', () => {
+             openMenu('key-binding-menu');
+        });
+        
+        document.getElementById('btn-menu-style').addEventListener('click', () => {
+             openMenu('styles-menu');
+        });
+
+        document.getElementById('btn-close-main-menu').addEventListener('click', () => {
+             closeAllMenus();
+        });
+        
+        // Attach sound to menu buttons
         function setupMenuSounds() {
             const clickables = document.querySelectorAll('.menu-btn, .upload-label, button');
             clickables.forEach(btn => {
@@ -533,12 +481,17 @@
             });
         }
 
+
+        // --- WEB ZIP UPLOAD HANDLER ---
         function handleWebZipUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            const fileStatus = document.getElementById('file-status'); // Might be hidden, but okay
+            
             closeAllMenus();
             
+            // Show loading...
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
@@ -548,22 +501,28 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 JSZip.loadAsync(e.target.result).then(async function(zip) {
+                    // 1. Map all files in ZIP to Blob URLs
                     const fileMap = {};
                     let indexHtmlPath = null;
+
+                    // We need to wait for all files to be read
                     const promises = [];
                     
                     zip.forEach((relativePath, zipEntry) => {
                         if (!zipEntry.dir) {
                              const promise = zipEntry.async("blob").then(blob => {
                                  const blobUrl = URL.createObjectURL(blob);
+                                 // Store by relative path (e.g. "game/index.html")
+                                 // Also store by filename just in case
                                  fileMap[relativePath] = blobUrl;
+                                 
+                                 // Simple name mapping for flat lookups
                                  const parts = relativePath.split('/');
                                  const fileName = parts[parts.length - 1];
                                  if(!fileMap[fileName]) fileMap[fileName] = blobUrl;
+
                                  if (fileName.toLowerCase() === 'index.html') {
-                                     if (!indexHtmlPath || (relativePath.includes('dist/') && !indexHtmlPath.includes('dist/'))) {
-                                         indexHtmlPath = relativePath;
-                                     }
+                                     indexHtmlPath = relativePath;
                                  }
                              });
                              promises.push(promise);
@@ -578,10 +537,12 @@
                         return;
                     }
                     
+                    // 2. Load the index.html content to inject our monkey patch
                     const indexBlobUrl = fileMap[indexHtmlPath];
                     const indexRes = await fetch(indexBlobUrl);
                     let htmlContent = await indexRes.text();
 
+                    // 3. Inject Monkey Patch
                     const monkeyPatchScript = `
                     <script>
                         (function() {
@@ -619,11 +580,11 @@
                                 mutations.forEach(mutation => {
                                     if (mutation.type === 'childList') {
                                         mutation.addedNodes.forEach(node => {
-                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK' || node.tagName === 'SOURCE') {
+                                            if (node.tagName === 'IMG' || node.tagName === 'SCRIPT' || node.tagName === 'LINK') {
                                                rewriteSrc(node);
                                             }
                                             if(node.querySelectorAll) {
-                                                node.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
+                                                node.querySelectorAll('img, script, link').forEach(rewriteSrc);
                                             }
                                         });
                                     } else if (mutation.type === 'attributes') {
@@ -632,42 +593,24 @@
                                 });
                             });
                             function rewriteSrc(node) {
-                                const attr = (node.tagName === 'LINK') ? 'href' : 'src';
+                                const attr = node.tagName === 'LINK' ? 'href' : 'src';
                                 const val = node.getAttribute(attr);
-                                if(val && !val.startsWith('blob:') && !val.startsWith('data:')) {
+                                if(val && !val.startsWith('blob:')) {
                                     const resolved = resolve(val);
                                     if(resolved !== val) node.setAttribute(attr, resolved);
                                 }
                             }
                             observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'href'] });
                             window.addEventListener('DOMContentLoaded', () => {
-                                 document.querySelectorAll('img, script, link, source').forEach(rewriteSrc);
-                            });
-                            try {
-                                const originalSetItem = window.localStorage.setItem;
-                                const originalGetItem = window.localStorage.getItem;
-                                const GAME_ID = "nann_boy_save_";
-                                window.localStorage.setItem = function(key, value) {
-                                    originalSetItem.call(window.localStorage, key, value);
-                                    window.parent.postMessage({ type: 'SAVE_STATE', key: GAME_ID + key, value: value }, '*');
-                                };
-                                window.parent.postMessage({ type: 'LOAD_REQUEST', prefix: GAME_ID }, '*');
-                                window.addEventListener('message', (e) => {
-                                    if(e.data.type === 'LOAD_DATA') {
-                                        const cleanKey = e.data.key.replace(GAME_ID, '');
-                                        originalSetItem.call(window.localStorage, cleanKey, e.data.value);
-                                    }
-                                });
-                            } catch(e) { }
-                            window.addEventListener('keydown', (e) => {
-                                if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
-                                    e.preventDefault();
-                                }
+                                 document.querySelectorAll('img, script, link').forEach(rewriteSrc);
                             });
                         })();
                     <\/script>
-                    <style>html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; } canvas { max-width: 100%; max-height: 100%; object-fit: contain; }</style>`;
+                    `;
+                    
                     htmlContent = htmlContent.replace('<head>', '<head>' + monkeyPatchScript);
+                    
+                    // 4. Launch in Iframe
                     const finalBlob = new Blob([htmlContent], { type: 'text/html' });
                     const finalUrl = URL.createObjectURL(finalBlob);
                     
@@ -680,7 +623,7 @@
                             iframe.onload = null;
                             gameMode = 'html';
                             iframe.style.display = 'block';
-                            romCanvas.style.visibility = 'hidden'; 
+                            romCanvas.style.display = 'none';
                             startScreen.style.display = 'none';
                             iframe.contentWindow.focus();
                             powerLed.classList.add('on');
@@ -689,6 +632,7 @@
                     iframe.src = finalUrl;
 
                 }).catch(err => {
+                    console.error(err);
                     alert("Failed to unzip game: " + err.message);
                     loadingOverlay.style.display = 'none';
                 });
@@ -713,26 +657,24 @@
                 const fitStyle = `<style>html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;}canvas{max-width:100%;max-height:100%;object-fit:contain;transform:translateZ(0);will-change:transform;}</style>`;
                 const bridgeScript = `<script>window.addEventListener('message',function(e){if(e.data.type==='keydown'||e.data.type==='keyup'){var ev=new KeyboardEvent(e.data.type,{key:e.data.key,code:e.data.code,keyCode:e.data.keyCode,which:e.data.keyCode,bubbles:true,cancelable:true,view:window});document.dispatchEvent(ev);window.dispatchEvent(ev);}});<\/script>`;
                 htmlContent = fitStyle + htmlContent + bridgeScript;
-                try { const blob = new Blob([htmlContent], { type: 'text/html' }); const blobUrl = URL.createObjectURL(blob); iframe.onload = () => { URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null; gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.visibility = 'hidden'; startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on'); }; iframe.src = blobUrl; } catch (error) { }
+                try { const blob = new Blob([htmlContent], { type: 'text/html' }); const blobUrl = URL.createObjectURL(blob); iframe.onload = () => { URL.revokeObjectURL(blobUrl); closeAllMenus(); iframe.onload = null; gameMode = 'html'; iframe.style.display = 'block'; romCanvas.style.display = 'none'; startScreen.style.display = 'none'; iframe.contentWindow.focus(); powerLed.classList.add('on'); }; iframe.src = blobUrl; } catch (error) { }
             };
             reader.readAsText(file);
         }
 
+        // =================================================================
+        // ==== mGBA SECTION (Replaced WasmBoy Logic) ======================
+        // =================================================================
+        
+        // 1. CONFIGURE THE MODULE
         var Module = {
             canvas: document.getElementById('rom-canvas'),
             noInitialRun: true, 
             print: function(text) { debugLog("STDOUT: " + text); },
             printErr: function(text) { debugLog("STDERR: " + text, 'error'); },
-            setStatus: function(text) {
-                if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-                if (text === Module.setStatus.last.text) return;
-                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-                if (m) { debugLog("Downloading: " + m[2] + "/" + m[4]); }
-                else { debugLog("Status: " + text); }
-                const loader = document.getElementById('loading-text');
-                if(loader) loader.textContent = text;
-            },
+            // This locator forces mGBA to look for mgba.wasm in the same folder
             locateFile: function(path, prefix) {
+                if (path.endsWith('.wasm')) return 'mgba.wasm';
                 return prefix + path;
             },
             onAbort: function(what) {
@@ -741,6 +683,7 @@
             }
         };
 
+        // 2. FILE INPUT LISTENER
         document.getElementById('file-input-rom').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const powerLed = document.getElementById('power-led');
@@ -751,7 +694,7 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
-                loadingOverlay.innerHTML = `<span class="text-xs tracking-widest font-bold mb-2">SYSTEM BOOT</span><div class="loader-bar-bg"><div id="loader-bar-fill"></div></div><div id="loading-text" class="mt-2 text-xs">Reading File...</div>`;
+                loadingOverlay.innerHTML = `<span id="loading-text">Loading ROM...</span>`;
             }
 
             const isZip = file.name.toLowerCase().endsWith('.zip');
@@ -783,9 +726,11 @@
             }
         });
 
+        // 3. LAUNCH FUNCTION (The "Bridge")
         function launchMgba(romData, romName) {
             const loadingOverlay = document.getElementById('loading-overlay');
             
+            // Check if engine is loaded
             if (window.mgbaScriptFailed || (typeof mGBA === 'undefined' && typeof Module.loadFile === 'undefined')) {
                 alert("CRITICAL ERROR: mgba.js failed to load. The emulator engine is missing.");
                 if(loadingOverlay) loadingOverlay.style.display = 'none';
@@ -793,6 +738,7 @@
             }
 
             try {
+                // Initialize the engine (modern factory pattern)
                 if (typeof mGBA === 'function') {
                     if (!window.Emulator) {
                         debugLog("Initializing mGBA Engine...");
@@ -827,6 +773,7 @@
             }
         }
 
+        // 4. RUN GAME (The "Start" Button)
         function runGame(instance, romData, romName) {
             const romCanvas = document.getElementById('rom-canvas');
             const startScreen = document.getElementById('start-screen');
@@ -836,9 +783,11 @@
             
             try {
                 debugLog("Writing ROM to FS: " + romName);
+                // Upload file to emulator's virtual filesystem
                 instance.FS.writeFile(romName, romData);
                 
                 debugLog("Launching ROM...");
+                // Command mGBA to start the main loop
                 if (instance.loadFile) {
                     instance.loadFile(romName);
                 } else if (instance.callMain) {
@@ -850,9 +799,7 @@
                 gameMode = 'rom';
                 startScreen.style.display = 'none';
                 gameIframe.style.display = 'none';
-                
-                romCanvas.style.visibility = 'visible';
-                
+                romCanvas.style.display = 'block'; // Show the screen!
                 powerLed.classList.add('on');
                 if(loadingOverlay) loadingOverlay.style.display = 'none';
                 debugLog("Game Running.");
@@ -863,6 +810,7 @@
                 if(loadingOverlay) loadingOverlay.style.display = 'none';
             }
         }
+        // ==== END mGBA SECTION ===========================================
 
         function setupControlListeners() {
             const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill'); const TAP_THRESHOLD_MS = 300; 
@@ -881,12 +829,16 @@
             gameControls.forEach(control => { control.addEventListener('touchstart', handleStart, { passive: false }); control.addEventListener('mousedown', handleStart); control.addEventListener('touchend', handleEnd); control.addEventListener('mouseup', handleEnd); control.addEventListener('mouseleave', handleEnd); });
             document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu')); document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
             document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
+            // Folder Upload (via ZIP)
             document.getElementById('file-input-zip-web')?.addEventListener('change', handleWebZipUpload); 
+            
+            // NOTE: file-input-rom listener is added in the mGBA section above
             
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection); document.getElementById('close-install')?.addEventListener('click', () => { document.getElementById('install-prompt').style.display = 'none'; });
             document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus); document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => { option.addEventListener('click', () => { const theme = option.getAttribute('data-theme'); applyTheme(theme); }); });
             window.addEventListener('keydown', handleGlobalKey); window.addEventListener('keyup', handleGlobalKey);
+            
             setupMenuSounds();
         }
         function checkStandalone() { const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; if (isIOS && !isStandalone) setTimeout(() => { document.getElementById('install-prompt').style.display = 'flex'; }, 3000); }
